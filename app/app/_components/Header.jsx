@@ -18,7 +18,7 @@ function Header() {
                         <DollarSign className='font-bold text-white' alt='Dollar' size={12} />
                     </div>
                     <span className='font-bold text-primary'>
-                        {userDetail.credits}
+                        {userDetail?.credits}
                     </span>
 
                 </div>

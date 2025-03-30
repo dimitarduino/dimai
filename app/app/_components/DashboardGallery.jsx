@@ -17,7 +17,7 @@ function DashboardGallery({imagesGallery}) {
           <div className="overflow-hidden rounded-sm shadow-sm">
             <Image 
               src={image.src} 
-              alt={image.alt} 
+              alt={image.alt || `Gallery one`} 
               width={400} 
               height={300} 
               layout="responsive"

@@ -46,7 +46,7 @@ function SideNav() {
     }, {
         id: 7,
         name: "Video Dubbing",
-        path: "/app/speech-text",
+        path: "/app/dubbing",
         icon: Video,
         sub: []
     }]

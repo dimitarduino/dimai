@@ -16,14 +16,16 @@ function Provider({ children }) {
     const res = await db.select().from(Users)
       .where(eq(Users.email, user?.primaryEmailAddress?.emailAddress));
 
-    console.log(res);
-
-    if (!res[0]) {
-      const dodaeno = await db.insert(Users).values({
-        ime: user.fullName,
+    if (!!res[0] == false) {
+      let vrednosti = {
+        ime: user?.fullName || user?.primaryEmailAddress?.emailAddress,
         email: user?.primaryEmailAddress?.emailAddress,
-        slika: user?.imageUrl
-      })
+        slika: user?.imageUrl,
+        credits: 50,
+      };
+      const dodaeno = await db.insert(Users).values(vrednosti)
+    } else {
+  
     }
 
 

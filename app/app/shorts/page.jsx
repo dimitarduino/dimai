@@ -26,11 +26,10 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className='px-10 py-10'>
       <div className="justify-between items-center flex">
         <h2 className='font-bold text-2xl text-primary'>Dashboard</h2>
         <Link href="/app/shorts/create">
-
           <Button>+ Create New</Button>
         </Link>
       </div>

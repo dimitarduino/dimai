@@ -20,7 +20,7 @@ function DashboaardLayout({ children }) {
 
   const getUserDetails = async () => {
     const res = await db.select().from(Users).where(eq(Users.email, user.primaryEmailAddress.emailAddress))
-
+    console.log('eve novo')
 
     setUserDetail(res[0]);
   }

@@ -126,3 +126,19 @@
   width: 2.5rem;
   height: 2.5rem;
 }
+
+@keyframes moveImage {
+  0% {
+    transform: translateY(-20px);
+  }
+  50% {
+    transform: translateY(20px);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
+}
+
+.animated-image {
+  animation: moveImage 10s ease-in-out infinite; /* 2s for duration, infinite for loop */
+}

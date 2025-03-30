@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
@@ -8,11 +8,24 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 import SelectMode from "../_components/SelectMode";
 import PromptInput from "../_components/PromptInput";
+import { useDropzone } from 'react-dropzone';
 import PromptImage from "../_components/PromptImage";
 import SelectComponent from "../_components/SelectComponent";
-import { CloudFog } from "lucide-react";
+import { CloudFog, UploadCloud, X } from "lucide-react";
+import Image from "next/image";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import CustomLoading from "../_components/CustomLoading";
 
-export default function UpscaleImage() {
+export default function DubbedVideo() {
     const [file, setFile] = useState(null);
     const [audioInput, setAudioInput] = useState();
     const [resultVideo, setResultVideo] = useState();
@@ -23,6 +36,9 @@ export default function UpscaleImage() {
     const [modifiedImage, setModifiedImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState([]);
+    const [openedResult, setOpenedResult] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState();
+
     const languages = ["None", "Afrikaans", "Amharic", "Armenian", "Assamese", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian",
         "Burmese", "Cantonese", "Catalan", "Cebuano", "Central Kurdish", "Croatian", "Czech", "Danish", "Dutch",
         "Egyptian Arabic", "English", "Estonian", "Finnish", "French", "Galician", "Ganda", "Georgian", "German",
@@ -83,9 +99,6 @@ export default function UpscaleImage() {
     }
 
     const generateDubbedVideo = async (audioUrl, videoUrl) => {
-        console.log(audioUrl);
-        console.log(videoUrl);
-
         const data = await axios.post(`/api/dub-video`, {
             videoUrl: videoUrl,
             dubbedAudioUrl: audioUrl
@@ -93,6 +106,8 @@ export default function UpscaleImage() {
             console.log(res.data);
             if (!!res.data.result) {
                 setResultVideo(res.data.result);
+                setOpenedResult(true);
+                setUploading(false)
                 setLoading(false);
             }
         });
@@ -163,57 +178,115 @@ export default function UpscaleImage() {
         }
     };
 
+    const onDrop = useCallback((acceptedFiles) => {
+        setUploadedImage(null);
+        console.log(acceptedFiles)
+        const fileAttached = acceptedFiles[0];
+        setFile(fileAttached);
+
+        console.log(URL.createObjectURL(fileAttached));
+    
+        setUploadedImage(URL.createObjectURL(fileAttached));
+
+        // Reset any previous results or states
+        setResultVideo(null);
+        setResultAudio(null);
+        setResultText(null);
+        setDownloadUrl(null);
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: 'video/*',
+        multiple: false,
+    });
+
     return (
-        <div className="flex max-w-3xl mx-auto border border-gray-3-50 rounded-md py-10 flex-col items-center space-y-4 p-4">
-            <PromptImage accept="video/*" name={`video`} handleFileChange={handleFileChange} onUserSelect={naPromenaInput} title={`Upload your video file`} description={`Video`} />
+        <div className="w-full flex">
+            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+                <h1 className="font-bold text-3xl text-primary">Bring Your Videos to Life with AI Dubbing</h1>
+                <h2>
+                    Effortlessly dub your videos into multiple languages with AI-powered voiceovers. Upload your video and get a natural, high-quality dubbed version in seconds.
+                </h2>
 
-
-
-            <div className="border border-3 border-primary w-full"></div>
-            <SelectComponent optionsAvailable={languagesSpeak} className="w-full" onUserSelect={naPromenaInput} placeholder="Target Language Audio" name="targetLanguageAudio" description="Target Language Audio" title="Language of your target" />
-
-
-            <Button className={`w-full py-6 text-xl cursor-pointer`} onClick={handleUpload} disabled={uploading}>
-                {uploading ? "Generating..." : "Generate"}
-            </Button>
-            <div className="grid grid-cols-2 w-full gap-24">
-                {
-                    !!downloadUrl && (
+                <h2 className='font-bold text-xl text-primary pb-0 mb-0'>{`Upload your video`}</h2>
+                <p className='text-gray-500 pb-0 mb-0'>{`Upload your video and get a natural, high-quality dubbed version in seconds.`}</p>
+                <div className="flex flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
+                    <input {...getInputProps()} />
+                    {uploadedImage ? (
                         <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">Uploaded audio:</span>
                             <video controls>
-                                <source src={downloadUrl} type="video/mp4" />
+                                <source src={uploadedImage} type="video/mp4" />
                             </video>
+
+                            <div className="flex text-primary mt-4 gap-x-2 items-center justify-center font-bold">
+                                <UploadCloud size={22} />
+                                <span>Or choose another video...</span>
+                            </div>
+
                         </div>
-                    )
-                }
-                {
-                    (resultText || resultVideo) && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">Result:</span>
-                            {resultVideo && (
-                                <video controls>
-                                    <source src={resultVideo} type="video/mp4" />
-                                </video>
+                    ) : (
+                        <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
+                            <UploadCloud size={48} className="mb-2" />
+                            {isDragActive ? (
+                                <p>Drop the video here...</p>
+                            ) : (
+                                <p>Drag & drop an video here, or click to select</p>
                             )}
-
-
-                            {resultText && (
-                                <p className="font-bold text-3xl">"{resultText}"</p>
-                            )}
-
-                            <Button className={`py-6 mt-5`} onClick={() => handleDownload(resultVideo)}>Download file</Button>
                         </div>
-                    )
-                }
-                {
-                    (loading && downloadUrl && !resultVideo) && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">Please wait...</span>
-                            <div className="w-full h-[400px] object-cover bg-blue-50 rounded-md h-[400px] flex items-center text-primary font-bold text-2xl justify-center">loading...</div>
+                    )}
+                </div>
+
+                <div className="border border-3 border-primary w-full"></div>
+                <SelectComponent optionsAvailable={languagesSpeak} className="w-full" onUserSelect={naPromenaInput} placeholder="Choose Dubbing Language" name="targetLanguageAudio" description="Select the language for your video dubbing" title="Choose Dubbing Language" />
+
+
+                <Button className={`w-full py-6 text-xl cursor-pointer`} onClick={handleUpload} disabled={uploading}>
+                    {uploading ? "Uploading..." : "Generate"}
+                </Button>
+
+                {resultVideo && (
+                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                        See your result
+                    </Button>
+                )}
+
+                <CustomLoading title="Generating your video..." loading={loading} />
+
+                <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+                    <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                        <DialogHeader>
+                            <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
+                            <DialogDescription className={`text-md`}>
+                                Your video has been dubbed! ✨ <br /> the seamless voiceover with accurate translations and AI-powered precision.
+                            </DialogDescription>
+
+                            <DialogClose asChild>
+                                <button
+                                    className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
+                                >
+                                    <X size={24} />
+                                </button>
+                            </DialogClose>
+                        </DialogHeader>
+                        <div className="grid pb-2 grid-cols-1 w-full gap-12">
+                            {
+                                resultVideo && (
+                                    <div className="flex flex-col">
+                                        <video controls className="rounded-md">
+                                            <source src={resultVideo} type="video/mp4" />
+                                        </video>
+
+
+                                        <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(resultVideo)}>Download Video</Button>
+                                    </div>
+                                )
+                            }
                         </div>
-                    )
-                }
+                        <DialogFooter>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
             </div>
         </div>

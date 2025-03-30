@@ -21,7 +21,7 @@ function CustomLoading({ loading, title='Generating your video' }) {
             <AlertDialogTitle></AlertDialogTitle>
             <AlertDialogContent className={`border-4 border-primary py-14`}>
                 <div className=" flex flex-col items-center justify-center">
-                    <Image alt="Loading" src={'/loading.gif'} width={100} height={100} />
+                    <Image alt="Loading" src={'/loading.gif?32'} width={100} height={100} />
                     <h2 className="text-primary text-3xl font-bold">{title}...</h2>
                 </div>
             </AlertDialogContent>
