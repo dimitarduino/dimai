@@ -17,7 +17,9 @@ import { toast } from 'sonner';
 import { eq } from 'drizzle-orm';
 
 function CreateNew() {
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({
+    topic: "Random AI Story"
+  });
   const [loading, setLoading] = useState(false);
   const [audioFileUrl, setAudioFileUrl] = useState("");
   const [videoScript, setVideoScript] = useState([]);
@@ -31,6 +33,7 @@ function CreateNew() {
   const { videoData, setVideoData } = useContext(VideoDataContext);
 
   const naPromenaInput = (ime, vrednost) => {
+  
     setFormData(prev => ({
       ...prev,
       [ime]: vrednost
@@ -119,6 +122,7 @@ function CreateNew() {
   }
 
   const onCreateClickHandler = () => {
+    console.log(formData)
     if (userDetail.credits >= 10) {
 
     } else {

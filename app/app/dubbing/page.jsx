@@ -35,7 +35,9 @@ export default function DubbedVideo() {
     const [downloadUrl, setDownloadUrl] = useState(null);
     const [modifiedImage, setModifiedImage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState([]);
+    const [formData, setFormData] = useState({
+        targetLanguageAudio: "Spanish"
+    });
     const [openedResult, setOpenedResult] = useState(false);
     const [uploadedImage, setUploadedImage] = useState();
 
@@ -185,7 +187,7 @@ export default function DubbedVideo() {
         setFile(fileAttached);
 
         console.log(URL.createObjectURL(fileAttached));
-    
+
         setUploadedImage(URL.createObjectURL(fileAttached));
 
         // Reset any previous results or states
@@ -212,7 +214,7 @@ export default function DubbedVideo() {
                 <h2 className='font-bold text-xl text-primary pb-0 mb-0'>{`Upload your video`}</h2>
                 <p className='text-gray-500 pb-0 mb-0'>{`Upload your video and get a natural, high-quality dubbed version in seconds.`}</p>
                 <div className="flex flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
-                    <input {...getInputProps()} />
+                    <input {...getInputProps()} key={file?.name} />
                     {uploadedImage ? (
                         <div className="flex flex-col">
                             <video controls>
@@ -238,7 +240,7 @@ export default function DubbedVideo() {
                 </div>
 
                 <div className="border border-3 border-primary w-full"></div>
-                <SelectComponent optionsAvailable={languagesSpeak} className="w-full" onUserSelect={naPromenaInput} placeholder="Choose Dubbing Language" name="targetLanguageAudio" description="Select the language for your video dubbing" title="Choose Dubbing Language" />
+                <SelectComponent defaultValue="Spanish" optionsAvailable={languagesSpeak} className="w-full" onUserSelect={naPromenaInput} placeholder="Choose Dubbing Language" name="targetLanguageAudio" description="Select the language for your video dubbing" title="Choose Dubbing Language" />
 
 
                 <Button className={`w-full py-6 text-xl cursor-pointer`} onClick={handleUpload} disabled={uploading}>
