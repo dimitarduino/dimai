@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
@@ -8,7 +8,21 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 import SelectMode from "../_components/SelectMode";
 import PromptInput from "../_components/PromptInput";
+import { useDropzone } from "react-dropzone";
+import { SmileIcon, UploadCloud, UploadCloudIcon, X } from "lucide-react";
 import PromptImage from "../_components/PromptImage";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import Image from "next/image";
+import CustomLoading from "../_components/CustomLoading";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -18,7 +32,10 @@ export default function UpscaleImage() {
     const [swapUrl, setSwapUrl] = useState(null);
     const [modifiedImage, setModifiedImage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState();
+    const [swapImage, setSwapImage] = useState();
     const [formData, setFormData] = useState([]);
+    const [openedResult, setOpenedResult] = useState(false);
 
 
     const naPromenaInput = (ime, vrednost) => {
@@ -28,28 +45,17 @@ export default function UpscaleImage() {
         }));
     }
 
-    const handleFileChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0]);
-        }
-    };
-
-    const handleSwapFileChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
-            setSwap(event.target.files[0]);
-        }
-    };
-
     const generateImageFromStyle = async (imageUrl, swapImageUrl) => {
         setLoading(true);
-        console.log(imageUrl, swapImageUrl);
+
         const data = await axios.post("/api/faceswap", {
             swapImageUrl: swapImageUrl,
             imageUrl: imageUrl
 
         }).then(res => {
+            setOpenedResult(true);
             setLoading(false);
-            // console.log(res);
+
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
             }
@@ -116,7 +122,7 @@ export default function UpscaleImage() {
         if (!swap) return alert("Please select a file first!");
         // setDownloadUrl(null);
         // setSwapUrl(null);
-        // setModifiedImage(null)
+        setModifiedImage(null)
         // console.log(formData);
         // generateImageFromStyle();
         setUploading(true);
@@ -142,45 +148,146 @@ export default function UpscaleImage() {
         );
     };
 
+
+    const onDrop = useCallback((acceptedFiles) => {
+        const file = acceptedFiles[0];
+        setFile(file);
+        naPromenaInput("image", file);
+        setUploadedImage(URL.createObjectURL(file));
+    }, []);
+
+    const onDropSwap = useCallback((acceptedFiles) => {
+        const file = acceptedFiles[0];
+        setSwap(file);
+        naPromenaInput("swap", file);
+        setSwapImage(URL.createObjectURL(file));
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: 'image/*',
+        multiple: false,
+    });
+
+    const { getRootProps: getSwapRootProps, getInputProps: getSwapInputProps, isDragActive: isSwapDragActive } = useDropzone({
+        onDrop: onDropSwap,
+        accept: 'image/*',
+        multiple: false,
+    });
+
+
     return (
-        <div className="flex flex-col items-center space-y-4 p-4">
-           
-            <PromptImage name={`image`} handleFileChange={handleFileChange} onUserSelect={naPromenaInput} title={`Upload your image`} description={`Image`} />
-            <PromptImage name={`swap`} handleFileChange={handleSwapFileChange} onUserSelect={naPromenaInput} title={`Upload your swap image`} description={`Swap image`} />
-            
-           
-            <Button onClick={handleUpload} disabled={uploading}>
-                {uploading ? "Uploading..." : "Upload Image"}
-            </Button>
-            <div className="grid grid-cols-2 w-full gap-24 mt-24">
-                {
-                    !!downloadUrl && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">Before:</span>
-                            <img className="w-full max-h-[400px] object-cover rounded-md" src={downloadUrl} alt="" />
-                        </div>
-                    )
-                }
-                {
-                    modifiedImage && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">After:</span>
-                            <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={modifiedImage} alt="" />
+        <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+            <h1 className="font-bold text-3xl text-primary">Swap Faces Instantly with AI</h1>
+            <h2>
+                Transform your images with seamless AI-powered face swapping. Upload your photo and let AI create a natural, high-quality swap in just seconds.
+            </h2>
 
-                            <Button className={`py-6 mt-5`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
-                        </div>
-                    )
-                }
-                {
-                    (loading && downloadUrl) && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">After:</span>
-                            <div className="w-full h-[400px] object-cover bg-blue-50 rounded-md h-[400px] flex items-center text-primary font-bold text-2xl justify-center">loading...</div>
-                        </div>
-                    )
-                }
 
+            <div className="grid grid-cols-2 gap-12">
+                <div className="flex flex-col gap-2">
+                    <h2 className='font-bold border-top border-neutral-200 border-t-1 pt-4 text-xl text-primary'>{`Upload your image`}</h2>
+                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        {uploadedImage ? (
+                            <div className="flex flex-col">
+                                <Image src={uploadedImage} alt="Uploaded" width={300} height={300} className="rounded-lg w-full max-w-sm" />
+                                <div className="flex text-primary mt-4 gap-x-2 items-center justify-center font-bold">
+                                    <UploadCloudIcon size={22} />
+                                    <span>Or choose another image...</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
+                                <UploadCloudIcon size={48} className="mb-2" />
+                                {isDragActive ? (
+                                    <p>Drop the image here...</p>
+                                ) : (
+                                    <p>Drag & drop an image here, or click to select</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <h2 className='font-bold border-top border-neutral-200 border-t-1 pt-4 text-xl text-primary'>{`Upload Swap Image`}</h2>
+                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getSwapRootProps()}>
+                        <input {...getSwapInputProps()} />
+                        {swapImage ? (
+                            <div className="flex flex-col">
+                                <Image src={swapImage} alt="Uploaded" width={300} height={300} className="rounded-lg w-full max-w-sm" />
+                                <div className="flex text-primary mt-4 gap-x-2 items-center justify-center font-bold">
+                                    <SmileIcon size={22} />
+                                    <span>Or choose another image...</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
+                                <SmileIcon size={48} className="mb-2" />
+                                {isSwapDragActive ? (
+                                    <p>Drop the image here...</p>
+                                ) : (
+                                    <p>Drag & drop an image here, or click to select</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                </div>
             </div>
+
+            <Button className={`py-6 cursor-pointer`} onClick={handleUpload} disabled={uploading}>
+                {uploading ? "Uploading..." : "Swap face"}
+            </Button>
+
+            {modifiedImage && (
+                <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                    See your result
+                </Button>
+            )}
+
+            <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+                <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
+                        <DialogDescription className={`text-md`}>
+                            Your image has been successfully processed! ✨ <br />The background is now removed, leaving you with a clean, high-quality cutout.
+                        </DialogDescription>
+
+                        <DialogClose asChild>
+                            <button
+                                className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
+                            >
+                                <X size={24} />
+                            </button>
+                        </DialogClose>
+                    </DialogHeader>
+                    <div className="grid py-4 grid-cols-2 w-full gap-12">
+                        {
+                            !!downloadUrl && (
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-2xl text-center text-primary mb-4">Your image:</span>
+                                    <img className="w-full max-h-[400px] object-cover rounded-md" src={downloadUrl} alt="" />
+                                </div>
+                            )
+                        }
+                        {
+                            modifiedImage && (
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-2xl text-primary text-center mb-4">Result:</span>
+                                    <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={modifiedImage} alt="" />
+
+                                    <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
+                                </div>
+                            )
+                        }
+                    </div>
+                    <DialogFooter>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <CustomLoading title="Generating your image..." loading={loading} />
         </div>
     );
 }
