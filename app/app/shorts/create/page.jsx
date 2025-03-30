@@ -1,17 +1,17 @@
 "use client"
 import React, { useContext, useEffect, useState } from 'react'
-import SelectTopic from '../_components/SelectTopic'
-import SelectStyle from '../_components/SelectStyle';
-import SelectDuration from '../_components/SelectDuration';
+import SelectTopic from '../../_components/SelectTopic'
+import SelectStyle from '../../_components/SelectStyle';
+import SelectDuration from '../../_components/SelectDuration';
 import { Button } from '@/ui/button';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import CustomLoading from '../_components/CustomLoading';
+import CustomLoading from '../../_components/CustomLoading';
 import { VideoDataContext } from 'app/_context/VideoDataContext';
 import { db } from 'configs/db';
 import { useUser } from '@clerk/nextjs';
 import { Users, VideoData } from 'configs/schema';
-import PlayerDialog from '../_components/PlayerDialog';
+import PlayerDialog from '../../_components/PlayerDialog';
 import { UserDetailContext } from 'app/_context/UserDetailContext';
 import { toast } from 'sonner';
 import { eq } from 'drizzle-orm';
@@ -25,10 +25,10 @@ function CreateNew() {
   const [imageList, setImageList] = useState([]);
   const [playVideo, setPlayVideo] = useState(false);
   const [videoId, setVideoId] = useState();
-  const {userDetail, setUserDetail} = useContext(UserDetailContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
   const { user } = useUser();
-  const {videoData, setVideoData} = useContext(VideoDataContext);
+  const { videoData, setVideoData } = useContext(VideoDataContext);
 
   const naPromenaInput = (ime, vrednost) => {
     setFormData(prev => ({
@@ -107,7 +107,7 @@ function CreateNew() {
       }).then(async (res) => {
         images.push(res.data.result);
       })
-    } 
+    }
 
     // console.log(images)
     setVideoData((prev) => ({
@@ -133,7 +133,7 @@ function CreateNew() {
       credits: userDetail?.credits - 10
     }).where(eq(Users.email, userDetail.email))
 
-    setUserDetail(prev=> ({
+    setUserDetail(prev => ({
       ...prev,
       "credits": userDetail.credits - 10
     }))
@@ -157,7 +157,7 @@ function CreateNew() {
       captions: videoData.captions,
       images: videoData.imageList,
       createdBy: user.primaryEmailAddress.emailAddress
-    }).returning({id: VideoData.id});
+    }).returning({ id: VideoData.id });
 
     await updateUserCredits();
     setVideoId(result[0].id);
@@ -166,13 +166,13 @@ function CreateNew() {
   }
 
   return (
-    <div className='md:px-20'>
-      <h2 className="font-bold text-4xl text-primary text-center">
-        Create New
-      </h2>
-
-      <div className='mt-10 shadow-md p-10 flex flex-col gap-7'>
+    <div className='md:px-20 max-w-7xl mx-auto'>
+      <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
         {/* Select Topic */}
+        <h1 className="font-bold text-3xl text-primary">Create Stunning Shorts with AI</h1>
+        <h2>
+          Effortlessly generate eye-catching shorts using the power of AI. Upload your video, and let the technology craft a short, high-quality clip with precise edits and enhancements in just a few seconds.
+        </h2>
         <SelectTopic onUserSelect={naPromenaInput} />
         {/* Select style */}
         <SelectStyle onUserSelect={naPromenaInput} />
@@ -180,7 +180,7 @@ function CreateNew() {
         <SelectDuration onUserSelect={naPromenaInput} />
         {/* Create Button */}
         <Button onClick={onCreateClickHandler} className="p-6 cursor-pointer">Create short AI Video</Button>
-    
+
         <CustomLoading loading={loading} />
         <PlayerDialog playVideo={playVideo} videoId={videoId} />
       </div>

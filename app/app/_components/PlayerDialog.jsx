@@ -72,7 +72,7 @@ function PlayerDialog({ playVideo, videoId }) {
                     />
 
                     <div className="grid mt-6 grid-cols-2 gap-12">
-                        <Button onClick={() => { router.replace("/dashboard"); setOpenDialog(false) }} className={`py-6 cursor-pointer`} variant={`ghost`}>Cancel</Button>
+                        <Button onClick={() => { router.replace("/app/shorts"); setOpenDialog(false) }} className={`py-6 cursor-pointer`} variant={`ghost`}>Cancel</Button>
                         <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer`}>Export</Button>
                     </div>
                     <DialogDescription>

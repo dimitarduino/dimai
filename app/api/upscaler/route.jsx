@@ -11,7 +11,7 @@ export async function POST(req) {
     const { imageUrl } = await req.json();
     const input = {
         image: imageUrl,
-        scale: 4,
+        scale: 8,
         face_enhance: false
      };
     // console.log(input)

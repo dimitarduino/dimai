@@ -1,33 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ImageComparison from '../_components/CompareImages'
 import { storage } from "configs/Firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
+import { useDropzone } from "react-dropzone";
+import { UploadCloud, X } from "lucide-react";
+import Image from "next/image";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState(null);
-    const [upscaleUrl, setUpscaled] = useState(null);
+    const [downloadUrl, setDownloadUrl] = useState();
+    const [upscaleUrl, setUpscaled] = useState();
     const [scaling, setScaling] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState();
+    const [openedResult, setOpenedResult] = useState(false);
 
-    const handleFileChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0]);
-        }
-    };
-
-    const removeBackgroundImage = async (imageUrl) => {
+    const upscaleImage = async (imageUrl) => {
         setScaling(true);
-        // console.log(imageUrl);
         const data = await axios.post("/api/upscaler", {
             imageUrl
         }).then(res => {
             setScaling(false);
-            // console.log(res);
             if (!!res.data.result) {
                 setUpscaled(res.data.result);
             }
@@ -35,32 +43,30 @@ export default function UpscaleImage() {
     }
 
     const handleDownload = async (imageUrl) => {
-        console.log(imageUrl);
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
-      
-            // Create an object URL for the blob
+
             const url = window.URL.createObjectURL(response.data);
-      
-            // Create a link element
+
             const a = document.createElement("a");
             a.href = url;
-            a.download = "downloaded-image.jpg"; // Set the filename
+            a.download = "downloaded-image.jpg";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-      
-            // Revoke the object URL to free up resources
+
             window.URL.revokeObjectURL(url);
-          } catch (error) {
+        } catch (error) {
             console.error("Download error:", error);
-          }
+        }
     };
 
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
-        // removeBackgroundImage();
+        setDownloadUrl(null);
+        setOpenedResult(false);
+        setUpscaled(null);
         setUploading(true);
         const storageRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -77,50 +83,100 @@ export default function UpscaleImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-                console.log(url)
+
                 setDownloadUrl(url);
+                setOpenedResult(true);
                 setUploading(false);
 
-                await removeBackgroundImage(url);
+                await upscaleImage(url);
             }
         );
     };
 
+
+    const onDrop = useCallback((acceptedFiles) => {
+        const file = acceptedFiles[0];
+        setFile(file);
+        setUploadedImage(URL.createObjectURL(file));
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: 'image/*',
+        multiple: false,
+    });
+
+
     return (
-        <div className="flex flex-col items-center space-y-4 p-4">
-            <Input type="file" accept="image/*" onChange={handleFileChange} />
-            <Button onClick={handleUpload} disabled={!file || uploading}>
-                {uploading ? "Uploading..." : "Upload Image"}
-            </Button>
-            <div className="grid grid-cols-2 w-full gap-24 mt-24">
-                {
-                    !!downloadUrl && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">Before:</span>
-                            <img className="w-full max-h-[400px] object-cover rounded-md" src={downloadUrl} alt="" />
-                        </div>
-                    )
-                }
-                {
-                    upscaleUrl && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">After:</span>
-                            <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={upscaleUrl} alt="" />
+        <div className="w-full flex">
 
-                            <Button className={`py-6 mt-5`} onClick={() => handleDownload(upscaleUrl)}>Download Image</Button>
-                        </div>
-                    )
-                }
-                {
-                    scaling && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-2xl text-primary mb-4">After:</span>
-                            <div className="w-full h-[400px] object-cover bg-blue-50 rounded-md h-[400px] flex items-center text-primary font-bold text-2xl justify-center">loading...</div>
-                        </div>
-                    )
-                }
+            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+                <h1 className="font-bold text-3xl text-primary">Enhance Your Images with AI Upscaling</h1>
+                <h2>
+                    Boost the resolution and quality of your images effortlessly using AI technology. Upload an image to enhance its clarity and details for a sharper, high-resolution result in seconds.
+                </h2>
 
+                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                    <input {...getInputProps()} />
+                    {uploadedImage ? (
+                        <div className="flex flex-col">
+                            <Image src={uploadedImage} alt="Uploaded" width={300} height={300} className="rounded-lg w-full max-w-sm" />
+                            <div className="flex text-primary mt-4 gap-x-2 items-center justify-center font-bold">
+                                <UploadCloud size={22} />
+                                <span>Or choose another image...</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
+                            <UploadCloud size={48} className="mb-2" />
+                            {isDragActive ? (
+                                <p>Drop the image here...</p>
+                            ) : (
+                                <p>Drag & drop an image here, or click to select</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || uploading}>
+                    {uploading ? "Please wait..." : "Upscale image"}
+                </Button>
             </div>
+
+            <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+                <DialogContent className="w-full [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
+                    <DialogHeader>
+
+                        <DialogTitle className={`font-bold text-3xl text-primary`}>{(scaling && !upscaleUrl) ? `Upscaling your image...` : `Your result!`}</DialogTitle>
+                        <DialogDescription className={`text-md`}>
+                            {(scaling && !upscaleUrl) ? "" : `Your image has been successfully processed! ✨`}
+                            <br />
+                            {(scaling && !upscaleUrl) ? `` : `The background is now removed, leaving you with a clean, high-quality cutout.`}
+                        </DialogDescription>
+
+                        <DialogClose asChild>
+                            <button
+                                className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
+                            >
+                                <X size={24} />
+                            </button>
+                        </DialogClose>
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 w-full gap-12">
+                        {
+                            (downloadUrl && upscaleUrl) && (
+                                <div className="flex flex-col">
+                                    <ImageComparison originalSrc={downloadUrl} upscaledSrc={upscaleUrl} />
+                                    <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(upscaleUrl)}>Download Image</Button>
+
+                                </div>
+                            )
+                        }
+
+                    </div>
+                    <DialogFooter>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

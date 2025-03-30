@@ -11,37 +11,44 @@ function SideNav() {
         id: 1,
         name: "Home",
         path: "/app",
-        icon: House
+        icon: House,
+        sub: []
     }, {
         id: 2,
         name: "Generate Shorts",
         path: "/app/shorts",
-        icon: FileVideo
+        icon: FileVideo,
+        sub: [`/app/shorts/create`],
     }, {
         id: 3,
         name: "Upscale Images",
         path: "/app/upscale",
-        icon: ImageUpscale
+        icon: ImageUpscale,
+        sub: []
     }, {
         id: 4,
         name: "Remove Background",
         path: "/app/removebg",
-        icon: ImageIcon
+        icon: ImageIcon,
+        sub: []
     }, {
         id: 5,
         name: "Face Swap",
         path: "/app/swapface",
-        icon: Laugh
+        icon: Laugh,
+        sub: []
     }, {
         id: 6,
         name: "Emoji Generator",
         path: "/app/imagemod",
-        icon: SmilePlus
+        icon: SmilePlus,
+        sub: []
     }, {
         id: 7,
         name: "Video Dubbing",
         path: "/app/speech-text",
-        icon: Video
+        icon: Video,
+        sub: []
     }]
 
     const pathname = usePathname();
@@ -54,7 +61,7 @@ function SideNav() {
                 </div>
                 {MenuOption.map((item, index) => (
                     <Link href={item.path} key={index}>
-                        <div className={`flex py-3 px-3 text-md hover:bg-gray-200 rounded-md cursor-pointer items-center gap-3 ${pathname == item.path ? "bg-gray-200 text-primary dark:bg-neutral-700 dark:text-white font-bold" : ""}`}>
+                        <div className={`flex py-3 px-3 text-md hover:bg-gray-200 rounded-md cursor-pointer items-center gap-3 ${(pathname == item.path || item.sub.includes(pathname)) ? "bg-gray-200 text-primary dark:bg-neutral-700 dark:text-white font-bold" : ""}`}>
                             <item.icon size={20} />
                             <p>{item.name}</p>
                         </div>

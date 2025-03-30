@@ -29,7 +29,7 @@ function Dashboard() {
     <div>
       <div className="justify-between items-center flex">
         <h2 className='font-bold text-2xl text-primary'>Dashboard</h2>
-        <Link href="/dashboard/create">
+        <Link href="/app/shorts/create">
 
           <Button>+ Create New</Button>
         </Link>

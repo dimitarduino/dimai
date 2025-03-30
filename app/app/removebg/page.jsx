@@ -9,7 +9,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 import { ImageMinus, LaughIcon, SearchCheck, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
-import { CheckBuilder } from "drizzle-orm/gel-core";
 import {
     Dialog,
     DialogClose,
@@ -30,15 +29,6 @@ export default function UploadImage() {
     const [removedUrl, setRemovedUrl] = useState(null);
     const [removing, setRemoving] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
-
-    const handleFileChange = (event) => {
-        console.log(event.target.files);
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0]);
-        }
-    };
-
-    const closeDialog = () => setOpen(false);
 
     const removeBackgroundImage = async (imageUrl) => {
         setRemoving(true);
@@ -123,7 +113,14 @@ export default function UploadImage() {
                 <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
                     <input {...getInputProps()} />
                     {uploadedImage ? (
-                        <Image src={uploadedImage} alt="Uploaded" width={300} height={300} className="rounded-lg w-full max-w-sm" />
+                        <div className="flex flex-col">
+                            <Image src={uploadedImage} alt="Uploaded" width={300} height={300} className="rounded-lg w-full max-w-sm" />
+                            <div className="flex text-primary mt-4 gap-x-2 items-center justify-center font-bold">
+                                <UploadCloud size={22} />
+                                <span>Or choose another image...</span>
+                            </div>
+
+                        </div>
                     ) : (
                         <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
                             <UploadCloud size={48} className="mb-2" />
@@ -183,7 +180,7 @@ export default function UploadImage() {
                             Your image has been successfully processed! ✨ <br />The background is now removed, leaving you with a clean, high-quality cutout.
                         </DialogDescription>
 
-                         <DialogClose asChild>
+                        <DialogClose asChild>
                             <button
                                 className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
                             >
