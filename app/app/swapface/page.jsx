@@ -251,7 +251,7 @@ export default function UpscaleImage() {
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                         <DialogDescription className={`text-md`}>
-                            Your image has been successfully processed! ✨ <br />The background is now removed, leaving you with a clean, high-quality cutout.
+                            Your face swap is complete! ✨ Experience a seamless and realistic transformation powered by AI.
                         </DialogDescription>
 
                         <DialogClose asChild>

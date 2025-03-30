@@ -53,7 +53,7 @@ function SideNav() {
 
     const pathname = usePathname();
     return (
-        <div className='w-68 h-screen shadow-sm p-2'>
+        <div className='w-68 h-screen p-2'>
             <div className="grid gap-2">
                 <div className="flex py-4 gap-3 items-center">
                     <Image alt='Logo' src={'/logo.svg'} width={32} height={30} />
