@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm';
 function DashboaardLayout({ children }) {
   const [videoData, setVideoData] = useState([]);
   const [userDetail, setUserDetail] = useState([]);
-  const {user} = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
     user && getUserDetails();
@@ -25,16 +25,18 @@ function DashboaardLayout({ children }) {
     setUserDetail(res[0]);
   }
   return (
-    <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
+    <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
       <VideoDataContext.Provider value={{ videoData, setVideoData }}>
-        <div className="hidden md:block h-screen bg-white fixed mt-[65px] w-64">
-          <SideNav />
-        </div>
+        <div className="flex h-full w-full bg-neutral-50 dark:bg-gray-950">
+          <div className="hidden md:block h-full w-68 sticky top-0 left-0">
+            <SideNav />
+          </div>
 
-        <div>
-          <Header />
-          <div className='ml-64 p-10'>
-            {children}
+          <div className='w-full'>
+            <Header />
+            <div className=''>
+              {children}
+            </div>
           </div>
         </div>
       </VideoDataContext.Provider>

@@ -24,8 +24,6 @@ function Provider({ children }) {
         email: user?.primaryEmailAddress?.emailAddress,
         slika: user?.imageUrl
       })
-
-      console.log(dodaeno);
     }
 
 

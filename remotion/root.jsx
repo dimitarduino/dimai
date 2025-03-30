@@ -1,7 +1,7 @@
 import React from 'react';
 import {Composition} from 'remotion';
 import {MyComposition} from './Composition';
-import RemotionVideo from '../app/dashboard/_components/RemotionVideo';
+import RemotionVideo from '../app/app/_components/RemotionVideo';
  
 const videoData = {
   captions: [

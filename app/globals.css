@@ -49,7 +49,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(63.82% 0.1875 260.47);
+  --primary: #009384;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -119,4 +119,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+.cl-avatarBox {
+  width: 2.5rem;
+  height: 2.5rem;
 }

@@ -1,13 +1,13 @@
 "use client"
 import React, { useContext, useEffect, useState } from 'react'
-import EmptyState from './_components/EmptyState'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link';
 import { db } from 'configs/db';
 import { VideoData } from 'configs/schema';
 import { eq } from 'drizzle-orm';
 import { useUser } from '@clerk/nextjs';
-import VideosDashboard from './_components/VideosDashboard';
+import VideosDashboard from 'app/app/_components/VideosDashboard';
+import EmptyState from 'app/app/_components/EmptyState';
 import { UserDetailContext } from 'app/_context/UserDetailContext';
 
 function Dashboard() {

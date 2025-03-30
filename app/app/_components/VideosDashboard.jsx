@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Thumbnail } from "@remotion/player"
 import RemotionVideo from './RemotionVideo'
 import PlayerDialog from './PlayerDialog'
