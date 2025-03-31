@@ -13,7 +13,7 @@ export default function ComingSoon() {
 
   const [email, setEmail] = useState();
   const { user } = useUser();
-  const [development, setDevelopment] = useState(true);
+  const [development, setDevelopment] = useState(false);
   useEffect(() => {
     // console.log(!!user)
     if (!!user) {
