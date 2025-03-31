@@ -19,3 +19,8 @@ export const VideoData = pgTable("videos", {
    images: varchar("images").array(),
    createdBy: varchar("createdBy").notNull()
 })
+
+export const Subscribers = pgTable('subscribers', {
+   id: serial("id").primaryKey(),
+   email: varchar("email", { length: 255 }).notNull()
+});

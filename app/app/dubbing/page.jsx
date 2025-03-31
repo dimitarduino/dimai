@@ -214,7 +214,7 @@ export default function DubbedVideo() {
                 <h2 className='font-bold text-xl text-primary pb-0 mb-0'>{`Upload your video`}</h2>
                 <p className='text-gray-500 pb-0 mb-0'>{`Upload your video and get a natural, high-quality dubbed version in seconds.`}</p>
                 <div className="flex flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
-                    <input {...getInputProps()} key={file?.name} />
+                    <input {...getInputProps()} key={file?.name || -1} />
                     {uploadedImage ? (
                         <div className="flex flex-col">
                             <video controls>
