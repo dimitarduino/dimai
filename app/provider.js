@@ -21,7 +21,7 @@ function Provider({ children }) {
         ime: user?.fullName || user?.primaryEmailAddress?.emailAddress,
         email: user?.primaryEmailAddress?.emailAddress,
         slika: user?.imageUrl,
-        credits: 50,
+        credits: 0,
       };
       const dodaeno = await db.insert(Users).values(vrednosti)
     } else {
