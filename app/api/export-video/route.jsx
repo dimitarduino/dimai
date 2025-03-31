@@ -1,7 +1,6 @@
 import {getServices, renderMediaOnCloudrun} from '@remotion/cloudrun/client';
 import { NextResponse } from 'next/server';
-import ffmpeg from '@ffmpeg-installer/ffmpeg';
-process.env.FFMPEG_PATH = ffmpeg.path;
+
 
 const services = await getServices({
   region: 'us-east1',
