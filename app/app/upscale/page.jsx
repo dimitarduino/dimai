@@ -20,6 +20,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import CustomLoading from "../_components/CustomLoading";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -28,6 +29,7 @@ export default function UpscaleImage() {
     const [upscaleUrl, setUpscaled] = useState();
     const [scaling, setScaling] = useState(false);
     const [uploadedImage, setUploadedImage] = useState();
+    const [loading, setLoading] = useState();
     const [openedResult, setOpenedResult] = useState(false);
 
     const upscaleImage = async (imageUrl) => {
@@ -38,6 +40,9 @@ export default function UpscaleImage() {
             setScaling(false);
             if (!!res.data.result) {
                 setUpscaled(res.data.result);
+                setOpenedResult(true);
+                setUploading(false)
+                setLoading(false)
             }
         })
     }
@@ -64,6 +69,7 @@ export default function UpscaleImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
+        setLoading(true);
         setDownloadUrl(null);
         setOpenedResult(false);
         setUpscaled(null);
@@ -85,7 +91,7 @@ export default function UpscaleImage() {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
 
                 setDownloadUrl(url);
-                setOpenedResult(true);
+                // setOpenedResult(true);
                 setUploading(false);
 
                 await upscaleImage(url);
@@ -137,10 +143,18 @@ export default function UpscaleImage() {
                         </div>
                     )}
                 </div>
-                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || uploading}>
-                    {uploading ? "Please wait..." : "Upscale image"}
+                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
+                    {loading ? "Please wait..." : "Upscale image"}
                 </Button>
+
+                {upscaleUrl && (
+                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                        See your result
+                    </Button>
+                )}
             </div>
+
+            <CustomLoading title="Upscaling your image..." loading={loading} />
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
                 <DialogContent className="w-full [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
@@ -171,7 +185,6 @@ export default function UpscaleImage() {
                                 </div>
                             )
                         }
-
                     </div>
                     <DialogFooter>
                     </DialogFooter>

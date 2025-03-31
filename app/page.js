@@ -1,26 +1,25 @@
 "use client";
-
-// import { useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { useUser } from "@clerk/nextjs";
-
-// export default function Page() {
-//   const router = useRouter();
-//   const { user } = useUser();
-
-//   useEffect(() => {
-//     router.push("/app"); // Redirect programmatically
-//   }, [user]);
-
-//   return <div>Redirecting...</div>;
-// }
+import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Subscribers } from "configs/schema";
 import { db } from "configs/db";
+import { Button } from "@/ui/button";
+import Link from "next/link";
 
 export default function ComingSoon() {
+  const router = useRouter();
+
   const [email, setEmail] = useState();
+  const { user } = useUser();
+  const [development, setDevelopment] = useState(true);
+  useEffect(() => {
+    // console.log(!!user)
+    if (!!user) {
+      router.push("/app"); // Redirect programmatically
+    }
+  }, [user]);
   const calculateTimeLeft = () => {
     const targetDate = new Date("2025-06-01").getTime();
     const now = new Date().getTime();
@@ -64,7 +63,7 @@ export default function ComingSoon() {
 
   }
 
-  return (
+  return (!user) ? (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-gray-900 to-black text-white text-center p-6">
       <motion.h1
         className="text-5xl md:text-7xl font-extrabold mb-4 tracking-wide"
@@ -90,7 +89,7 @@ export default function ComingSoon() {
       >
         {Object.entries(timeLeft).map(([unit, value]) => (
           <div key={unit} className="flex flex-col items-center px-10">
-            <span className="text-blue-500">{value || 0}</span>
+            <span className="text-emerald-500">{value || 0}</span>
             <span className="text-sm uppercase text-gray-400">{unit}</span>
           </div>
         ))}
@@ -115,11 +114,19 @@ export default function ComingSoon() {
           placeholder="Join waitlist..."
           className="p-3 rounded-lg text-white text-black w-60 outline-none"
         />
-        <button onClick={dodajCekanje} className="bg-blue-500 cursor-pointer hover:bg-blue-700 px-5 py-3 rounded-lg font-semibold transition duration-300">
+        <button onClick={dodajCekanje} className="bg-emerald-500 cursor-pointer hover:bg-emerald-700 px-5 py-3 rounded-lg font-semibold transition duration-300">
           Join
         </button>
       </motion.div>
+
+      {development && (
+        <Link href="/sign-in" className="cursor-pointer mt-10 bg-emerald-900 w-full max-w-sm">
+          <Button className={`w-full py-6 cursor-pointer`}>Sign in</Button>
+        </Link>
+      )}
     </div>
-  );
+  ) : (
+    <h2>Redirecting...</h2>
+  )
 }
 

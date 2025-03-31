@@ -28,7 +28,7 @@ function Dashboard() {
   return (
     <div className='px-10 py-10'>
       <div className="justify-between items-center flex">
-        <h2 className='font-bold text-2xl text-primary'>Dashboard</h2>
+        <h2 className='font-bold text-2xl text-primary'>Generated Shorts</h2>
         <Link href="/app/shorts/create" className='cursor-pointer'>
           <Button className={`cursor-pointer`}>+ Create New</Button>
         </Link>

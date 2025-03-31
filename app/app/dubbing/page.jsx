@@ -70,12 +70,6 @@ export default function DubbedVideo() {
         }));
     }
 
-    const handleFileChange = (event) => {
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0]);
-        }
-    };
-
     const handleDownload = async (videoUrl) => {
         try {
             const response = await axios.get(videoUrl, { responseType: "blob" });

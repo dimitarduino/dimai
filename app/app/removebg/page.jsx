@@ -20,6 +20,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import CustomLoading from "../_components/CustomLoading";
 
 export default function UploadImage() {
     const [file, setFile] = useState(null);
@@ -29,6 +30,8 @@ export default function UploadImage() {
     const [removedUrl, setRemovedUrl] = useState(null);
     const [removing, setRemoving] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
+    const [loading, setLoading] = useState();
+
 
     const removeBackgroundImage = async (imageUrl) => {
         setRemoving(true);
@@ -39,6 +42,8 @@ export default function UploadImage() {
             setRemoving(false);
             if (!!res.data.result) {
                 setRemovedUrl(res.data.result);
+                setOpenedResult(true);
+                setLoading(false)
             }
         })
     }
@@ -65,6 +70,7 @@ export default function UploadImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
+        setLoading(true);
         setUploading(true);
         const storageRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -81,7 +87,7 @@ export default function UploadImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-                setOpenedResult(true);
+                // setOpenedResult(true);
                 setDownloadUrl(url);
                 setUploading(false);
 
@@ -132,8 +138,8 @@ export default function UploadImage() {
                         </div>
                     )}
                 </div>
-                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || uploading}>
-                    {uploading ? "Please wait..." : "Remove background"}
+                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
+                    {loading ? "Please wait..." : "Remove background"}
                 </Button>
 
                 {downloadUrl && (
@@ -172,6 +178,9 @@ export default function UploadImage() {
                 </h3>
 
             </div>
+
+            <CustomLoading title="Removing background..." loading={loading} />
+
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
                 <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                     <DialogHeader>
