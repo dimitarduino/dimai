@@ -5,8 +5,9 @@ import axios from "axios";
 import path from 'path'
 import { storage } from "configs/Firebase";
 import ffmpeg from "fluent-ffmpeg";
-// import ffmpeg from '@ffmpeg-installer/ffmpeg';
-// process.env.FFMPEG_PATH = ffmpeg.path;
+import ffmpegPath from "@ffmpeg-installer/ffmpeg";
+
+ffmpeg.setFfmpegPath(ffmpegPath.path);
 import { ref, uploadString, getDownloadURL, uploadBytes } from "firebase/storage";
 import fs from 'fs'
 
