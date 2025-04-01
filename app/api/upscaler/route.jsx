@@ -11,7 +11,7 @@ export async function POST(req) {
     const { imageUrl } = await req.json();
     const input = {
       image: imageUrl,
-      scale: 8,
+      scale: 4,
       face_enhance: false
     };
 
@@ -22,7 +22,7 @@ export async function POST(req) {
     // console.log(output[0])
     console.log('1')
 
-    const resp = await axios.get(output, { responseType: 'arraybuffer' });
+    const resp = await fetchWithRetry(output, { responseType: 'arraybuffer' });
     // console.log(resp);
     const base64 = `data:image/png;base64,${Buffer.from(resp.data).toString('base64')}`;
     // console.log(base64);
@@ -38,5 +38,16 @@ export async function POST(req) {
     return NextResponse.json({ result: downloadUrl });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+async function fetchWithRetry(url, options, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await axios.get(url, options);
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(res => setTimeout(res, 1000 * (2 ** i))); // Exponential backoff
+    }
   }
 }
