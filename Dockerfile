@@ -13,6 +13,8 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application
+COPY .env.production .env.production
+
 COPY . .
 
 # Explicitly set environment variables at build time
