@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { storage } from "@/configs/Firebase"; // Firebase client SDK
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import axios from "axios";
-import ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
+// import ffmpeg from '@ffmpeg-installer/ffmpeg';
+// process.env.FFMPEG_PATH = ffmpeg.path;
 
 // Temporary storage directory
 const TEMP_DIR = "/tmp";
