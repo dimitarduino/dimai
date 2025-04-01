@@ -1,6 +1,9 @@
 # Use an official Node.js runtime as a parent image
 FROM node:20-alpine
 
+# Install ffmpeg and other dependencies
+RUN apk add --no-cache ffmpeg
+
 # Set the working directory in the container
 WORKDIR /app
 
