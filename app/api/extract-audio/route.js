@@ -4,7 +4,7 @@ import Replicate from "replicate";
 import axios from "axios";
 import path from 'path'
 import { storage } from "configs/Firebase";
-import ffmpeg from "ffmpeg-static";
+import ffmpeg from 'fluent-ffmpeg';
 
 import { ref, uploadString, getDownloadURL, uploadBytes } from "firebase/storage";
 import fs from 'fs'
