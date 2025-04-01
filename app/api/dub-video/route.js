@@ -2,15 +2,7 @@ import { NextResponse } from "next/server";
 import { storage } from "@/configs/Firebase"; // Firebase client SDK
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import axios from "axios";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "@ffmpeg-installer/ffmpeg";
-
-const ffmpegPathName =
-  process.platform === "win32"
-    ? ffmpegPath.path.replace("app.asar", "app.asar.unpacked")
-    : ffmpegPath.path;
-
-ffmpeg.setFfmpegPath(ffmpegPathName);
+import ffmpeg from "ffmpeg-static";
 import fs from "fs";
 import path from "path";
 
