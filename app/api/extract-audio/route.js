@@ -7,7 +7,12 @@ import { storage } from "configs/Firebase";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegPath from "@ffmpeg-installer/ffmpeg";
 
-ffmpeg.setFfmpegPath(ffmpegPath.path);
+const ffmpegPathName =
+  process.platform === "win32"
+    ? ffmpegPath.path.replace("app.asar", "app.asar.unpacked")
+    : ffmpegPath.path;
+
+ffmpeg.setFfmpegPath(ffmpegPathName);
 import { ref, uploadString, getDownloadURL, uploadBytes } from "firebase/storage";
 import fs from 'fs'
 
