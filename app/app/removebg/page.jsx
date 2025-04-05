@@ -1,14 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useDropzone } from 'react-dropzone';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
-import { ImageMinus, LaughIcon, SearchCheck, UploadCloud, X } from "lucide-react";
+import { DollarSign, ImageMinus, LaughIcon, SearchCheck, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
+import { iskoristPoeni, proveriPoeni } from "lib/utils";
+import { UserDetailContext } from "app/_context/UserDetailContext";
+import { useUser } from "@clerk/nextjs";
+
 import {
     Dialog,
     DialogClose,
@@ -21,6 +25,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import CustomLoading from "../_components/CustomLoading";
+import { toast } from "sonner";
 
 export default function UploadImage() {
     const [file, setFile] = useState(null);
@@ -31,6 +36,8 @@ export default function UploadImage() {
     const [removing, setRemoving] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
     const [loading, setLoading] = useState();
+    const { user } = useUser();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
 
     const removeBackgroundImage = async (imageUrl) => {
@@ -38,7 +45,16 @@ export default function UploadImage() {
 
         const data = await axios.post("/api/remove-bg", {
             imageUrl
-        }).then(res => {
+        }).then(async (res) => {
+            const slednoPoeni = await iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 5,
+                email: user.primaryEmailAddress.emailAddress
+            })
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
             setRemoving(false);
             if (!!res.data.result) {
                 setRemovedUrl(res.data.result);
@@ -49,14 +65,13 @@ export default function UploadImage() {
     }
 
     const handleDownload = async (imageUrl) => {
-        console.log(imageUrl);
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
             const url = window.URL.createObjectURL(response.data);
 
             const a = document.createElement("a");
             a.href = url;
-            a.download = "downloaded-image.jpg";
+            a.download = "downloaded-image.png";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -69,6 +84,10 @@ export default function UploadImage() {
 
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
+        if (!proveriPoeni(userDetail.credits, 5)) {
+            toast("Insufficient credits! Please recharge to generate a video.");
+            return;
+        }
 
         setLoading(true);
         setUploading(true);
@@ -147,6 +166,15 @@ export default function UploadImage() {
                         See your result
                     </Button>
                 )}
+
+                <div className="text-primary gap-2 font-bold flex items-center justify-center">
+                    <div className="bg-primary p-1 rounded-full">
+                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                    </div>
+                    <span>
+                        5 credits per image
+                    </span>
+                </div>
 
                 <p>Our AI-powered background remover ensures clean and precise cutouts, making your images look professional in seconds. For best results, use high-quality images with clear subject-background contrast.
                 </p>

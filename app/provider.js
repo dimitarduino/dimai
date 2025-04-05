@@ -1,15 +1,15 @@
 "use client";
 import React, { useEffect } from 'react'
-import {db} from "@/configs/db" 
+import { db } from "@/configs/db"
 import { useUser } from "@clerk/nextjs";
-import {Users} from "@/configs/schema" 
+import { Users } from "@/configs/schema"
 import { eq } from 'drizzle-orm';
 
 function Provider({ children }) {
   const { user } = useUser();
 
   useEffect(() => {
-    user&&proveriNovUser();
+    user && proveriNovUser();
   }, [user]);
 
   const proveriNovUser = async () => {
@@ -21,15 +21,14 @@ function Provider({ children }) {
         ime: user?.fullName || user?.primaryEmailAddress?.emailAddress,
         email: user?.primaryEmailAddress?.emailAddress,
         slika: user?.imageUrl,
-        credits: 0,
+        credits: 20,
       };
       const dodaeno = await db.insert(Users).values(vrednosti)
     } else {
-  
+
     }
-
-
   }
+
   return (
     <div>{children}</div>
   )

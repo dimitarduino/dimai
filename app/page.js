@@ -7,6 +7,7 @@ import { Subscribers } from "configs/schema";
 import { db } from "configs/db";
 import { Button } from "@/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ComingSoon() {
   const router = useRouter();
@@ -64,7 +65,14 @@ export default function ComingSoon() {
   }
 
   return (!user) ? (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-gray-900 to-black text-white text-center p-6">
+    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-emerald-950 to-black text-white text-center p-6">
+       <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+       <Image alt="DimnAI Logo" className="fixed bottom-0 left-1/2 mb-12 -translate-x-1/2" width={150} height={30} src={`/logo.png`} />
+      </motion.h1>
       <motion.h1
         className="text-5xl md:text-7xl font-extrabold mb-4 tracking-wide"
         initial={{ opacity: 0, y: -20 }}

@@ -11,7 +11,6 @@ export async function POST(req) {
   const serviceName = services[0]?.serviceName;
 
   const { inputProps } = await req.json();
-  console.log(inputProps);
 
   const result = await renderMediaOnCloudrun({
     serviceName,
@@ -23,8 +22,7 @@ export async function POST(req) {
   });
 
   if (result.type === 'success') {
-    console.log(result.bucketName);
-    console.log(result.renderId);
+   
   }
 
   return NextResponse.json({ result: result?.publicUrl });

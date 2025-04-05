@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImageComparison from '../_components/CompareImages'
@@ -8,7 +8,7 @@ import { storage } from "configs/Firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud, X } from "lucide-react";
+import { DollarSign, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
 import {
     Dialog,
@@ -21,6 +21,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import CustomLoading from "../_components/CustomLoading";
+import { iskoristPoeni, proveriPoeni } from "lib/utils";
+import { UserDetailContext } from "app/_context/UserDetailContext";
+import { useUser } from "@clerk/nextjs";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -31,12 +34,25 @@ export default function UpscaleImage() {
     const [uploadedImage, setUploadedImage] = useState();
     const [loading, setLoading] = useState();
     const [openedResult, setOpenedResult] = useState(false);
+    const { user } = useUser();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+
 
     const upscaleImage = async (imageUrl) => {
         setScaling(true);
         const data = await axios.post("/api/upscaler", {
             imageUrl
-        }).then(res => {
+        }).then(async (res) => {
+            const slednoPoeni = await iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 5,
+                email: user.primaryEmailAddress.emailAddress
+            });
+
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
             setScaling(false);
             if (!!res.data.result) {
                 setUpscaled(res.data.result);
@@ -69,6 +85,11 @@ export default function UpscaleImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
+        if (!proveriPoeni(userDetail.credits, 5)) {
+            toast("Insufficient credits! Please recharge to generate a video.");
+            return;
+        }
+
         setLoading(true);
         setDownloadUrl(null);
         setOpenedResult(false);
@@ -81,7 +102,7 @@ export default function UpscaleImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log(`Upload is ${progress}% done`);
+                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
                 console.error("Upload failed:", error);
@@ -152,6 +173,15 @@ export default function UpscaleImage() {
                         See your result
                     </Button>
                 )}
+
+                <div className="text-primary gap-2 font-bold flex items-center justify-center">
+                    <div className="bg-primary p-1 rounded-full">
+                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                    </div>
+                    <span>
+                        5 credits per image
+                    </span>
+                </div>
             </div>
 
             <CustomLoading title="Upscaling your image..." loading={loading} />

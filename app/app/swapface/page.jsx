@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
@@ -9,7 +9,7 @@ import axios from "axios";
 import SelectMode from "../_components/SelectMode";
 import PromptInput from "../_components/PromptInput";
 import { useDropzone } from "react-dropzone";
-import { SmileIcon, UploadCloud, UploadCloudIcon, X } from "lucide-react";
+import { DollarSign, SmileIcon, UploadCloud, UploadCloudIcon, X } from "lucide-react";
 import PromptImage from "../_components/PromptImage";
 import {
     Dialog,
@@ -23,6 +23,10 @@ import {
 } from "@/components/ui/dialog"
 import Image from "next/image";
 import CustomLoading from "../_components/CustomLoading";
+import { iskoristPoeni, proveriPoeni } from "lib/utils";
+import { UserDetailContext } from "app/_context/UserDetailContext";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -36,7 +40,8 @@ export default function UpscaleImage() {
     const [swapImage, setSwapImage] = useState();
     const [formData, setFormData] = useState([]);
     const [openedResult, setOpenedResult] = useState(false);
-
+    const { user } = useUser();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
     const naPromenaInput = (ime, vrednost) => {
         setFormData(prev => ({
@@ -56,6 +61,16 @@ export default function UpscaleImage() {
             setOpenedResult(true);
             setLoading(false);
 
+            const slednoPoeni = iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 5,
+                email: user.primaryEmailAddress.emailAddress
+            });
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
+
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
             }
@@ -63,7 +78,6 @@ export default function UpscaleImage() {
     }
 
     const handleDownload = async (imageUrl) => {
-        console.log(imageUrl);
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
 
@@ -100,7 +114,7 @@ export default function UpscaleImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log(`Upload is ${progress}% done`);
+                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
                 console.error("Upload failed:", error);
@@ -120,6 +134,11 @@ export default function UpscaleImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
         if (!swap) return alert("Please select a file first!");
+
+        if (!proveriPoeni(userDetail.credits, 5)) {
+            toast("Insufficient credits! Please recharge to generate a video.");
+            return;
+        }
         // setDownloadUrl(null);
         // setSwapUrl(null);
         setModifiedImage(null)
@@ -133,7 +152,7 @@ export default function UpscaleImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log(`Upload is ${progress}% done`);
+                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
                 console.error("Upload failed:", error);
@@ -245,6 +264,15 @@ export default function UpscaleImage() {
                     See your result
                 </Button>
             )}
+
+            <div className="text-primary gap-2 font-bold flex items-center justify-center">
+                <div className="bg-primary p-1 rounded-full">
+                    <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                </div>
+                <span>
+                    5 credits per image
+                </span>
+            </div>
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
                 <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">

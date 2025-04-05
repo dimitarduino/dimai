@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
@@ -11,7 +11,7 @@ import PromptInput from "../_components/PromptInput";
 import { useDropzone } from 'react-dropzone';
 import PromptImage from "../_components/PromptImage";
 import SelectComponent from "../_components/SelectComponent";
-import { CloudFog, UploadCloud, X } from "lucide-react";
+import { CloudFog, DollarSign, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
 import {
     Dialog,
@@ -23,7 +23,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { iskoristPoeni, proveriPoeni } from "lib/utils";
+import { UserDetailContext } from "app/_context/UserDetailContext";
 import CustomLoading from "../_components/CustomLoading";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export default function DubbedVideo() {
     const [file, setFile] = useState(null);
@@ -40,6 +44,8 @@ export default function DubbedVideo() {
     });
     const [openedResult, setOpenedResult] = useState(false);
     const [uploadedImage, setUploadedImage] = useState();
+    const { user } = useUser();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
     const languages = ["None", "Afrikaans", "Amharic", "Armenian", "Assamese", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian",
         "Burmese", "Cantonese", "Catalan", "Cebuano", "Central Kurdish", "Croatian", "Czech", "Danish", "Dutch",
@@ -63,7 +69,7 @@ export default function DubbedVideo() {
     ];
 
     const naPromenaInput = (ime, vrednost) => {
-        console.log(ime, vrednost);
+        // console.log(ime, vrednost);
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
@@ -99,7 +105,7 @@ export default function DubbedVideo() {
             videoUrl: videoUrl,
             dubbedAudioUrl: audioUrl
         }).then(res => {
-            console.log(res.data);
+
             if (!!res.data.result) {
                 setResultVideo(res.data.result);
                 setOpenedResult(true);
@@ -129,8 +135,17 @@ export default function DubbedVideo() {
         const data = await axios.post("/api/extract-audio", {
             videoUrl: videoUrl,
             ...formData
-        }).then(res => {
-            // setLoading(false);
+        }).then(async (res) => {
+            const slednoPoeni = await iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 20,
+                email: user.primaryEmailAddress.emailAddress
+            });
+
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
 
             if (!!res.data.audioUrl) {
                 setAudioInput(res.data.audioUrl);
@@ -142,6 +157,12 @@ export default function DubbedVideo() {
 
     const handleUpload = async () => {
         if (!file && !proveriDaliETekst()) return alert("Please select a file first!");
+
+        if (!proveriPoeni(userDetail.credits, 20)) {
+            toast("Insufficient credits! Please recharge to generate a video.");
+            return;
+        }
+
         setDownloadUrl(null);
         setUploading(true);
         setResultAudio(null);
@@ -156,7 +177,7 @@ export default function DubbedVideo() {
                 "state_changed",
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log(`Upload is ${progress}% done`);
+                    // console.log(`Upload is ${progress}% done`);
                 },
                 (error) => {
                     console.error("Upload failed:", error);
@@ -176,11 +197,11 @@ export default function DubbedVideo() {
 
     const onDrop = useCallback((acceptedFiles) => {
         setUploadedImage(null);
-        console.log(acceptedFiles)
+        // console.log(acceptedFiles)
         const fileAttached = acceptedFiles[0];
         setFile(fileAttached);
 
-        console.log(URL.createObjectURL(fileAttached));
+        // console.log(URL.createObjectURL(fileAttached));
 
         setUploadedImage(URL.createObjectURL(fileAttached));
 
@@ -210,7 +231,7 @@ export default function DubbedVideo() {
                 <div className="flex flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
                     <input {...getInputProps()} key={file?.name || -1} />
                     {uploadedImage ? (
-                        <div className="flex flex-col">
+                        <div key={1} className="flex flex-col">
                             <video controls>
                                 <source src={uploadedImage} type="video/mp4" />
                             </video>
@@ -222,7 +243,7 @@ export default function DubbedVideo() {
 
                         </div>
                     ) : (
-                        <div className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
+                        <div key={2} className="flex w-full flex-col items-center text-center text-gray-500 py-12 dark:text-gray-300">
                             <UploadCloud size={48} className="mb-2" />
                             {isDragActive ? (
                                 <p>Drop the video here...</p>
@@ -246,6 +267,15 @@ export default function DubbedVideo() {
                         See your result
                     </Button>
                 )}
+
+                <div className="text-primary gap-2 font-bold flex items-center justify-center">
+                    <div className="bg-primary p-1 rounded-full">
+                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                    </div>
+                    <span>
+                        20 credits per video
+                    </span>
+                </div>
 
                 <CustomLoading title="Generating your video..." loading={loading} />
 
