@@ -12,8 +12,10 @@ const outfit = Outfit({
 export const metadata = {
   title: "Dim AI | Generate AI Videos, Upscale Images, Remove Background, Dubbing Videos",
   description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dim AI. Transform your content with cutting-edge AI tools!",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
-
 export default function RootLayout({ children }) {
 
   return (

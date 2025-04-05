@@ -43,7 +43,7 @@ export default function UpscaleImage() {
     ];
 
     const naPromenaInput = (ime, vrednost) => {
-        console.log(ime, vrednost);
+        // console.log(ime, vrednost);
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
@@ -118,7 +118,7 @@ export default function UpscaleImage() {
                 "state_changed",
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log(`Upload is ${progress}% done`);
+                    // console.log(`Upload is ${progress}% done`);
                 },
                 (error) => {
                     console.error("Upload failed:", error);

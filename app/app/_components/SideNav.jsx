@@ -56,8 +56,8 @@ function SideNav() {
         <div className='w-68 h-screen p-2'>
             <div className="grid gap-2">
                 <div className="flex py-4 gap-3 items-center">
-                    <Image alt='Logo' src={'/logo.svg'} width={32} height={30} />
-                    <h2 className='font-bold text-2xl'>AI Generator</h2>
+                    <Image className='pl-3' alt='Logo' src={'/logo.png'} width={120} height={30} />
+                    <h2 className='font-bold text-2xl'></h2>
                 </div>
                 {MenuOption.map((item, index) => (
                     <Link href={item.path} key={index}>

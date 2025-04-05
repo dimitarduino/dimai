@@ -15,6 +15,7 @@ import PlayerDialog from '../../_components/PlayerDialog';
 import { UserDetailContext } from 'app/_context/UserDetailContext';
 import { toast } from 'sonner';
 import { eq } from 'drizzle-orm';
+import { iskoristPoeni, proveriPoeni } from 'lib/utils';
 
 function CreateNew() {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ function CreateNew() {
   const { videoData, setVideoData } = useContext(VideoDataContext);
 
   const naPromenaInput = (ime, vrednost) => {
-  
+
     setFormData(prev => ({
       ...prev,
       [ime]: vrednost
@@ -122,25 +123,27 @@ function CreateNew() {
   }
 
   const onCreateClickHandler = () => {
-    console.log(formData)
-    if (userDetail.credits >= 10) {
+    const daliImaPoeni = proveriPoeni(userDetail.credits, 10);
 
-    } else {
+    if (!daliImaPoeni) {
       toast("Insufficient credits! Please recharge to generate a video.");
       return;
     }
+
     getVideoScript();
   }
 
   const updateUserCredits = async () => {
-    const res = await db.update(Users).set({
-      credits: userDetail?.credits - 10
-    }).where(eq(Users.email, userDetail.email))
+    const slednoPoeni = await iskoristPoeni({
+      momentalnoKrediti: userDetail.credits,
+      kolkuMinus: 10,
+      email: user.primaryEmailAddress.emailAddress
+    });
 
     setUserDetail(prev => ({
       ...prev,
-      "credits": userDetail.credits - 10
-    }))
+      "credits": slednoPoeni
+    }));
 
     setVideoData(null);
   }

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { UserButton } from '@clerk/nextjs'
 import { UserDetailContext } from 'app/_context/UserDetailContext';
 import { BadgePlusIcon, CircleDollarSign, CoinsIcon, ConeIcon, Crown, DollarSign, PlusCircle } from 'lucide-react';
+import Link from 'next/link';
 
 function Header() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -22,14 +23,15 @@ function Header() {
                     </span>
 
                 </div>
-                <Button className={`py-5 cursor-pointer`}>
-                    <Crown className='text-white font-bold' size={20} />
-                    Upgrade
-                </Button>
-
-            <div className="w-10 h-10 bg-primary rounded-full">
-                <UserButton className='scale-150' />
-            </div>
+                <Link href="/app/upgrade" className={``}>
+                    <Button className={`py-5 cursor-pointer`}>
+                        <Crown className='text-white font-bold' size={20} />
+                        Upgrade
+                    </Button>
+                </Link>
+                <div className="w-10 h-10 bg-primary rounded-full">
+                    <UserButton className='scale-150' />
+                </div>
             </div>
 
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useDropzone } from 'react-dropzone';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,10 @@ import axios from "axios";
 import SelectMode from "../_components/SelectMode";
 import PromptInput from "../_components/PromptInput";
 import PromptImage from "../_components/PromptImage";
-import { AmphoraIcon, BoxIcon, ImageMinus, LaughIcon, RectangleEllipsis, SearchCheck, SmileIcon, Swords, ToyBrick, UploadCloud, X } from "lucide-react";
+import { AmphoraIcon, BoxIcon, DollarSign, ImageMinus, LaughIcon, RectangleEllipsis, SearchCheck, SmileIcon, Swords, ToyBrick, UploadCloud, X } from "lucide-react";
+import { iskoristPoeni, proveriPoeni } from "lib/utils";
+import { UserDetailContext } from "app/_context/UserDetailContext";
+import { useUser } from "@clerk/nextjs";
 
 import Image from "next/image";
 import {
@@ -25,8 +28,9 @@ import {
 } from "@/components/ui/dialog"
 import CustomLoading from "../_components/CustomLoading";
 import { ClientPageRoot } from "next/dist/client/components/client-page";
+import { toast } from "sonner";
 
-export default function UpscaleImage() {
+export default function ImageToImage() {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [downloadUrl, setDownloadUrl] = useState(null);
@@ -37,6 +41,8 @@ export default function UpscaleImage() {
     });
     const [openedResult, setOpenedResult] = useState(false);
     const [uploadedImage, setUploadedImage] = useState();
+    const { user } = useUser();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
 
     const naPromenaInput = (ime, vrednost) => {
@@ -54,9 +60,20 @@ export default function UpscaleImage() {
             prompt: formData.text,
             style: formData.style
 
-        }).then(res => {
+        }).then(async (res) => {
             setLoading(false);
-            console.log(res.data.result)
+
+            const slednoPoeni = await iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 5,
+                email: user.primaryEmailAddress.emailAddress
+            });
+
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
+
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
                 setOpenedResult(true);
@@ -65,7 +82,6 @@ export default function UpscaleImage() {
     }
 
     const handleDownload = async (imageUrl) => {
-        console.log(imageUrl);
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
 
@@ -86,6 +102,12 @@ export default function UpscaleImage() {
 
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
+
+        if (!proveriPoeni(userDetail.credits, 5)) {
+            toast("Insufficient credits! Please recharge to generate a video.");
+            return;
+        }
+
         setDownloadUrl(null);
         setModifiedImage(null)
 
@@ -97,7 +119,7 @@ export default function UpscaleImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log(`Upload is ${progress}% done`);
+                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
                 console.error("Upload failed:", error);
@@ -105,7 +127,7 @@ export default function UpscaleImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-                console.log(url)
+                // console.log(url)
                 setDownloadUrl(url);
                 setUploading(false);
 
@@ -199,6 +221,21 @@ export default function UpscaleImage() {
                 <Button className={`py-6 cursor-pointer`} onClick={handleUpload} disabled={uploading}>
                     {uploading ? "Uploading..." : "Generate image"}
                 </Button>
+
+                {modifiedImage && (
+                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                        See your result
+                    </Button>
+                )}
+
+                <div className="text-primary gap-2 font-bold flex items-center justify-center">
+                    <div className="bg-primary p-1 rounded-full">
+                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                    </div>
+                    <span>
+                        5 credits per image
+                    </span>
+                </div>
 
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
