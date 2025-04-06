@@ -27,7 +27,7 @@ function DashboaardLayout({ children }) {
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
       <VideoDataContext.Provider value={{ videoData, setVideoData }}>
-        <div className="flex h-full w-full bg-neutral-50 dark:bg-gray-950">
+        <div className="flex h-full w-full bg-neutral-50 dark:bg-zinc-950">
           <div className="hidden md:block h-full w-68 sticky top-0 left-0">
             <SideNav />
           </div>

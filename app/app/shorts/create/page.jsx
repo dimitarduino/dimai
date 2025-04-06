@@ -186,7 +186,7 @@ function CreateNew() {
         {/* Duration */}
         <SelectDuration onUserSelect={naPromenaInput} />
         {/* Create Button */}
-        <Button onClick={onCreateClickHandler} className="p-6 cursor-pointer">Create short AI Video</Button>
+        <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
 
         <CustomLoading loading={loading} />
         <PlayerDialog playVideo={playVideo} videoId={videoId} />

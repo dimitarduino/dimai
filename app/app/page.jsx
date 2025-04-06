@@ -116,7 +116,7 @@ function Dashboard() {
 
   return (
     <div className='dashboard px-6'>
-      <div className="dashboard-top rounded-3xl px-10 items-center justify-center w-full flex py-14 flex flex-col bg-gradient-to-tl from-emerald-300 to-green-100">
+      <div className="dashboard-top rounded-3xl px-10 items-center justify-center w-full flex py-14 flex flex-col bg-gradient-to-tl dark:from-black dark:to-emerald-800 from-emerald-300 to-green-100">
         <h1 className='font-bold text-4xl text-primary'>Describe your ideas and generate 🚀</h1>
         <h2 className='py-4'>Transform your words into visual masterpieces: Leverage AI technology to craft breathtaking images.</h2>
 
@@ -125,9 +125,9 @@ function Dashboard() {
 
           <div className="buttons absolute flex items-center right-2 top-2 gap-3">
             <Button className={`bg-transparent cursor-pointer text-black hover:text-primary text-3xl hover:bg-transparent`}>
-              <Dices size={32} className='' />
+              <Dices size={32} className='dark:text-white' />
             </Button>
-            <Button className={`bg-primary cursor-pointer px-10 py-5`}>
+            <Button className={`bg-primary dark:text-white cursor-pointer px-10 py-5`}>
               <SparkleIcon />
               <p>Generate</p>
             </Button>
@@ -139,10 +139,10 @@ function Dashboard() {
         <h3 className='font-bold text-3xl text-primary'>Our AI Tools for you</h3>
         <div className="relative" ref={scrollRef}>
           {/* Buttons to control scrolling */}
-          <button className='absolute left-[-20px] cursor-pointer top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md z-2' onClick={scrollLeft}>
+          <button className='absolute dark:bg-neutral-800 dark:text-white left-[-20px] cursor-pointer top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md z-2' onClick={scrollLeft}>
             <ChevronLeft />
           </button>
-          <button className='absolute right-[-20px] cursor-pointer top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md z-2' onClick={scrollRight}>
+          <button className='absolute dark:bg-neutral-800 dark:text-white right-[-20px] cursor-pointer top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md z-2' onClick={scrollRight}>
             <ChevronRight />
           </button>
           <div className="w-fit whitespace-nowrap rounded-md pt-4">
