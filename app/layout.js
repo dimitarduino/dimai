@@ -3,11 +3,30 @@ import "./globals.css";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import Provider from "./provider";
 import { Toaster } from "sonner";
+import { ThemeProvider, useTheme } from "./_context/ThemeContext";
+import ClerkWithThemeProvider from "./ClerkProvider";
 
 
 const outfit = Outfit({
   subsets: ["latin"],
 });
+
+
+function ClerkWrapper({ children }) {
+  const { isDark } = useTheme();
+
+  return (
+    <ClerkProvider
+      appearance={{
+        baseTheme: isDark ? dark : neobrutalism,
+        variables: { colorPrimary: "#059485" },
+      }}
+    >
+      {children}
+    </ClerkProvider>
+  );
+}
+
 
 export const metadata = {
   title: "Dimn AI | Generate AI Videos, Upscale Images, Remove Background, Dubbing Videos",
@@ -17,20 +36,23 @@ export const metadata = {
   },
 };
 export default function RootLayout({ children }) {
-
   return (
-    <ClerkProvider appearance={{ elements: { avatarBox: "w-20 h-20" } }}>
-      <html lang="en">
-        <body
-          className={`${outfit.className}`}
-        >
-          <Provider>
-            {children}
-          </Provider>
+    <html lang="en" suppressHydrationWarning>
 
-          <Toaster />
-        </body>
-      </html>
-    </ClerkProvider>
+      <body
+        className={`${outfit.className}`}
+      >
+        <ThemeProvider>
+          <ClerkWithThemeProvider>
+
+            <Provider>
+              {children}
+            </Provider>
+
+            <Toaster />
+          </ClerkWithThemeProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
