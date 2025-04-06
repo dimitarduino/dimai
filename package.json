@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.6",
+    "@clerk/themes": "^2.2.27",
     "@google-cloud/text-to-speech": "^6.0.1",
     "@google/generative-ai": "^0.24.0",
     "@neondatabase/serverless": "^0.10.4",
