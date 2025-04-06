@@ -102,10 +102,8 @@ export default function UpscaleImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
-                console.error("Upload failed:", error);
                 setUploading(false);
             },
             async () => {
@@ -137,13 +135,13 @@ export default function UpscaleImage() {
     return (
         <div className="w-full flex">
 
-            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+            <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Enhance Your Images with AI Upscaling</h1>
                 <h2>
                     Boost the resolution and quality of your images effortlessly using AI technology. Upload an image to enhance its clarity and details for a sharper, high-resolution result in seconds.
                 </h2>
 
-                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-zinc-950 cursor-pointer hover:border-gray-400" {...getRootProps()}>
                     <input {...getInputProps()} />
                     {uploadedImage ? (
                         <div className="flex flex-col">
@@ -164,12 +162,12 @@ export default function UpscaleImage() {
                         </div>
                     )}
                 </div>
-                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
+                <Button className={`py-6 text-md dark:text-white cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
                     {loading ? "Please wait..." : "Upscale image"}
                 </Button>
 
                 {upscaleUrl && (
-                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 dark:hover:bg-neutral-700 bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
                         See your result
                     </Button>
                 )}
@@ -210,7 +208,7 @@ export default function UpscaleImage() {
                             (downloadUrl && upscaleUrl) && (
                                 <div className="flex flex-col">
                                     <ImageComparison originalSrc={downloadUrl} upscaledSrc={upscaleUrl} />
-                                    <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(upscaleUrl)}>Download Image</Button>
+                                    <Button className={`py-6 mt-5 cursor-pointer  dark:text-white`} onClick={() => handleDownload(upscaleUrl)}>Download Image</Button>
 
                                 </div>
                             )

@@ -61,7 +61,7 @@ function SideNav() {
                 </div>
                 {MenuOption.map((item, index) => (
                     <Link href={item.path} key={index}>
-                        <div className={`flex py-3 px-3 text-md hover:bg-gray-200 rounded-md cursor-pointer items-center gap-3 ${(pathname == item.path || item.sub.includes(pathname)) ? "bg-gray-200 text-primary dark:bg-neutral-700 dark:text-white font-bold" : ""}`}>
+                        <div className={`flex py-3 px-3 text-md hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-md cursor-pointer items-center gap-3 ${(pathname == item.path || item.sub.includes(pathname)) ? "bg-gray-200 text-primary dark:bg-neutral-700 dark:text-white font-bold" : ""}`}>
                             <item.icon size={20} />
                             <p>{item.name}</p>
                         </div>

@@ -3,8 +3,8 @@ import Image from 'next/image'
 
 
 export const metadata = {
-  title: "Dim AI | Sign in",
-  description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dim AI. Transform your content with cutting-edge AI tools!",
+  title: "Dimn AI | Sign in",
+  description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
   icons: {
       icon: "/favicon.png",
   },

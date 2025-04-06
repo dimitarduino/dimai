@@ -196,7 +196,7 @@ export default function UpscaleImage() {
 
 
     return (
-        <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+        <div className="flex dark:bg-zinc-900 bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
             <h1 className="font-bold text-3xl text-primary">Swap Faces Instantly with AI</h1>
             <h2>
                 Transform your images with seamless AI-powered face swapping. Upload your photo and let AI create a natural, high-quality swap in just seconds.
@@ -206,7 +206,7 @@ export default function UpscaleImage() {
             <div className="grid grid-cols-2 gap-12">
                 <div className="flex flex-col gap-2">
                     <h2 className='font-bold border-top border-neutral-200 border-t-1 pt-4 text-xl text-primary'>{`Upload your image`}</h2>
-                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-zinc-950 cursor-pointer hover:border-gray-400" {...getRootProps()}>
                         <input {...getInputProps()} />
                         {uploadedImage ? (
                             <div className="flex flex-col">
@@ -230,7 +230,7 @@ export default function UpscaleImage() {
                 </div>
                 <div className="flex flex-col gap-2">
                     <h2 className='font-bold border-top border-neutral-200 border-t-1 pt-4 text-xl text-primary'>{`Upload Swap Image`}</h2>
-                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getSwapRootProps()}>
+                    <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-zinc-950 cursor-pointer hover:border-gray-400" {...getSwapRootProps()}>
                         <input {...getSwapInputProps()} />
                         {swapImage ? (
                             <div className="flex flex-col">
@@ -255,12 +255,12 @@ export default function UpscaleImage() {
                 </div>
             </div>
 
-            <Button className={`py-6 cursor-pointer`} onClick={handleUpload} disabled={uploading}>
+            <Button className={`py-6 cursor-pointer dark:text-white`} onClick={handleUpload} disabled={uploading}>
                 {uploading ? "Uploading..." : "Swap face"}
             </Button>
 
             {modifiedImage && (
-                <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                <Button className={`py-2 border-bottom dark:hover:bg-neutral-800 border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
                     See your result
                 </Button>
             )}
@@ -305,7 +305,7 @@ export default function UpscaleImage() {
                                     <span className="font-bold text-2xl text-primary text-center mb-4">Result:</span>
                                     <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={modifiedImage} alt="" />
 
-                                    <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
+                                    <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
                                 </div>
                             )
                         }

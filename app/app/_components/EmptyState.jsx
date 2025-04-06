@@ -7,7 +7,7 @@ function EmptyState() {
       <p className='font-bold text-3xl'>You don't have any short videos created!</p>
       <Link href="/app/shorts/create">
 
-        <Button className="mt-4 py-7 cursor-pointer">Create New Short Video</Button>
+        <Button className="mt-4 py-7 cursor-pointer dark:text-white">Create New Short Video</Button>
       </Link>
     </div>
   )

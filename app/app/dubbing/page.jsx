@@ -197,15 +197,11 @@ export default function DubbedVideo() {
 
     const onDrop = useCallback((acceptedFiles) => {
         setUploadedImage(null);
-        // console.log(acceptedFiles)
         const fileAttached = acceptedFiles[0];
-        setFile(fileAttached);
-
-        // console.log(URL.createObjectURL(fileAttached));
+        setFile(fileAttached);;
 
         setUploadedImage(URL.createObjectURL(fileAttached));
 
-        // Reset any previous results or states
         setResultVideo(null);
         setResultAudio(null);
         setResultText(null);
@@ -220,7 +216,7 @@ export default function DubbedVideo() {
 
     return (
         <div className="w-full flex">
-            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+            <div className="flex dark:bg-neutral-900 bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Bring Your Videos to Life with AI Dubbing</h1>
                 <h2>
                     Effortlessly dub your videos into multiple languages with AI-powered voiceovers. Upload your video and get a natural, high-quality dubbed version in seconds.
@@ -228,7 +224,7 @@ export default function DubbedVideo() {
 
                 <h2 className='font-bold text-xl text-primary pb-0 mb-0'>{`Upload your video`}</h2>
                 <p className='text-gray-500 pb-0 mb-0'>{`Upload your video and get a natural, high-quality dubbed version in seconds.`}</p>
-                <div className="flex flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
+                <div className="flex dark:bg-neutral-950 flex-col items-center mt-2 justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()} key={file?.name}>
                     <input {...getInputProps()} key={file?.name || -1} />
                     {uploadedImage ? (
                         <div key={1} className="flex flex-col">
@@ -258,12 +254,12 @@ export default function DubbedVideo() {
                 <SelectComponent defaultValue="Spanish" optionsAvailable={languagesSpeak} className="w-full" onUserSelect={naPromenaInput} placeholder="Choose Dubbing Language" name="targetLanguageAudio" description="Select the language for your video dubbing" title="Choose Dubbing Language" />
 
 
-                <Button className={`w-full py-6 text-xl cursor-pointer`} onClick={handleUpload} disabled={uploading}>
+                <Button className={`w-full py-6 text-xl cursor-pointer dark:text-white`} onClick={handleUpload} disabled={uploading}>
                     {uploading ? "Uploading..." : "Generate"}
                 </Button>
 
                 {resultVideo && (
-                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                    <Button className={`py-2 border-bottom dark:hover:bg-neutral-800 border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
                         See your result
                     </Button>
                 )}
@@ -304,7 +300,7 @@ export default function DubbedVideo() {
                                         </video>
 
 
-                                        <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(resultVideo)}>Download Video</Button>
+                                        <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(resultVideo)}>Download Video</Button>
                                     </div>
                                 )
                             }

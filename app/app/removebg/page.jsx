@@ -130,12 +130,12 @@ export default function UploadImage() {
 
     return (
         <div className="w-full flex">
-            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+            <div className="flex dark:bg-zinc-900 bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Remove Backgrounds with AI Precision</h1>
                 <h2>
                     Effortlessly remove backgrounds from any image with AI-powered accuracy. Upload or generate an image and get a clean, high-quality cutout in seconds.
                 </h2>
-                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-zinc-950 cursor-pointer hover:border-gray-400" {...getRootProps()}>
                     <input {...getInputProps()} />
                     {uploadedImage ? (
                         <div className="flex flex-col">
@@ -157,12 +157,12 @@ export default function UploadImage() {
                         </div>
                     )}
                 </div>
-                <Button className={`py-6 text-md cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
+                <Button className={`py-6 text-md dark:text-white cursor-pointer`} onClick={handleUpload} disabled={!file || loading}>
                     {loading ? "Please wait..." : "Remove background"}
                 </Button>
 
-                {downloadUrl && (
-                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                {true && (
+                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none dark:hover:bg-neutral-800 hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
                         See your result
                     </Button>
                 )}
@@ -180,20 +180,20 @@ export default function UploadImage() {
                 </p>
 
                 <div className="grid grid-cols-3 gap-10 items-start">
-                    <p className="flex items-center flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
+                    <p className="flex items-center dark:bg-neutral-800 flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
                         <SearchCheck className="text-primary mb-2" size={40} />
                         <span className="text-primary font-bold">
                             Instant & Automatic Removal
                         </span>
                     </p>
-                    <p className="flex items-center flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
+                    <p className="flex items-center dark:bg-neutral-800 flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
                         <LaughIcon className="text-primary mb-2" size={40} />
                         <span className="text-primary font-bold">
                             Preserve Fine Details (like hair & edges)
                         </span>
                     </p>
 
-                    <p className="flex items-center flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
+                    <p className="flex items-center dark:bg-neutral-800 flex-col items-center justify-center bg-neutral-50 rounded-md py-10 px-6 text-center  gap-x-4">
                         <ImageMinus className="text-primary mb-2" size={40} />
                         <span className="text-primary font-bold">
                             Download in High Resolution <br />
@@ -230,7 +230,7 @@ export default function UploadImage() {
                             !!downloadUrl && (
                                 <div className="flex flex-col">
                                     <span className="font-bold text-2xl text-center text-primary mb-4">Your image:</span>
-                                    <img className="w-full max-h-[400px] object-cover rounded-md" src={downloadUrl} alt="" />
+                                    <img className="w-full max-h-[400px] object-cover rounded-md " src={downloadUrl} alt="" />
                                 </div>
                             )
                         }
@@ -240,7 +240,7 @@ export default function UploadImage() {
                                     <span className="font-bold text-2xl text-primary text-center mb-4">Removed Background:</span>
                                     <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={removedUrl} alt="" />
 
-                                    <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(removedUrl)}>Download Image</Button>
+                                    <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(removedUrl)}>Download Image</Button>
                                 </div>
                             )
                         }

@@ -156,7 +156,7 @@ export default function ImageToImage() {
 
     return (
         <div className="w-full flex">
-            <div className="flex bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
+            <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Transform Images into Unique Styles with AI</h1>
                 <h2>
                     Convert your images into emojis, 3D models, pixel art, clay figures, video game characters, and toy designs with AI. Upload an image and watch it transform instantly.
@@ -164,27 +164,27 @@ export default function ImageToImage() {
 
                 <h2 className='font-bold text-xl text-primary mt-4 mb-2'>{`Select an Image Style:`}</h2>
                 <div className="grid grid-cols-6 gap-x-6">
-                    <div onClick={() => promeniInput(0)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[0] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(0)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[0] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <BoxIcon size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">3D Character</span>
                     </div>
-                    <div onClick={() => promeniInput(1)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[1] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(1)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[1] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <SmileIcon size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">Emoji</span>
                     </div>
-                    <div onClick={() => promeniInput(2)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[2] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(2)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[2] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <Swords size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">Video Game</span>
                     </div>
-                    <div onClick={() => promeniInput(3)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[3] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(3)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[3] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <RectangleEllipsis size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">Pixels</span>
                     </div>
-                    <div onClick={() => promeniInput(4)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[4] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(4)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[4] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <AmphoraIcon size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">Clay</span>
                     </div>
-                    <div onClick={() => promeniInput(5)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 rounded-md border border-1 border-gray-100 py-5 px-2 items-center ${formData?.style == options[5] ? `bg-primary text-white hover:bg-primary` : ``}`}>
+                    <div onClick={() => promeniInput(5)} className={`style-item cursor-pointer flex text-primary flex-col hover:bg-green-50 dark:hover:bg-zinc-700 rounded-md border border-1 border-gray-100 dark:border-zinc-800 py-5 px-2 items-center ${formData?.style == options[5] ? `bg-primary text-white hover:bg-primary` : ``}`}>
                         <ToyBrick size={33} className="" />
                         <span className="font-bold mt-1 text-center text-sm">Toy</span>
                     </div>
@@ -193,7 +193,7 @@ export default function ImageToImage() {
 
                 <h2 className='font-bold text-xl text-primary mt-4 mb-0 pb-0'>{`Upload your image`}</h2>
                 <p className='text-gray-500'>{`Upload an image to transform it with AI-powered effects`}</p>
-                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400" {...getRootProps()}>
+                <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer hover:border-gray-400 dark:bg-zinc-950" {...getRootProps()}>
                     <input {...getInputProps()} />
                     {uploadedImage ? (
                         <div className="flex flex-col">
@@ -218,12 +218,12 @@ export default function ImageToImage() {
 
                 <PromptInput onUserSelect={naPromenaInput} title={`Caption:`} />
 
-                <Button className={`py-6 cursor-pointer`} onClick={handleUpload} disabled={uploading}>
+                <Button className={`py-6 cursor-pointer dark:text-white`} onClick={handleUpload} disabled={uploading}>
                     {uploading ? "Uploading..." : "Generate image"}
                 </Button>
 
                 {modifiedImage && (
-                    <Button className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
+                    <Button className={`py-2 border-bottom dark:hover:bg-zinc-800 border-2 border-primary text-md border-none hover:bg-neutral-100 h bg-transparent text-primary cursor-pointer`} onClick={() => setOpenedResult(true)}>
                         See your result
                     </Button>
                 )}
@@ -269,7 +269,7 @@ export default function ImageToImage() {
                                         <span className="font-bold text-2xl text-primary text-center mb-4">Result:</span>
                                         <img className="w-full bg-gray-50 max-h-[400px] object-cover rounded-md" src={modifiedImage} alt="" />
 
-                                        <Button className={`py-6 mt-5 cursor-pointer`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
+                                        <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(modifiedImage)}>Download Image</Button>
                                     </div>
                                 )
                             }
