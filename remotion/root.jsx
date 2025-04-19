@@ -6,573 +6,650 @@ import RemotionVideo from '../app/app/_components/RemotionVideo';
 const videoData = {
   captions: [
     {
-      "text": "The",
+      "text": "It",
       "start": 160,
       "end": 272,
-      "confidence": 0.99957,
+      "confidence": 0.9995,
       "speaker": null
     },
     {
-      "text": "climb",
+      "text": "was",
       "start": 272,
-      "end": 552,
-      "confidence": 0.9873,
-      "speaker": null
-    },
-    {
-      "text": "may",
-      "start": 568,
-      "end": 712,
-      "confidence": 0.9999,
-      "speaker": null
-    },
-    {
-      "text": "be",
-      "start": 736,
-      "end": 920,
-      "confidence": 0.99912,
-      "speaker": null
-    },
-    {
-      "text": "tough,",
-      "start": 960,
-      "end": 1176,
-      "confidence": 0.99984,
-      "speaker": null
-    },
-    {
-      "text": "but",
-      "start": 1208,
-      "end": 1448,
-      "confidence": 0.94658,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 1504,
-      "end": 1624,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "view",
-      "start": 1632,
-      "end": 1800,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "from",
-      "start": 1840,
-      "end": 1992,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 2016,
-      "end": 2152,
-      "confidence": 0.99973,
-      "speaker": null
-    },
-    {
-      "text": "top",
-      "start": 2176,
-      "end": 2408,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "is",
-      "start": 2464,
-      "end": 2632,
-      "confidence": 0.99983,
-      "speaker": null
-    },
-    {
-      "text": "worth",
-      "start": 2656,
-      "end": 2856,
+      "end": 408,
       "confidence": 0.99999,
       "speaker": null
     },
     {
-      "text": "every",
-      "start": 2888,
-      "end": 3128,
-      "confidence": 0.99994,
-      "speaker": null
-    },
-    {
-      "text": "step.",
-      "start": 3184,
-      "end": 3832,
-      "confidence": 0.99984,
-      "speaker": null
-    },
-    {
-      "text": "Even",
-      "start": 4016,
-      "end": 4360,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 4400,
-      "end": 4552,
-      "confidence": 0.99991,
-      "speaker": null
-    },
-    {
-      "text": "tallest",
-      "start": 4576,
-      "end": 4984,
-      "confidence": 0.83539,
-      "speaker": null
-    },
-    {
-      "text": "tree",
-      "start": 5032,
-      "end": 5352,
-      "confidence": 0.97843,
-      "speaker": null
-    },
-    {
-      "text": "started",
-      "start": 5416,
-      "end": 5688,
-      "confidence": 0.99984,
-      "speaker": null
-    },
-    {
-      "text": "as",
-      "start": 5744,
-      "end": 5912,
-      "confidence": 0.99989,
-      "speaker": null
-    },
-    {
       "text": "a",
-      "start": 5936,
-      "end": 6072,
-      "confidence": 0.99967,
+      "start": 416,
+      "end": 552,
+      "confidence": 0.9999,
       "speaker": null
     },
     {
-      "text": "tiny",
-      "start": 6096,
-      "end": 6424,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "seed.",
-      "start": 6472,
-      "end": 6936,
-      "confidence": 0.79148,
-      "speaker": null
-    },
-    {
-      "text": "Nurture",
-      "start": 7048,
-      "end": 7416,
-      "confidence": 0.71443,
-      "speaker": null
-    },
-    {
-      "text": "your",
-      "start": 7448,
-      "end": 7640,
-      "confidence": 0.99391,
-      "speaker": null
-    },
-    {
-      "text": "dreams",
-      "start": 7680,
-      "end": 8024,
-      "confidence": 0.63703,
+      "text": "dark",
+      "start": 576,
+      "end": 728,
+      "confidence": 0.99998,
       "speaker": null
     },
     {
       "text": "and",
-      "start": 8072,
-      "end": 8280,
-      "confidence": 0.97685,
+      "start": 744,
+      "end": 968,
+      "confidence": 0.9883,
       "speaker": null
     },
     {
-      "text": "they",
-      "start": 8320,
-      "end": 8472,
-      "confidence": 0.99983,
+      "text": "stormy",
+      "start": 1024,
+      "end": 1464,
+      "confidence": 0.9999,
       "speaker": null
     },
     {
-      "text": "will",
-      "start": 8496,
-      "end": 8680,
-      "confidence": 0.9997,
+      "text": "night.",
+      "start": 1512,
+      "end": 1864,
+      "confidence": 0.99988,
       "speaker": null
     },
     {
-      "text": "grow.",
-      "start": 8720,
-      "end": 9160,
-      "confidence": 0.99986,
+      "text": "They",
+      "start": 1952,
+      "end": 2200,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "dared",
+      "start": 2240,
+      "end": 2504,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "me",
+      "start": 2552,
+      "end": 2664,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "to",
+      "start": 2672,
+      "end": 2792,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "go",
+      "start": 2816,
+      "end": 2904,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "into",
+      "start": 2912,
+      "end": 3128,
+      "confidence": 0.80775,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 3184,
+      "end": 3352,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "abandoned",
+      "start": 3376,
+      "end": 3816,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "house",
+      "start": 3848,
+      "end": 4040,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "on",
+      "start": 4080,
+      "end": 4280,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "Widow's",
+      "start": 4320,
+      "end": 4728,
+      "confidence": 0.96947,
+      "speaker": null
+    },
+    {
+      "text": "Hill.",
+      "start": 4744,
+      "end": 5320,
+      "confidence": 0.96483,
       "speaker": null
     },
     {
       "text": "The",
-      "start": 9280,
-      "end": 9512,
-      "confidence": 0.99987,
+      "start": 5480,
+      "end": 5752,
+      "confidence": 0.99997,
       "speaker": null
     },
     {
-      "text": "only",
-      "start": 9536,
-      "end": 9768,
-      "confidence": 0.99976,
+      "text": "door",
+      "start": 5776,
+      "end": 6024,
+      "confidence": 0.99998,
       "speaker": null
     },
     {
-      "text": "limit",
-      "start": 9824,
+      "text": "groaned",
+      "start": 6072,
+      "end": 6456,
+      "confidence": 0.90961,
+      "speaker": null
+    },
+    {
+      "text": "open,",
+      "start": 6488,
+      "end": 6824,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "revealing",
+      "start": 6912,
+      "end": 7368,
+      "confidence": 0.99508,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 7384,
+      "end": 7560,
+      "confidence": 0.60772,
+      "speaker": null
+    },
+    {
+      "text": "long,",
+      "start": 7600,
+      "end": 7944,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "dark",
+      "start": 8032,
+      "end": 8296,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "hallway.",
+      "start": 8328,
+      "end": 8936,
+      "confidence": 0.99995,
+      "speaker": null
+    },
+    {
+      "text": "Cobwebs",
+      "start": 9048,
+      "end": 9752,
+      "confidence": 0.78936,
+      "speaker": null
+    },
+    {
+      "text": "brushed",
+      "start": 9816,
       "end": 10136,
       "confidence": 0.99997,
       "speaker": null
     },
     {
-      "text": "is",
+      "text": "my",
       "start": 10168,
       "end": 10312,
-      "confidence": 0.99323,
+      "confidence": 0.99998,
       "speaker": null
     },
     {
-      "text": "the",
+      "text": "face",
       "start": 10336,
-      "end": 10424,
-      "confidence": 0.99966,
+      "end": 10616,
+      "confidence": 0.70582,
       "speaker": null
     },
     {
-      "text": "one",
-      "start": 10432,
-      "end": 10552,
-      "confidence": 0.99991,
+      "text": "like",
+      "start": 10688,
+      "end": 10920,
+      "confidence": 0.99998,
       "speaker": null
     },
     {
-      "text": "you",
-      "start": 10576,
-      "end": 10760,
-      "confidence": 0.9997,
-      "speaker": null
-    },
-    {
-      "text": "set",
-      "start": 10800,
-      "end": 11000,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "for",
-      "start": 11040,
-      "end": 11192,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "yourself.",
-      "start": 11216,
-      "end": 11832,
-      "confidence": 0.99964,
-      "speaker": null
-    },
-    {
-      "text": "Push",
-      "start": 11976,
-      "end": 12344,
-      "confidence": 0.99917,
-      "speaker": null
-    },
-    {
-      "text": "harder.",
-      "start": 12392,
-      "end": 12792,
-      "confidence": 0.99289,
-      "speaker": null
-    },
-    {
-      "text": "You're",
-      "start": 12856,
-      "end": 13128,
-      "confidence": 0.99084,
-      "speaker": null
-    },
-    {
-      "text": "almost",
-      "start": 13144,
-      "end": 13416,
-      "confidence": 0.99997,
-      "speaker": null
-    },
-    {
-      "text": "there.",
-      "start": 13488,
-      "end": 14056,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "Together,",
-      "start": 14208,
-      "end": 14664,
-      "confidence": 0.99988,
-      "speaker": null
-    },
-    {
-      "text": "we",
-      "start": 14752,
-      "end": 15000,
-      "confidence": 0.99988,
-      "speaker": null
-    },
-    {
-      "text": "can",
-      "start": 15040,
-      "end": 15192,
-      "confidence": 0.99984,
-      "speaker": null
-    },
-    {
-      "text": "achieve",
-      "start": 15216,
-      "end": 15496,
-      "confidence": 0.97062,
-      "speaker": null
-    },
-    {
-      "text": "what",
-      "start": 15528,
-      "end": 15720,
+      "text": "ghostly",
+      "start": 10960,
+      "end": 11464,
       "confidence": 0.99982,
       "speaker": null
     },
     {
-      "text": "we",
-      "start": 15760,
-      "end": 15960,
-      "confidence": 0.99993,
+      "text": "fingers.",
+      "start": 11512,
+      "end": 12040,
+      "confidence": 0.99881,
       "speaker": null
     },
     {
-      "text": "never",
-      "start": 16000,
-      "end": 16200,
-      "confidence": 0.99975,
-      "speaker": null
-    },
-    {
-      "text": "thought",
-      "start": 16240,
-      "end": 16440,
-      "confidence": 0.99994,
-      "speaker": null
-    },
-    {
-      "text": "possible.",
-      "start": 16480,
-      "end": 17064,
-      "confidence": 0.99956,
-      "speaker": null
-    },
-    {
-      "text": "Collaboration",
-      "start": 17232,
-      "end": 17992,
-      "confidence": 0.53105,
-      "speaker": null
-    },
-    {
-      "text": "is",
-      "start": 18056,
-      "end": 18232,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 18256,
-      "end": 18392,
+      "text": "I",
+      "start": 12120,
+      "end": 12360,
       "confidence": 0.9996,
       "speaker": null
     },
     {
-      "text": "key",
-      "start": 18416,
-      "end": 18552,
+      "text": "saw",
+      "start": 12400,
+      "end": 12552,
       "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "it",
+      "start": 12576,
+      "end": 12760,
+      "confidence": 0.9999,
+      "speaker": null
+    },
+    {
+      "text": "then.",
+      "start": 12800,
+      "end": 13192,
+      "confidence": 0.90431,
+      "speaker": null
+    },
+    {
+      "text": "A",
+      "start": 13296,
+      "end": 13512,
+      "confidence": 0.99747,
+      "speaker": null
+    },
+    {
+      "text": "figure",
+      "start": 13536,
+      "end": 13864,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "standing",
+      "start": 13912,
+      "end": 14296,
+      "confidence": 0.86701,
+      "speaker": null
+    },
+    {
+      "text": "at",
+      "start": 14328,
+      "end": 14424,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 14432,
+      "end": 14552,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "end",
+      "start": 14576,
+      "end": 14712,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "of",
+      "start": 14736,
+      "end": 14824,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 14832,
+      "end": 14952,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "hall.",
+      "start": 14976,
+      "end": 15656,
+      "confidence": 0.99938,
+      "speaker": null
+    },
+    {
+      "text": "Its",
+      "start": 15848,
+      "end": 16200,
+      "confidence": 0.99504,
+      "speaker": null
+    },
+    {
+      "text": "eyes",
+      "start": 16240,
+      "end": 16456,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "glowed",
+      "start": 16488,
+      "end": 16776,
+      "confidence": 0.9999,
+      "speaker": null
+    },
+    {
+      "text": "red",
+      "start": 16808,
+      "end": 17000,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "in",
+      "start": 17040,
+      "end": 17192,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 17216,
+      "end": 17352,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "darkness.",
+      "start": 17376,
+      "end": 17976,
+      "confidence": 0.99974,
+      "speaker": null
+    },
+    {
+      "text": "I",
+      "start": 18088,
+      "end": 18312,
+      "confidence": 0.99972,
+      "speaker": null
+    },
+    {
+      "text": "didn't",
+      "start": 18336,
+      "end": 18616,
+      "confidence": 0.99989,
+      "speaker": null
+    },
+    {
+      "text": "wait",
+      "start": 18648,
+      "end": 18808,
+      "confidence": 0.99997,
       "speaker": null
     },
     {
       "text": "to",
-      "start": 18576,
-      "end": 18712,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "unlocking",
-      "start": 18736,
-      "end": 19224,
+      "start": 18824,
+      "end": 18952,
       "confidence": 0.99993,
       "speaker": null
     },
     {
-      "text": "limitless",
-      "start": 19272,
-      "end": 19704,
-      "confidence": 0.77728,
+      "text": "see",
+      "start": 18976,
+      "end": 19160,
+      "confidence": 0.99999,
       "speaker": null
     },
     {
-      "text": "potential.",
-      "start": 19752,
-      "end": 20392,
-      "confidence": 0.99954,
+      "text": "more.",
+      "start": 19200,
+      "end": 19592,
+      "confidence": 0.99994,
       "speaker": null
     },
     {
-      "text": "From",
-      "start": 20536,
-      "end": 20792,
-      "confidence": 0.99984,
+      "text": "I",
+      "start": 19696,
+      "end": 19960,
+      "confidence": 0.99982,
       "speaker": null
     },
     {
-      "text": "the",
-      "start": 20816,
-      "end": 20952,
-      "confidence": 0.99991,
-      "speaker": null
-    },
-    {
-      "text": "ashes",
-      "start": 20976,
-      "end": 21336,
-      "confidence": 0.65132,
-      "speaker": null
-    },
-    {
-      "text": "of",
-      "start": 21368,
-      "end": 21560,
-      "confidence": 0.99985,
-      "speaker": null
-    },
-    {
-      "text": "failure,",
-      "start": 21600,
-      "end": 22088,
-      "confidence": 0.99958,
-      "speaker": null
-    },
-    {
-      "text": "rise",
-      "start": 22184,
-      "end": 22536,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "stronger",
-      "start": 22568,
-      "end": 22968,
-      "confidence": 0.99996,
+      "text": "turned",
+      "start": 20000,
+      "end": 20248,
+      "confidence": 0.99998,
       "speaker": null
     },
     {
       "text": "and",
-      "start": 22984,
-      "end": 23160,
-      "confidence": 0.96266,
+      "start": 20264,
+      "end": 20440,
+      "confidence": 0.99934,
       "speaker": null
     },
     {
-      "text": "wiser.",
-      "start": 23200,
-      "end": 23864,
-      "confidence": 0.99955,
+      "text": "ran.",
+      "start": 20480,
+      "end": 20840,
+      "confidence": 0.99663,
       "speaker": null
     },
     {
-      "text": "Embrace",
-      "start": 23992,
-      "end": 24424,
-      "confidence": 0.99942,
+      "text": "The",
+      "start": 20920,
+      "end": 21112,
+      "confidence": 0.99937,
+      "speaker": null
+    },
+    {
+      "text": "image",
+      "start": 21136,
+      "end": 21384,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "seared",
+      "start": 21432,
+      "end": 21784,
+      "confidence": 0.94178,
+      "speaker": null
+    },
+    {
+      "text": "into",
+      "start": 21832,
+      "end": 22040,
+      "confidence": 0.99986,
+      "speaker": null
+    },
+    {
+      "text": "my",
+      "start": 22080,
+      "end": 22232,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "mind",
+      "start": 22256,
+      "end": 22536,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "forever.",
+      "start": 22608,
+      "end": 23368,
+      "confidence": 0.9998,
+      "speaker": null
+    },
+    {
+      "text": "Even",
+      "start": 23544,
+      "end": 24024,
+      "confidence": 0.99993,
+      "speaker": null
+    },
+    {
+      "text": "now,",
+      "start": 24112,
+      "end": 24456,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "safe",
+      "start": 24528,
+      "end": 24856,
+      "confidence": 0.99979,
+      "speaker": null
+    },
+    {
+      "text": "in",
+      "start": 24888,
+      "end": 25032,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "my",
+      "start": 25056,
+      "end": 25192,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "bed,",
+      "start": 25216,
+      "end": 25560,
+      "confidence": 0.99989,
+      "speaker": null
+    },
+    {
+      "text": "I",
+      "start": 25640,
+      "end": 25832,
+      "confidence": 0.99967,
+      "speaker": null
+    },
+    {
+      "text": "can't",
+      "start": 25856,
+      "end": 26056,
+      "confidence": 0.99922,
+      "speaker": null
+    },
+    {
+      "text": "shake",
+      "start": 26088,
+      "end": 26296,
+      "confidence": 0.99991,
       "speaker": null
     },
     {
       "text": "the",
-      "start": 24472,
-      "end": 24632,
-      "confidence": 0.99999,
+      "start": 26328,
+      "end": 26472,
+      "confidence": 0.99997,
       "speaker": null
     },
     {
-      "text": "power",
-      "start": 24656,
-      "end": 24840,
-      "confidence": 0.99999,
+      "text": "feeling",
+      "start": 26496,
+      "end": 26744,
+      "confidence": 0.62243,
       "speaker": null
     },
     {
-      "text": "of",
-      "start": 24880,
-      "end": 25080,
-      "confidence": 0.99981,
+      "text": "that",
+      "start": 26792,
+      "end": 26952,
+      "confidence": 0.99983,
       "speaker": null
     },
     {
-      "text": "reinvention.",
-      "start": 25120,
-      "end": 25560,
-      "confidence": 0.64621,
+      "text": "I'm",
+      "start": 26976,
+      "end": 27128,
+      "confidence": 0.99911,
+      "speaker": null
+    },
+    {
+      "text": "still",
+      "start": 27144,
+      "end": 27320,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "being",
+      "start": 27360,
+      "end": 27560,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "watched.",
+      "start": 27600,
+      "end": 27880,
+      "confidence": 0.99989,
       "speaker": null
     }
   ],
   images: [
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1742678807953.png?alt=media&token=8f2cf822-edd2-4b85-b345-402c94aac4b7",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1742678811833.png?alt=media&token=747b2d66-3e5f-47f8-ac13-a8a13672a67a",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1742678814637.png?alt=media&token=d7f63c4c-9be3-4006-809f-1264e2e2c03c",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1742678817200.png?alt=media&token=b628d738-7b7e-4c5c-a8a5-a92afc38713a",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1742678819979.png?alt=media&token=c6adf03e-43ee-496f-86b7-9ac5d2da53e9"
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1745042184762.png?alt=media&token=656a8572-ba14-48c5-8fb8-b2271c8fedea",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1745042197118.png?alt=media&token=6255cc5c-1c80-4e78-a8eb-9cba17f1aa48",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1745042208248.png?alt=media&token=67d81f5a-72d0-42dd-8bda-a9043131b955",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1745042218836.png?alt=media&token=3a876714-704d-4a9b-82d2-5d0ab5c2f3e7",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1745042230435.png?alt=media&token=8d456775-4a07-4194-97c9-0956019facfc"
   ],
-  audio: 'https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F6554292f-63d6-42a4-884e-a2d671a52f97.mp3?alt=media&token=020aa416-e3f0-46c5-97b4-e9265f1b6a43',
+  audio: 'https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2Fb5ed4e25-340b-47c9-8f22-904508d26ac9.mp3?alt=media&token=48dfda4b-0305-4c60-9c6d-36e2db372a42',
   script: [
     {
-      "imagePrompt": "A breathtaking vista of a lone hiker standing on the summit of a snow-capped mountain at sunrise. The sky is ablaze with vibrant oranges, pinks, and purples. The hiker is silhouetted against the light, exuding a sense of accomplishment and freedom. Focus on capturing the grandeur of nature and the hiker's smallness within it. Realistic, high-resolution photography.",
-      "ContentText": "The climb may be tough, but the view from the top is worth every step."
+      "imagePrompt": "Cartoon illustration of a creepy old house on a hill, silhouetted against a full moon. Exaggerate the house's features: crooked windows, gnarled trees, and a general sense of decay. Use a dark, moody color palette with greens and purples.",
+      "ContentText": "It was a dark and stormy night. They dared me to go into the abandoned house on Widow's Hill."
     },
     {
-      "imagePrompt": "A close-up, high-resolution shot of hands planting a small seedling in fertile soil. Sunlight filters through the leaves of nearby plants, illuminating the hands and the seedling. Focus on the details: the texture of the soil, the delicate nature of the seedling, and the hope for growth. Realistic, warm lighting.",
-      "ContentText": "Even the tallest tree started as a tiny seed. Nurture your dreams, and they will grow."
+      "imagePrompt": "Cartoon depiction of a character cautiously opening a creaky, wooden door inside the house. Use exaggerated shadows to create a sense of suspense. Show the character's wide, scared eyes and trembling hands.",
+      "ContentText": "The door groaned open, revealing a long, dark hallway. Cobwebs brushed my face like ghostly fingers."
     },
     {
-      "imagePrompt": "A realistic depiction of an athlete sprinting towards a finish line, their face etched with determination and sweat. The background is blurred, conveying a sense of speed and focus. Capture the intensity of the moment, the grit and perseverance required to push through. Use dynamic lighting to highlight the athlete's effort.",
-      "ContentText": "The only limit is the one you set for yourself. Push harder, you're almost there."
+      "imagePrompt": "Cartoon scene of a shadowy figure lurking at the end of the hallway. Make the figure's features indistinct, focusing on its menacing silhouette. Emphasize the long, spindly fingers and glowing red eyes.",
+      "ContentText": "I saw it then... a figure standing at the end of the hall. Its eyes glowed red in the darkness."
     },
     {
-      "imagePrompt": "A diverse group of people working collaboratively on a complex project, surrounded by computers, blueprints, and whiteboards filled with ideas. The atmosphere is energetic and focused. Capture the sense of teamwork and shared purpose, the power of collective intelligence. Realistic, well-lit office environment.",
-      "ContentText": "Together, we can achieve what we never thought possible. Collaboration is the key to unlocking limitless potential."
+      "imagePrompt": "Cartoon illustration of the character running away in terror, their face contorted in a scream. Use blur effects and dynamic lines to convey the speed and intensity of their flight. The creepy house is in the background, looming ominously.",
+      "ContentText": "I didn't wait to see more. I turned and ran, the image seared into my mind forever!"
     },
     {
-      "imagePrompt": "A phoenix rising from ashes. A realistic, detailed phoenix with fiery feathers, lifting its wings in a triumphant pose. The ashes below are dark and gray, contrasting with the vibrant colors of the phoenix. Emphasize the resilience and power of rebirth. Use dramatic lighting to highlight the phoenix's form.",
-      "ContentText": "From the ashes of failure, rise stronger and wiser. Embrace the power of reinvention."
+      "imagePrompt": "Cartoon depiction of the character safely back home, huddled under the covers, still terrified. Exaggerate their trembling body and wide, sleepless eyes. The silhouette of the creepy house is visible through the window, reminding them of their ordeal.",
+      "ContentText": "Even now, safe in my bed, I can't shake the feeling that I'm still being watched."
     }
   ]
 }
