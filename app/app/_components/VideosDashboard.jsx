@@ -28,7 +28,9 @@ function VideosDashboard({ videoList }) {
                         frameToDisplay={30}
                         durationInFrames={120}
                         inputProps={{
-                            ...video,
+                            videoData: {
+                                ...video
+                            },
                             setDurationInFrame: (v) => console.log(v)
                         }}
                     />

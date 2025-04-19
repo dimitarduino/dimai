@@ -17,45 +17,75 @@ import { VideoData } from 'configs/schema'
 import { eq } from 'drizzle-orm'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { proveriPoeni } from 'lib/utils'
+import { iskoristPoeni, proveriPoeni } from 'lib/utils'
 import { DollarSign, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { UserDetailContext } from 'app/_context/UserDetailContext'
+import { useUser } from '@clerk/nextjs'
+import CustomLoading from './CustomLoading'
 
 
 function PlayerDialog({ playVideo, videoId }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoData, setVideoData] = useState();
+    const [loading, setLoading] = useState(false);
+    const [downloadUrl, setDownloadUrl] = useState(`https://storage.googleapis.com/remotioncloudrun-qrj7ipfq4c/renders%2F1pcwc6kjmb%2Fout.mp4`);
     const [durationFrame, setDurationFrame] = useState(1200);
+    const { user } = useUser();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const router = useRouter();
 
     useEffect(() => {
         setOpenDialog(!!playVideo)
         videoId && getVideoData();
-        // console.log('rpomena')
-        // console.log(durationFrame);
     }, [playVideo, durationFrame]);
 
     const getVideoData = async (id) => {
         const result = await db.select().from(VideoData).where(eq(VideoData.id, videoId));
         setVideoData(result[0]);
-        // console.log(result)
     }
 
     const exportVideo = async () => {
-        if (!proveriPoeni(userDetail.credits, 100)) {
+        if (!proveriPoeni(userDetail.credits, 2)) {
             toast("Insufficient credits! Please recharge to generate a video.");
             return;
         }
+
+        setLoading(true);
         const res = await axios.post("/api/export-video", {
             inputProps: videoData
         }).then(async (res) => {
-            // console.log(res);
+            setLoading(false);
+
+            if (!!res.result) {
+                setDownloadUrl(res.result);
+            }
+
+            const slednoPoeni = iskoristPoeni({
+                momentalnoKrediti: userDetail.credits,
+                kolkuMinus: 2,
+                email: user.primaryEmailAddress.emailAddress
+            });
+            setUserDetail(prev => ({
+                ...prev,
+                "credits": slednoPoeni
+            }));
+
         })
     }
+    const handleDownload = async (videoUrl) => {
+        const response = await fetch(videoUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
 
-
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "video.mp4"; // Name of the file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    };
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogContent className={`[&>button]:hidden`}>
@@ -69,16 +99,32 @@ function PlayerDialog({ playVideo, videoId }) {
                         fps={30}
                         controls={true}
                         inputProps={{
-                            ...videoData,
+                            videoData: { ...videoData },
                             setDurationInFrame: (frameValue) => setDurationFrame(frameValue)
                         }}
                     />
 
                     <div className="grid mt-6 grid-cols-2 gap-12">
                         <Button onClick={() => { router.replace("/app/shorts"); setOpenDialog(false) }} className={`py-6 cursor-pointer`} variant={`ghost`}>Cancel</Button>
-                        <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer`}>Export (100 credits)</Button>
+                        {downloadUrl && (
+                            <a
+                                href={downloadUrl}
+                                download="video.mp4"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Button className={`py-6 cursor-pointer`}>Download video</Button>
+                            </a>
+                        )}
+
+                        {!downloadUrl && (
+                            <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer`}>Export (2 credits)</Button>
+                        )}
                     </div>
                     <DialogDescription>
+
+                        <CustomLoading title="Rendering your video..." loading={loading} />
+
                     </DialogDescription>
 
                     <DialogClose asChild>
@@ -91,6 +137,8 @@ function PlayerDialog({ playVideo, videoId }) {
                 </DialogHeader>
             </DialogContent>
         </Dialog>
+
+
     )
 }
 
