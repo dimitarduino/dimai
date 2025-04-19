@@ -9,8 +9,11 @@ import PlayerDialog from './PlayerDialog'
 function VideosDashboard({ videoList }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoId, setVideoId] = useState();
+    const [openedVideo, setOpenedVideo] = useState(false);
 
     const setOpenVideo = (id) => {
+        const videoOpened = videoList.find((video) => video.id === id); 
+        setOpenedVideo(videoOpened);
         setOpenDialog(Date.now());
         setVideoId(id);
     }
@@ -37,7 +40,7 @@ function VideosDashboard({ videoList }) {
                 </div>
             ))}
 
-            <PlayerDialog playVideo={openDialog} videoId={videoId} />
+            <PlayerDialog playVideo={openDialog} videoId={videoId} downloadUrlProp={openedVideo ? openedVideo.downloadUrl : false} />
         </div>
     )
 }

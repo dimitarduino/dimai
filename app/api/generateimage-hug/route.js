@@ -17,20 +17,24 @@ export async function POST(req) {
         const image = await client.textToImage({
             model: "black-forest-labs/FLUX.1-dev",
             inputs: prompt,
-            parameters: { num_inference_steps: 5 },
+            parameters: {
+                num_inference_steps: 25,
+                width: 1080,
+                height: 1920,
+            },
         });
 
         const filename = `hugface_images/${Date.now()}.png`;
         const storageRef = ref(storage, filename);
-      
+
         // Upload the blob
         const snapshot = await uploadBytes(storageRef, image, {
-          contentType: 'image/png',
+            contentType: 'image/png',
         });
-      
+
         // Get the download URL
         const downloadUrl = await getDownloadURL(snapshot.ref);
-    
+
         return NextResponse.json({ result: downloadUrl });
     } catch (error) {
         console.log(error.message)

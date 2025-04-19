@@ -41,7 +41,7 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
                         </Sequence>
 
                         <AbsoluteFill style={{
-                            color: "white",
+                            color: "yellow",
                             justifyContent: "center",
                             bottom: 50,
                             top: undefined,
@@ -49,7 +49,7 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 className="font-bold text-4xl">{getFrameCaption()}</h2>
+                            <h2 className="font-bold text-7xl">{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </>
                 )

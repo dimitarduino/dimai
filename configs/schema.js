@@ -17,7 +17,8 @@ export const VideoData = pgTable("videos", {
    audio: varchar("audio").notNull(),
    captions: json("captions").notNull(),
    images: varchar("images").array(),
-   createdBy: varchar("createdBy").notNull()
+   createdBy: varchar("createdBy").notNull(),
+   downloadUrl: varchar("downloadUrl").default('').notNull()
 })
 
 export const Subscribers = pgTable('subscribers', {

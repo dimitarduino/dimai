@@ -12,22 +12,20 @@ const client = new textToSpeech.TextToSpeechClient({
 
 
 export async function POST(req) {
-    const { text, id } = await req.json();
+    const { text, id, gender, voice } = await req.json();
     const storageRef = ref(storage, 'aishortvideofiles/' + id + ".mp3");
 
     const request = {
-        input: {text: text},
-        voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
-        audioConfig: {audioEncoding: 'MP3'},
-      };
-    
-      const [response] = await client.synthesizeSpeech(request);
+        input: { text: text },
+        voice: { languageCode: 'en-US', ssmlGender: gender, name: voice },
+        audioConfig: { audioEncoding: 'MP3' },
+    };
 
-      const audioBuffer = Buffer.from(response.audioContent, 'binary');
-      await uploadBytes(storageRef, audioBuffer, {contentType: "audio/mp3"});
-      const downloadUrl = await getDownloadURL(storageRef);
+    const [response] = await client.synthesizeSpeech(request);
 
-      
+    const audioBuffer = Buffer.from(response.audioContent, 'binary');
+    await uploadBytes(storageRef, audioBuffer, { contentType: "audio/mp3" });
+    const downloadUrl = await getDownloadURL(storageRef);
 
-      return NextResponse.json({result: downloadUrl});
+    return NextResponse.json({ result: downloadUrl });
 }
