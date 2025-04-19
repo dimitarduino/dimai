@@ -16,11 +16,16 @@ import { UserDetailContext } from 'app/_context/UserDetailContext';
 import { toast } from 'sonner';
 import { eq } from 'drizzle-orm';
 import { iskoristPoeni, proveriPoeni } from 'lib/utils';
+import SelectComponent from 'app/app/_components/SelectComponent';
 
 function CreateNew() {
   const [formData, setFormData] = useState({
     topic: "Random AI Story"
   });
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
+  const [gender, setGender] = useState();
+  const [currentVoices, setCurrentVoices] = useState(false);
   const [loading, setLoading] = useState(false);
   const [audioFileUrl, setAudioFileUrl] = useState("");
   const [videoScript, setVideoScript] = useState([]);
@@ -34,7 +39,8 @@ function CreateNew() {
   const { videoData, setVideoData } = useContext(VideoDataContext);
 
   const naPromenaInput = (ime, vrednost) => {
-
+    if (ime == 'gender') setGender(vrednost);
+    if (ime == 'voice') setSelectedVoice(vrednost);
     setFormData(prev => ({
       ...prev,
       [ime]: vrednost
@@ -42,8 +48,32 @@ function CreateNew() {
   }
 
   useEffect(() => {
-    // console.log(userDetail);
-  }, [userDetail])
+    getVoices();
+  }, [])
+
+  useEffect(() => {
+    const cur = voices.filter(v => (v.ssmlGender == gender));
+    const current = cur.map(c => c.name);
+ 
+    try {
+      setCurrentVoices(current);
+      setGender(cur[0].ssmlGender)
+    } catch (e) {
+      console.log(e);
+    }
+    // setSelectedVoice(cur[0].name);
+  }, [gender])
+
+  const getVoices = async () => {
+    const res = await axios.post("/api/getvoices", {
+    }).then((res) => {
+      let voices = res.data.result;
+
+      setVoices(voices);
+      setSelectedVoice(voices[0].name);
+      setGender(voices[0].ssmlGender);
+    })
+  }
 
   const getVideoScript = async () => {
     setLoading(true);
@@ -72,9 +102,14 @@ function CreateNew() {
       script += item.ContentText + " ";
     })
 
+    console.log(gender);
+    console.log(selectedVoice);
+
     const res = await axios.post("/api/generate-audio", {
       id,
-      text: script
+      text: script,
+      gender,
+      voice: selectedVoice
     }).then(async (res) => {
       setVideoData((prev) => ({
         ...prev,
@@ -106,7 +141,7 @@ function CreateNew() {
     let images = [];
 
     for (const item of videoScriptData) {
-      await axios.post("/api/generate-image", {
+      await axios.post("/api/generateimage-hug", {
         prompt: item.imagePrompt
       }).then(async (res) => {
         images.push(res.data.result);
@@ -184,6 +219,16 @@ function CreateNew() {
         {/* Select style */}
         <SelectStyle onUserSelect={naPromenaInput} />
         {/* Duration */}
+
+
+        <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
+
+        {
+          !!currentVoices && (
+            <SelectComponent defaultValue={selectedVoice} optionsAvailable={currentVoices} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Model" name="voice" description="Select the voice for your video" title="Choose Voice Model" />
+          )
+        }
+
         <SelectDuration onUserSelect={naPromenaInput} />
         {/* Create Button */}
         <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>

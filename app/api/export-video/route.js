@@ -11,14 +11,16 @@ export async function POST(req) {
   const serviceName = services[0]?.serviceName;
 
   const { inputProps } = await req.json();
-  console.log(inputProps);
+  // console.log(inputProps.audio);
 
   const result = await renderMediaOnCloudrun({
     serviceName,
     region: 'us-east1',
     serveUrl: process.env.GCP_SERVER_URL,
     composition: 'shortVideo',
-    inputProps,
+    inputProps: {
+      videoData: inputProps
+    },
     codec: 'h264',
   });
 

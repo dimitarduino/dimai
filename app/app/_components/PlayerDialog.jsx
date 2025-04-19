@@ -17,7 +17,7 @@ import { VideoData } from 'configs/schema'
 import { eq } from 'drizzle-orm'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import { iskoristPoeni, proveriPoeni } from 'lib/utils'
+import { iskoristPoeni, namestiDownloadUrl, proveriPoeni } from 'lib/utils'
 import { DollarSign, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { UserDetailContext } from 'app/_context/UserDetailContext'
@@ -25,15 +25,21 @@ import { useUser } from '@clerk/nextjs'
 import CustomLoading from './CustomLoading'
 
 
-function PlayerDialog({ playVideo, videoId }) {
+function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoData, setVideoData] = useState();
     const [loading, setLoading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState(`https://storage.googleapis.com/remotioncloudrun-qrj7ipfq4c/renders%2F1pcwc6kjmb%2Fout.mp4`);
+    const [downloadUrl, setDownloadUrl] = useState(false);
     const [durationFrame, setDurationFrame] = useState(1200);
     const { user } = useUser();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const router = useRouter();
+
+    useEffect(() => {
+        if (downloadUrlProp) {
+            setDownloadUrl(downloadUrlProp);
+        }
+    }, []);
 
     useEffect(() => {
         setOpenDialog(!!playVideo)
@@ -56,9 +62,13 @@ function PlayerDialog({ playVideo, videoId }) {
             inputProps: videoData
         }).then(async (res) => {
             setLoading(false);
-
-            if (!!res.result) {
-                setDownloadUrl(res.result);
+            console.log(res);
+            if (!!res.data.result) {
+                setDownloadUrl(res.data.result);
+                namestiDownloadUrl({
+                    id: videoId,
+                    downloadUrl: res.data.result
+                });
             }
 
             const slednoPoeni = iskoristPoeni({
@@ -100,7 +110,7 @@ function PlayerDialog({ playVideo, videoId }) {
                         controls={true}
                         inputProps={{
                             videoData: { ...videoData },
-                            setDurationInFrame: (frameValue) => setDurationFrame(frameValue)
+                            setDurationInFrame: (frameValue) => setDurationFrame(frameValue + 20)
                         }}
                     />
 
