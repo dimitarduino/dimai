@@ -14,12 +14,12 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
         try {
             setDurationInFrame(getDurationFrames());
         } catch (err) {
-            
+
         }
     }, [captions]); // Runs only when captions change
 
     const totalDurationInFrames = getDurationFrames();
-    const imagesDuration = totalDurationInFrames / images?.length;
+    const imagesDuration = (totalDurationInFrames / images?.length) + 200;
 
     const getFrameCaption = () => {
         const currentTime = frame / 30 * 1000;
@@ -33,7 +33,7 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
             {images?.map((image, index) => {
                 const startTime = index * imagesDuration;
                 const duration = getDurationFrames();
-                const scale = (index) => interpolate(frame, [startTime, startTime + duration / 2, startTime + duration], index % 2== 0 ? [1, 1.8, 1] : [1.8, 1.2, 1.8], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+                const scale = (index) => interpolate(frame, [startTime, startTime + duration / 2, startTime + duration], index % 2 == 0 ? [1, 1.8, 1] : [1.8, 1.2, 1.8], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
                 return (
                     <>
                         <Sequence key={index} from={index * imagesDuration} durationInFrames={imagesDuration}>
@@ -49,7 +49,12 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 className="font-bold text-7xl">{getFrameCaption()}</h2>
+                            <h2 style={{
+                                fontSize: 100, // Much larger
+                                fontWeight: 'bold',
+                                lineHeight: 1.2,
+                                textShadow: '0px 0px 15px rgba(0,0,0,0.75)', // Outline effect for readability
+                            }}>{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </>
                 )

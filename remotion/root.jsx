@@ -6,769 +6,874 @@ import RemotionVideo from '../app/app/_components/RemotionVideo';
 const videoData = {
   captions: [
     {
-      "text": "Once",
-      "start": 240,
-      "end": 352,
+      "text": "Bolt,",
+      "start": 160,
+      "end": 416,
+      "confidence": 0.94025,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 416,
+      "end": 560,
+      "confidence": 0.99858,
+      "speaker": null
+    },
+    {
+      "text": "robot",
+      "start": 576,
+      "end": 1064,
+      "confidence": 0.97931,
+      "speaker": null
+    },
+    {
+      "text": "woke",
+      "start": 1112,
+      "end": 1288,
+      "confidence": 0.99979,
+      "speaker": null
+    },
+    {
+      "text": "up",
+      "start": 1304,
+      "end": 1432,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "in",
+      "start": 1456,
+      "end": 1592,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 1616,
+      "end": 1752,
+      "confidence": 0.9999,
+      "speaker": null
+    },
+    {
+      "text": "sunflower",
+      "start": 1776,
+      "end": 2344,
+      "confidence": 0.99017,
+      "speaker": null
+    },
+    {
+      "text": "field.",
+      "start": 2392,
+      "end": 2840,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "He",
+      "start": 2960,
+      "end": 3240,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "had",
+      "start": 3280,
+      "end": 3432,
+      "confidence": 0.99988,
+      "speaker": null
+    },
+    {
+      "text": "no",
+      "start": 3456,
+      "end": 3640,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "memory",
+      "start": 3680,
+      "end": 4024,
+      "confidence": 0.99995,
+      "speaker": null
+    },
+    {
+      "text": "of",
+      "start": 4072,
+      "end": 4184,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "how",
+      "start": 4192,
+      "end": 4360,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "he",
+      "start": 4400,
+      "end": 4552,
+      "confidence": 0.99993,
+      "speaker": null
+    },
+    {
+      "text": "got",
+      "start": 4576,
+      "end": 4760,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "there,",
+      "start": 4800,
+      "end": 5144,
+      "confidence": 0.99859,
+      "speaker": null
+    },
+    {
+      "text": "only",
+      "start": 5232,
+      "end": 5480,
+      "confidence": 0.99955,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 5520,
+      "end": 5720,
+      "confidence": 0.9999,
+      "speaker": null
+    },
+    {
+      "text": "strange",
+      "start": 5760,
+      "end": 6120,
+      "confidence": 0.74313,
+      "speaker": null
+    },
+    {
+      "text": "craving",
+      "start": 6200,
+      "end": 6568,
+      "confidence": 0.99827,
+      "speaker": null
+    },
+    {
+      "text": "for",
+      "start": 6584,
+      "end": 6760,
+      "confidence": 0.96675,
+      "speaker": null
+    },
+    {
+      "text": "oil",
+      "start": 6800,
+      "end": 7096,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "and",
+      "start": 7168,
+      "end": 7496,
+      "confidence": 0.98602,
+      "speaker": null
+    },
+    {
+      "text": "cupcakes.",
+      "start": 7568,
+      "end": 8616,
+      "confidence": 0.98776,
+      "speaker": null
+    },
+    {
+      "text": "He",
+      "start": 8808,
+      "end": 9208,
+      "confidence": 0.99984,
+      "speaker": null
+    },
+    {
+      "text": "stumbled",
+      "start": 9264,
+      "end": 9656,
       "confidence": 0.99991,
       "speaker": null
     },
     {
       "text": "upon",
-      "start": 352,
-      "end": 680,
-      "confidence": 0.67995,
+      "start": 9688,
+      "end": 9896,
+      "confidence": 0.9958,
       "speaker": null
     },
     {
       "text": "a",
-      "start": 712,
-      "end": 872,
-      "confidence": 0.99999,
-      "speaker": null
-    },
-    {
-      "text": "time,",
-      "start": 896,
-      "end": 1272,
-      "confidence": 1,
-      "speaker": null
-    },
-    {
-      "text": "high",
-      "start": 1376,
-      "end": 1640,
-      "confidence": 0.99997,
-      "speaker": null
-    },
-    {
-      "text": "in",
-      "start": 1680,
-      "end": 1832,
+      "start": 9928,
+      "end": 10072,
       "confidence": 0.99996,
       "speaker": null
     },
     {
-      "text": "the",
-      "start": 1856,
-      "end": 1992,
-      "confidence": 0.99992,
-      "speaker": null
-    },
-    {
-      "text": "sky,",
-      "start": 2016,
-      "end": 2408,
-      "confidence": 0.99913,
-      "speaker": null
-    },
-    {
-      "text": "lived",
-      "start": 2504,
-      "end": 2808,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "a",
-      "start": 2824,
-      "end": 2952,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "little",
-      "start": 2976,
-      "end": 3160,
-      "confidence": 0.99997,
-      "speaker": null
-    },
-    {
-      "text": "dragon",
-      "start": 3200,
-      "end": 3624,
-      "confidence": 0.9432,
-      "speaker": null
-    },
-    {
-      "text": "egg.",
-      "start": 3672,
-      "end": 4328,
-      "confidence": 0.92409,
-      "speaker": null
-    },
-    {
-      "text": "One",
-      "start": 4504,
-      "end": 4888,
-      "confidence": 0.99912,
-      "speaker": null
-    },
-    {
-      "text": "sunny",
-      "start": 4944,
-      "end": 5304,
-      "confidence": 0.99994,
-      "speaker": null
-    },
-    {
-      "text": "morning.",
-      "start": 5352,
-      "end": 5752,
-      "confidence": 0.99952,
-      "speaker": null
-    },
-    {
-      "text": "Crack.",
-      "start": 5856,
-      "end": 6504,
-      "confidence": 0.97839,
-      "speaker": null
-    },
-    {
-      "text": "Sparky",
-      "start": 6632,
-      "end": 7256,
-      "confidence": 0.76605,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 7288,
-      "end": 7384,
-      "confidence": 0.99949,
-      "speaker": null
-    },
-    {
-      "text": "Dragon",
-      "start": 7392,
-      "end": 7736,
-      "confidence": 0.96685,
-      "speaker": null
-    },
-    {
-      "text": "was",
-      "start": 7768,
-      "end": 8008,
-      "confidence": 0.99983,
-      "speaker": null
-    },
-    {
-      "text": "born.",
-      "start": 8064,
-      "end": 8584,
-      "confidence": 0.91883,
-      "speaker": null
-    },
-    {
-      "text": "Sparky",
-      "start": 8712,
-      "end": 9384,
-      "confidence": 0.97665,
-      "speaker": null
-    },
-    {
-      "text": "wanted",
-      "start": 9432,
-      "end": 9688,
-      "confidence": 0.99997,
-      "speaker": null
-    },
-    {
-      "text": "to",
-      "start": 9704,
-      "end": 9832,
-      "confidence": 0.99999,
-      "speaker": null
-    },
-    {
-      "text": "fly,",
-      "start": 9856,
-      "end": 10184,
-      "confidence": 0.99995,
-      "speaker": null
-    },
-    {
-      "text": "but",
-      "start": 10232,
-      "end": 10488,
-      "confidence": 0.5311,
-      "speaker": null
-    },
-    {
-      "text": "his",
-      "start": 10544,
-      "end": 10760,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "little",
-      "start": 10800,
-      "end": 11000,
-      "confidence": 0.99987,
-      "speaker": null
-    },
-    {
-      "text": "wings",
-      "start": 11040,
-      "end": 11464,
-      "confidence": 0.95787,
-      "speaker": null
-    },
-    {
-      "text": "just",
-      "start": 11512,
-      "end": 11672,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "wouldn't",
-      "start": 11696,
-      "end": 12056,
-      "confidence": 0.99892,
-      "speaker": null
-    },
-    {
-      "text": "work.",
-      "start": 12088,
-      "end": 12712,
-      "confidence": 0.99997,
-      "speaker": null
-    },
-    {
-      "text": "He",
-      "start": 12896,
-      "end": 13192,
-      "confidence": 0.99996,
-      "speaker": null
-    },
-    {
-      "text": "tumbled",
-      "start": 13216,
-      "end": 13624,
-      "confidence": 0.63635,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 13672,
-      "end": 13832,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "wobbled,",
-      "start": 13856,
-      "end": 14472,
-      "confidence": 0.99711,
-      "speaker": null
-    },
-    {
-      "text": "making",
-      "start": 14536,
-      "end": 14760,
-      "confidence": 0.99999,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 14800,
-      "end": 14952,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "cloud",
-      "start": 14976,
-      "end": 15272,
-      "confidence": 0.83489,
-      "speaker": null
-    },
-    {
-      "text": "creatures",
-      "start": 15336,
-      "end": 15752,
-      "confidence": 0.99901,
-      "speaker": null
-    },
-    {
-      "text": "giggle.",
-      "start": 15816,
-      "end": 16440,
-      "confidence": 0.99943,
-      "speaker": null
-    },
-    {
-      "text": "A",
-      "start": 16520,
-      "end": 16712,
-      "confidence": 0.99987,
-      "speaker": null
-    },
-    {
-      "text": "wise",
-      "start": 16736,
-      "end": 16984,
-      "confidence": 0.99991,
-      "speaker": null
-    },
-    {
-      "text": "old",
-      "start": 17032,
-      "end": 17240,
-      "confidence": 0.9999,
-      "speaker": null
-    },
-    {
-      "text": "owl",
-      "start": 17280,
-      "end": 17624,
-      "confidence": 0.64845,
-      "speaker": null
-    },
-    {
-      "text": "saw",
-      "start": 17672,
-      "end": 17880,
-      "confidence": 0.99999,
-      "speaker": null
-    },
-    {
-      "text": "Sparky's",
-      "start": 17920,
-      "end": 18536,
-      "confidence": 0.87657,
-      "speaker": null
-    },
-    {
-      "text": "struggle",
-      "start": 18568,
-      "end": 18856,
-      "confidence": 0.99999,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 18888,
-      "end": 19080,
+      "text": "talking",
+      "start": 10096,
+      "end": 10504,
       "confidence": 0.99984,
       "speaker": null
     },
     {
-      "text": "hooted.",
-      "start": 19120,
-      "end": 19640,
-      "confidence": 0.98961,
-      "speaker": null
-    },
-    {
-      "text": "Little",
-      "start": 19720,
-      "end": 20008,
-      "confidence": 0.98187,
-      "speaker": null
-    },
-    {
-      "text": "one",
-      "start": 20064,
-      "end": 20424,
-      "confidence": 0.9973,
-      "speaker": null
-    },
-    {
-      "text": "Flying",
-      "start": 20512,
-      "end": 20952,
-      "confidence": 0.98297,
-      "speaker": null
-    },
-    {
-      "text": "takes",
-      "start": 21016,
-      "end": 21336,
-      "confidence": 0.9999,
-      "speaker": null
-    },
-    {
-      "text": "practice",
-      "start": 21368,
-      "end": 21656,
-      "confidence": 0.58959,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 21688,
-      "end": 21928,
-      "confidence": 0.92406,
-      "speaker": null
-    },
-    {
-      "text": "believing",
-      "start": 21984,
-      "end": 22296,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "in",
-      "start": 22328,
-      "end": 22520,
-      "confidence": 0.93244,
-      "speaker": null
-    },
-    {
-      "text": "yourself.",
-      "start": 22560,
-      "end": 23340,
-      "confidence": 0.99978,
-      "speaker": null
-    },
-    {
-      "text": "Sparky",
-      "start": 23760,
-      "end": 24424,
-      "confidence": 0.99261,
-      "speaker": null
-    },
-    {
-      "text": "took",
-      "start": 24472,
-      "end": 24632,
-      "confidence": 0.99987,
-      "speaker": null
-    },
-    {
-      "text": "a",
-      "start": 24656,
-      "end": 24744,
+      "text": "squirrel",
+      "start": 10552,
+      "end": 10936,
       "confidence": 0.99997,
       "speaker": null
     },
     {
-      "text": "deep",
-      "start": 24752,
-      "end": 24936,
-      "confidence": 0.99981,
-      "speaker": null
-    },
-    {
-      "text": "breath,",
-      "start": 24968,
-      "end": 25320,
-      "confidence": 0.99871,
-      "speaker": null
-    },
-    {
-      "text": "believing,",
-      "start": 25400,
-      "end": 25668,
-      "confidence": 0.38823,
-      "speaker": null
-    },
-    {
-      "text": "believed",
-      "start": 25704,
-      "end": 25996,
-      "confidence": 0.99929,
-      "speaker": null
-    },
-    {
       "text": "in",
-      "start": 26028,
-      "end": 26172,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "himself,",
-      "start": 26196,
-      "end": 26572,
-      "confidence": 0.99983,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 26636,
-      "end": 26908,
-      "confidence": 0.91474,
-      "speaker": null
-    },
-    {
-      "text": "soared",
-      "start": 26964,
-      "end": 27324,
-      "confidence": 0.54651,
-      "speaker": null
-    },
-    {
-      "text": "into",
-      "start": 27372,
-      "end": 27580,
-      "confidence": 0.99932,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 27620,
-      "end": 27772,
-      "confidence": 0.99995,
-      "speaker": null
-    },
-    {
-      "text": "sky.",
-      "start": 27796,
-      "end": 28460,
-      "confidence": 0.99988,
-      "speaker": null
-    },
-    {
-      "text": "He",
-      "start": 28620,
-      "end": 28940,
-      "confidence": 0.99978,
-      "speaker": null
-    },
-    {
-      "text": "flew",
-      "start": 28980,
-      "end": 29244,
-      "confidence": 0.95527,
-      "speaker": null
-    },
-    {
-      "text": "over",
-      "start": 29292,
-      "end": 29548,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "hills",
-      "start": 29604,
-      "end": 29868,
-      "confidence": 0.99986,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 29884,
-      "end": 30060,
-      "confidence": 0.98829,
-      "speaker": null
-    },
-    {
-      "text": "oceans,",
-      "start": 30100,
-      "end": 30636,
-      "confidence": 0.6222,
-      "speaker": null
-    },
-    {
-      "text": "happy",
-      "start": 30748,
-      "end": 31116,
-      "confidence": 0.99979,
-      "speaker": null
-    },
-    {
-      "text": "as",
-      "start": 31148,
-      "end": 31292,
-      "confidence": 0.99994,
-      "speaker": null
-    },
-    {
-      "text": "could",
-      "start": 31316,
-      "end": 31500,
-      "confidence": 0.99994,
-      "speaker": null
-    },
-    {
-      "text": "be.",
-      "start": 31540,
-      "end": 31980,
-      "confidence": 0.99974,
-      "speaker": null
-    },
-    {
-      "text": "From",
-      "start": 32100,
-      "end": 32332,
-      "confidence": 0.99995,
-      "speaker": null
-    },
-    {
-      "text": "that",
-      "start": 32356,
-      "end": 32540,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "day",
-      "start": 32580,
-      "end": 32732,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "on,",
-      "start": 32756,
-      "end": 33036,
-      "confidence": 0.99982,
-      "speaker": null
-    },
-    {
-      "text": "Sparky",
-      "start": 33108,
-      "end": 33724,
-      "confidence": 0.93556,
-      "speaker": null
-    },
-    {
-      "text": "and",
-      "start": 33772,
-      "end": 33932,
-      "confidence": 0.99939,
-      "speaker": null
-    },
-    {
-      "text": "his",
-      "start": 33956,
-      "end": 34092,
-      "confidence": 0.99989,
-      "speaker": null
-    },
-    {
-      "text": "friends",
-      "start": 34116,
-      "end": 34444,
-      "confidence": 0.9998,
-      "speaker": null
-    },
-    {
-      "text": "played",
-      "start": 34532,
-      "end": 34828,
-      "confidence": 0.99988,
-      "speaker": null
-    },
-    {
-      "text": "together",
-      "start": 34884,
-      "end": 35148,
-      "confidence": 0.99998,
-      "speaker": null
-    },
-    {
-      "text": "in",
-      "start": 35204,
-      "end": 35372,
-      "confidence": 0.99991,
-      "speaker": null
-    },
-    {
-      "text": "the",
-      "start": 35396,
-      "end": 35532,
+      "start": 10968,
+      "end": 11112,
       "confidence": 0.99985,
       "speaker": null
     },
     {
-      "text": "sky,",
-      "start": 35556,
-      "end": 36076,
-      "confidence": 0.99953,
-      "speaker": null
-    },
-    {
-      "text": "proving",
-      "start": 36188,
-      "end": 36556,
-      "confidence": 0.99993,
-      "speaker": null
-    },
-    {
-      "text": "that",
-      "start": 36588,
-      "end": 36780,
-      "confidence": 0.99991,
-      "speaker": null
-    },
-    {
-      "text": "anything",
-      "start": 36820,
-      "end": 37116,
+      "text": "a",
+      "start": 11136,
+      "end": 11272,
       "confidence": 0.99994,
       "speaker": null
     },
     {
-      "text": "is",
-      "start": 37148,
-      "end": 37292,
-      "confidence": 0.99983,
+      "text": "top",
+      "start": 11296,
+      "end": 11528,
+      "confidence": 0.99997,
       "speaker": null
     },
     {
-      "text": "possible",
-      "start": 37316,
-      "end": 37596,
-      "confidence": 0.99617,
+      "text": "hat.",
+      "start": 11584,
+      "end": 12008,
+      "confidence": 0.99939,
       "speaker": null
     },
     {
-      "text": "if",
-      "start": 37668,
-      "end": 37900,
-      "confidence": 0.96687,
+      "text": "The",
+      "start": 12104,
+      "end": 12360,
+      "confidence": 0.99859,
       "speaker": null
     },
     {
-      "text": "you",
-      "start": 37940,
-      "end": 38092,
-      "confidence": 0.99975,
+      "text": "squirrel,",
+      "start": 12400,
+      "end": 13000,
+      "confidence": 0.98396,
       "speaker": null
     },
     {
-      "text": "believe.",
-      "start": 38116,
-      "end": 38180,
-      "confidence": 0.99975,
+      "text": "sipping",
+      "start": 13080,
+      "end": 13496,
+      "confidence": 0.99768,
+      "speaker": null
+    },
+    {
+      "text": "tea,",
+      "start": 13528,
+      "end": 13880,
+      "confidence": 0.62192,
+      "speaker": null
+    },
+    {
+      "text": "grumbled,",
+      "start": 13960,
+      "end": 14568,
+      "confidence": 0.55898,
+      "speaker": null
+    },
+    {
+      "text": "cupcakes.",
+      "start": 14664,
+      "end": 15464,
+      "confidence": 0.99316,
+      "speaker": null
+    },
+    {
+      "text": "You",
+      "start": 15592,
+      "end": 15928,
+      "confidence": 0.99536,
+      "speaker": null
+    },
+    {
+      "text": "want",
+      "start": 15984,
+      "end": 16200,
+      "confidence": 0.99981,
+      "speaker": null
+    },
+    {
+      "text": "cupcakes?",
+      "start": 16240,
+      "end": 16984,
+      "confidence": 0.53053,
+      "speaker": null
+    },
+    {
+      "text": "Suddenly,",
+      "start": 17112,
+      "end": 17704,
+      "confidence": 0.99858,
+      "speaker": null
+    },
+    {
+      "text": "they",
+      "start": 17752,
+      "end": 17912,
+      "confidence": 0.99989,
+      "speaker": null
+    },
+    {
+      "text": "were",
+      "start": 17936,
+      "end": 18072,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "soaring",
+      "start": 18096,
+      "end": 18536,
+      "confidence": 0.72292,
+      "speaker": null
+    },
+    {
+      "text": "through",
+      "start": 18568,
+      "end": 18712,
+      "confidence": 0.99906,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 18736,
+      "end": 18872,
+      "confidence": 0.99972,
+      "speaker": null
+    },
+    {
+      "text": "candyland",
+      "start": 18896,
+      "end": 19512,
+      "confidence": 0.57718,
+      "speaker": null
+    },
+    {
+      "text": "on",
+      "start": 19576,
+      "end": 19752,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 19776,
+      "end": 19864,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "giant",
+      "start": 19872,
+      "end": 20184,
+      "confidence": 0.99949,
+      "speaker": null
+    },
+    {
+      "text": "ladybug.",
+      "start": 20232,
+      "end": 21240,
+      "confidence": 0.88214,
+      "speaker": null
+    },
+    {
+      "text": "The",
+      "start": 21400,
+      "end": 21720,
+      "confidence": 0.99977,
+      "speaker": null
+    },
+    {
+      "text": "squirrel,",
+      "start": 21760,
+      "end": 22360,
+      "confidence": 0.96676,
+      "speaker": null
+    },
+    {
+      "text": "surprisingly",
+      "start": 22440,
+      "end": 23096,
+      "confidence": 0.99217,
+      "speaker": null
+    },
+    {
+      "text": "chipper,",
+      "start": 23128,
+      "end": 23800,
+      "confidence": 0.61994,
+      "speaker": null
+    },
+    {
+      "text": "shouted",
+      "start": 23880,
+      "end": 24344,
+      "confidence": 0.99932,
+      "speaker": null
+    },
+    {
+      "text": "to",
+      "start": 24392,
+      "end": 24504,
+      "confidence": 0.99951,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 24512,
+      "end": 24632,
+      "confidence": 0.99907,
+      "speaker": null
+    },
+    {
+      "text": "cupcake",
+      "start": 24656,
+      "end": 25224,
+      "confidence": 0.59071,
+      "speaker": null
+    },
+    {
+      "text": "kingdom.",
+      "start": 25272,
+      "end": 25990,
+      "confidence": 0.997,
+      "speaker": null
+    },
+    {
+      "text": "They",
+      "start": 26160,
+      "end": 26490,
+      "confidence": 0.99964,
+      "speaker": null
+    },
+    {
+      "text": "arrived",
+      "start": 26530,
+      "end": 26922,
+      "confidence": 0.99291,
+      "speaker": null
+    },
+    {
+      "text": "to",
+      "start": 26986,
+      "end": 27162,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "find",
+      "start": 27186,
+      "end": 27322,
+      "confidence": 0.99998,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 27346,
+      "end": 27482,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "cupcake",
+      "start": 27506,
+      "end": 28026,
+      "confidence": 0.9239,
+      "speaker": null
+    },
+    {
+      "text": "eating",
+      "start": 28058,
+      "end": 28362,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "monster.",
+      "start": 28426,
+      "end": 29066,
+      "confidence": 0.97347,
+      "speaker": null
+    },
+    {
+      "text": "Bolt,",
+      "start": 29178,
+      "end": 29722,
+      "confidence": 0.85468,
+      "speaker": null
+    },
+    {
+      "text": "fueled",
+      "start": 29786,
+      "end": 30154,
+      "confidence": 0.99226,
+      "speaker": null
+    },
+    {
+      "text": "by",
+      "start": 30202,
+      "end": 30362,
+      "confidence": 0.99999,
+      "speaker": null
+    },
+    {
+      "text": "his",
+      "start": 30386,
+      "end": 30570,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "mysterious",
+      "start": 30610,
+      "end": 31242,
+      "confidence": 0.99963,
+      "speaker": null
+    },
+    {
+      "text": "craving,",
+      "start": 31306,
+      "end": 31818,
+      "confidence": 0.95522,
+      "speaker": null
+    },
+    {
+      "text": "prepared",
+      "start": 31914,
+      "end": 32474,
+      "confidence": 0.93924,
+      "speaker": null
+    },
+    {
+      "text": "for",
+      "start": 32522,
+      "end": 32874,
+      "confidence": 0.73054,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 32962,
+      "end": 33162,
+      "confidence": 0.99719,
+      "speaker": null
+    },
+    {
+      "text": "bake",
+      "start": 33186,
+      "end": 33386,
+      "confidence": 0.99922,
+      "speaker": null
+    },
+    {
+      "text": "off",
+      "start": 33418,
+      "end": 33706,
+      "confidence": 0.58931,
+      "speaker": null
+    },
+    {
+      "text": "battle.",
+      "start": 33778,
+      "end": 34522,
+      "confidence": 0.73107,
+      "speaker": null
+    },
+    {
+      "text": "Bolt",
+      "start": 34666,
+      "end": 35194,
+      "confidence": 0.80759,
+      "speaker": null
+    },
+    {
+      "text": "offered",
+      "start": 35242,
+      "end": 35546,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 35578,
+      "end": 35722,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "monster",
+      "start": 35746,
+      "end": 36106,
+      "confidence": 0.93243,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 36138,
+      "end": 36330,
+      "confidence": 0.77728,
+      "speaker": null
+    },
+    {
+      "text": "cupcake.",
+      "start": 36370,
+      "end": 37018,
+      "confidence": 0.75464,
+      "speaker": null
+    },
+    {
+      "text": "The",
+      "start": 37114,
+      "end": 37370,
+      "confidence": 0.99992,
+      "speaker": null
+    },
+    {
+      "text": "monster",
+      "start": 37410,
+      "end": 37834,
+      "confidence": 0.93988,
+      "speaker": null
+    },
+    {
+      "text": "wept",
+      "start": 37882,
+      "end": 38202,
+      "confidence": 0.69243,
+      "speaker": null
+    },
+    {
+      "text": "with",
+      "start": 38266,
+      "end": 38490,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "joy.",
+      "start": 38530,
+      "end": 39034,
+      "confidence": 0.99549,
+      "speaker": null
+    },
+    {
+      "text": "It",
+      "start": 39162,
+      "end": 39402,
+      "confidence": 0.99918,
+      "speaker": null
+    },
+    {
+      "text": "turns",
+      "start": 39426,
+      "end": 39786,
+      "confidence": 0.99938,
+      "speaker": null
+    },
+    {
+      "text": "out",
+      "start": 39818,
+      "end": 40058,
+      "confidence": 0.99996,
+      "speaker": null
+    },
+    {
+      "text": "it",
+      "start": 40114,
+      "end": 40330,
+      "confidence": 0.99995,
+      "speaker": null
+    },
+    {
+      "text": "just",
+      "start": 40370,
+      "end": 40570,
+      "confidence": 0.99993,
+      "speaker": null
+    },
+    {
+      "text": "needed",
+      "start": 40610,
+      "end": 40906,
+      "confidence": 0.9998,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 40938,
+      "end": 41130,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "friend.",
+      "start": 41170,
+      "end": 41466,
+      "confidence": 0.99994,
+      "speaker": null
+    },
+    {
+      "text": "And",
+      "start": 41538,
+      "end": 41674,
+      "confidence": 0.99946,
+      "speaker": null
+    },
+    {
+      "text": "a",
+      "start": 41682,
+      "end": 41898,
+      "confidence": 0.81757,
+      "speaker": null
+    },
+    {
+      "text": "really",
+      "start": 41954,
+      "end": 42218,
+      "confidence": 0.99986,
+      "speaker": null
+    },
+    {
+      "text": "good",
+      "start": 42274,
+      "end": 42490,
+      "confidence": 0.99991,
+      "speaker": null
+    },
+    {
+      "text": "cupcake.",
+      "start": 42530,
+      "end": 43466,
+      "confidence": 0.65084,
+      "speaker": null
+    },
+    {
+      "text": "Bolt,",
+      "start": 43658,
+      "end": 44234,
+      "confidence": 0.9019,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 44282,
+      "end": 44442,
+      "confidence": 0.99974,
+      "speaker": null
+    },
+    {
+      "text": "squirrel",
+      "start": 44466,
+      "end": 44906,
+      "confidence": 0.72525,
+      "speaker": null
+    },
+    {
+      "text": "and",
+      "start": 44938,
+      "end": 45082,
+      "confidence": 0.9996,
+      "speaker": null
+    },
+    {
+      "text": "the",
+      "start": 45106,
+      "end": 45242,
+      "confidence": 0.99958,
+      "speaker": null
+    },
+    {
+      "text": "frosting",
+      "start": 45266,
+      "end": 45722,
+      "confidence": 0.90363,
+      "speaker": null
+    },
+    {
+      "text": "fiend",
+      "start": 45786,
+      "end": 46170,
+      "confidence": 0.99986,
+      "speaker": null
+    },
+    {
+      "text": "lived",
+      "start": 46250,
+      "end": 46506,
+      "confidence": 0.99986,
+      "speaker": null
+    },
+    {
+      "text": "happily",
+      "start": 46538,
+      "end": 46922,
+      "confidence": 0.99997,
+      "speaker": null
+    },
+    {
+      "text": "ever",
+      "start": 46986,
+      "end": 47210,
+      "confidence": 0.99976,
+      "speaker": null
+    },
+    {
+      "text": "after.",
+      "start": 47250,
+      "end": 47330,
+      "confidence": 0.99945,
       "speaker": null
     }
   ],
   images: [
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745063367021.png?alt=media&token=330025db-adbe-4a89-a1da-3d0fbc17f030",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745063413190.png?alt=media&token=2d42d5bc-d5c0-4932-aba4-88a28ea7246e",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745063456595.png?alt=media&token=3055d7b1-b940-457a-b9ae-a4decf54c770",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745063518659.png?alt=media&token=0ff68c7c-7c1e-43bc-86ac-0db390a09572",
-    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745063575349.png?alt=media&token=7bc9a6f2-6608-40d9-8ec3-aef4cce28274"
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745147802278.png?alt=media&token=6cd60b0f-ddaa-4f04-bcdc-b2d2a3700c36",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745147836662.png?alt=media&token=9cb1ab44-1b79-41c1-809e-581c9a791b63",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745147905575.png?alt=media&token=1c224be0-9c1b-47b5-82be-2a05f2f1e5cd",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745147987668.png?alt=media&token=761848fb-b718-4703-8855-207066c302a6",
+    "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/hugface_images%2F1745148038552.png?alt=media&token=35985b3f-d908-4264-9350-9bc2303432c1"
   ],
-  audio: 'https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F745092cc-9946-4380-a15e-06462f3fa54f.mp3?alt=media&token=7c788b19-72d3-487a-9aa4-a86f51e5e4a3',
+  audio: 'https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F4ae63761-46d1-429b-9e7d-7c0c7bd5f624.mp3?alt=media&token=c3cab9d3-1559-4b47-abd6-1ebacb7b106c',
   script: [
     {
-      "imagePrompt": "Cartoon illustration of a friendly purple dragon named Sparky hatching from a bright blue egg in a cozy nest made of soft clouds. The background is a sunny sky with fluffy white clouds and a rainbow. Style: Cute, colorful, and whimsical.",
-      "ContentText": "Once upon a time, high in the sky, lived a little dragon egg. One sunny morning... crack! Sparky the dragon was born!"
+      "imagePrompt": "Cartoon illustration of a quirky robot named Bolt, with mismatched circuits and a perpetually surprised expression, standing in a field of oversized, rainbow-colored sunflowers. The style should be bright, cheerful, and reminiscent of a children's cartoon.",
+      "ContentText": "Bolt the robot woke up in a sunflower field. He had no memory of how he got there, only a strange craving for oil and... cupcakes?"
     },
     {
-      "imagePrompt": "Cartoon scene of Sparky the purple dragon trying to fly for the first time. He's flapping his wings enthusiastically but comically failing, surrounded by giggling cloud creatures. Style: Expressive, funny, and heartwarming.",
-      "ContentText": "Sparky wanted to fly, but his little wings just wouldn't work! He tumbled and wobbled, making the cloud creatures giggle."
+      "imagePrompt": "A cartoon depiction of Bolt nervously approaching a grumpy-looking talking squirrel wearing a tiny top hat. The squirrel is sitting on a giant mushroom, holding a teacup. The setting is a whimsical forest with floating lanterns and singing flowers. Use a style that is both cute and slightly absurd.",
+      "ContentText": "He stumbled upon a talking squirrel in a top hat! The squirrel, sipping tea, grumbled, 'Cupcakes? You want *cupcakes*?'"
     },
     {
-      "imagePrompt": "Cartoon illustration of a wise old owl perched on a large, glowing mushroom, giving Sparky advice. The owl has spectacles and a kind expression. The background is a magical forest with sparkling fireflies. Style: Enchanting, detailed, and comforting.",
-      "ContentText": "A wise old owl saw Sparky's struggle and hooted, 'Little one, flying takes practice and believing in yourself!'"
+      "imagePrompt": "Cartoon scene showing Bolt and the squirrel riding a giant ladybug through a candy-coated landscape. There are lollipop trees, gumdrop houses, and a river of chocolate. The scene should be filled with vibrant colors and exaggerated features. The style should be reminiscent of a classic Looney Tunes cartoon.",
+      "ContentText": "Suddenly, they were soaring through a candy land on a giant ladybug! The squirrel, surprisingly chipper, shouted, 'To the Cupcake Kingdom!'"
     },
     {
-      "imagePrompt": "Cartoon scene of Sparky taking a deep breath and soaring gracefully through the sky. He's smiling, and the wind is blowing through his purple scales. The background is a panoramic view of rolling green hills and a sparkling blue ocean. Style: Uplifting, adventurous, and joyful.",
-      "ContentText": "Sparky took a deep breath, believed in himself, and soared into the sky! He flew over hills and oceans, happy as could be."
+      "imagePrompt": "A cartoon climax with Bolt facing a giant, cupcake-eating monster made of frosting and sprinkles. The squirrel is hiding behind Bolt's leg, trembling. The scene should be dynamic and slightly scary, but still maintain a lighthearted, cartoonish feel. The style should evoke the feeling of a Saturday morning cartoon.",
+      "ContentText": "They arrived to find a cupcake-eating monster! Bolt, fueled by his mysterious craving, prepared for... a bake-off battle?!"
     },
     {
-      "imagePrompt": "Cartoon illustration of Sparky the purple dragon surrounded by his new friends, the cloud creatures, all laughing and playing together in the sky. The sun is setting, casting a warm golden glow. Style: Heartwarming, friendly, and peaceful.",
-      "ContentText": "From that day on, Sparky and his friends played together in the sky, proving that anything is possible if you believe!"
+      "imagePrompt": "Cartoon resolution with Bolt offering the monster a perfectly baked cupcake. The monster is crying tears of joy. The squirrel is patting Bolt on the back with a proud smile. The scene should be heartwarming and humorous, with a soft color palette. The style should be similar to a Pixar short.",
+      "ContentText": "Bolt offered the monster a cupcake. The monster wept with joy! It turns out, it just needed a friend (and a really good cupcake). Bolt, the squirrel and the frosting fiend lived happily ever after."
     }
   ]
 }
@@ -777,7 +882,7 @@ export const RemotionRoot = () => {
   const captionsMs = videoData.captions.at(-1)?.end || 0;
   const totalDurationMs = captionsMs;
 
-  const bufferFrames = 10; // Optional: 2s buffer
+  const bufferFrames = 30; // Optional: 2s buffer
   const durationInFrames = Math.round((totalDurationMs / 1000) * 30) + bufferFrames;
 
 
