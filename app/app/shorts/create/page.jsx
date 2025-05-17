@@ -141,7 +141,7 @@ function CreateNew() {
     let images = [];
 
     for (const item of videoScriptData) {
-      await axios.post("/api/generateimage-hug", {
+      await axios.post("/api/generate-image", {
         prompt: item.imagePrompt
       }).then(async (res) => {
         images.push(res.data.result);

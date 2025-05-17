@@ -4,28 +4,25 @@ FROM node:20-alpine
 # Install ffmpeg and other dependencies
 RUN apk add --no-cache ffmpeg
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json (or yarn.lock) first for better caching
-COPY package*.json ./
 # Install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the application
-COPY .env.production .env.production
-
+# Copy the rest of the app (excluding .env.production)
 COPY . .
 
-# Explicitly set environment variables at build time
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+# Optional: set ARGs if you're injecting at build time (but not needed on Render)
+# ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+# ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
-# Build the Next.js application
+# Build the Next.js app
 RUN npm run build
 
-# Expose the port that the app will run on
+# Expose port
 EXPOSE 3000
 
-# Start the application
+# Start app
 CMD ["npm", "start"]
