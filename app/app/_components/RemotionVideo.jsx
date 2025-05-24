@@ -50,7 +50,7 @@ function RemotionVideo({ videoData, setDurationInFrame }) {
                             width: "100%"
                         }}>
                             <h2 style={{
-                                fontSize: 100, // Much larger
+                                fontSize: 60, // Much larger
                                 fontWeight: 'bold',
                                 lineHeight: 1.2,
                                 textShadow: '0px 0px 15px rgba(0,0,0,0.75)', // Outline effect for readability
