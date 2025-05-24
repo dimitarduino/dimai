@@ -882,7 +882,7 @@ export const RemotionRoot = () => {
   const captionsMs = videoData.captions.at(-1)?.end || 0;
   const totalDurationMs = captionsMs;
 
-  const bufferFrames = 30; // Optional: 2s buffer
+  const bufferFrames = 10;
   const durationInFrames = Math.round((totalDurationMs / 1000) * 30) + bufferFrames;
 
 

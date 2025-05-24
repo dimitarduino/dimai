@@ -52,7 +52,7 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
     }
 
     const exportVideo = async () => {
-        if (!proveriPoeni(userDetail.credits, 2)) {
+        if (!proveriPoeni(userDetail?.credits, 2)) {
             toast("Insufficient credits! Please recharge to generate a video.");
             return;
         }
