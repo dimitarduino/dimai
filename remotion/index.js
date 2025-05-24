@@ -1,6 +1,6 @@
 import { registerRoot } from "remotion";
 import RemotionVideo from '../app/app/_components/RemotionVideo';
 
-import { RemotionRoot } from "./Root";
+import { RemotionRoot } from "./root";
  
 registerRoot(RemotionRoot);

@@ -128,7 +128,7 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
                         )}
 
                         {!downloadUrl && (
-                            <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer`}>Export (2 credits)</Button>
+                            <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer dark:text-white`}>Export (2 credits)</Button>
                         )}
                     </div>
                     <DialogDescription>
