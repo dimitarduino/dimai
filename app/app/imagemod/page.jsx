@@ -119,7 +119,6 @@ export default function ImageToImage() {
             "state_changed",
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                // console.log(`Upload is ${progress}% done`);
             },
             (error) => {
                 console.error("Upload failed:", error);
@@ -127,7 +126,6 @@ export default function ImageToImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-                // console.log(url)
                 setDownloadUrl(url);
                 setUploading(false);
 

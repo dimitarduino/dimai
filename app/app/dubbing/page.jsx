@@ -69,7 +69,6 @@ export default function DubbedVideo() {
     ];
 
     const naPromenaInput = (ime, vrednost) => {
-        // console.log(ime, vrednost);
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
@@ -121,7 +120,6 @@ export default function DubbedVideo() {
             task: `S2ST (Speech to Speech translation)`,
             targetLanguageAudio: formData?.targetLanguageAudio
         }).then(res => {
-            // console.log(res.data);
             if (!!res.data.result.audio_output) {
                 setResultAudio(res.data.result.audio_output);
                 generateDubbedVideo(res.data.result.audio_output, videoUrl);
@@ -176,8 +174,6 @@ export default function DubbedVideo() {
             uploadTask.on(
                 "state_changed",
                 (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    // console.log(`Upload is ${progress}% done`);
                 },
                 (error) => {
                     console.error("Upload failed:", error);

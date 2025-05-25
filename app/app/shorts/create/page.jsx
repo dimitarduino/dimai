@@ -59,7 +59,7 @@ function CreateNew() {
       setCurrentVoices(current);
       setGender(cur[0].ssmlGender)
     } catch (e) {
-      console.log(e);
+      // Handle error silently
     }
     // setSelectedVoice(cur[0].name);
   }, [gender])
@@ -88,7 +88,6 @@ function CreateNew() {
         'videoScript': res.data.result
       }))
       await GenerateAudioFile(res.data.result);
-      // console.log('eve sea ke pustam')
       await GenerateImage(res.data.result);
     })
     // setLoading(false);
@@ -101,9 +100,6 @@ function CreateNew() {
     videoScriptData.forEach(item => {
       script += item.ContentText + " ";
     })
-
-    console.log(gender);
-    console.log(selectedVoice);
 
     const res = await axios.post("/api/generate-audio", {
       id,
@@ -148,7 +144,6 @@ function CreateNew() {
       })
     }
 
-    // console.log(images)
     setVideoData((prev) => ({
       ...prev,
       'imageList': images

@@ -18,7 +18,6 @@ export async function POST(req) {
         audio_url: audioUrl
     }
     const transcript = await client.transcripts.transcribe(config)
-    // console.log(transcript.text)
 
     return NextResponse.json({ result: transcript.words });
 }

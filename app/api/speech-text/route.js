@@ -33,7 +33,6 @@ export async function POST(req) {
       }
     );
 
-    // console.log(output)
     let outputResult = {
       text_output: input.input_text,
       audio_output: input.audioFileUrl

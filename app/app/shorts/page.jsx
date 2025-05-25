@@ -16,11 +16,12 @@ function Dashboard() {
   const {userDetail, setUserDetail} = useContext(UserDetailContext);
 
   useEffect(() => {
-    console.log(user)
-    user && getVideosList();
+    if (user) {
+        getVideos();
+    }
   }, [user]);
 
-  const getVideosList =  async () => {
+  const getVideos =  async () => {
     const res = await db.select().from(VideoData).where(eq(VideoData.createdBy, user?.primaryEmailAddress?.emailAddress));
     setVideos(res);  
   }

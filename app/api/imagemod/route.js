@@ -32,7 +32,6 @@ export async function POST(req) {
         const resp = await axios.get(output[0], { responseType: 'arraybuffer' });
       
         const base64 = `data:image/png;base64,${Buffer.from(resp.data).toString('base64')}`;
-        // console.log(base64);
         const storageRef = ref(storage, `modified_imgs/${Date.now()}.png`);
 
         await uploadString(storageRef, base64, 'data_url');
@@ -41,7 +40,6 @@ export async function POST(req) {
      
         return NextResponse.json({ result: downloadUrl });
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ error: error }, { status: 500 });
     }
 }

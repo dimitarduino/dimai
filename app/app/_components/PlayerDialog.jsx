@@ -62,7 +62,6 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
             inputProps: videoData
         }).then(async (res) => {
             setLoading(false);
-            console.log(res);
             if (!!res.data.result) {
                 setDownloadUrl(res.data.result);
                 namestiDownloadUrl({
