@@ -37,7 +37,6 @@ export async function POST(req) {
 
         return NextResponse.json({ result: downloadUrl });
     } catch (error) {
-        console.log(error.message)
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

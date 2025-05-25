@@ -10,6 +10,7 @@ function VideosDashboard({ videoList }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoId, setVideoId] = useState();
     const [openedVideo, setOpenedVideo] = useState(false);
+    const [durationFrame, setDurationFrame] = useState(0);
 
     const setOpenVideo = (id) => {
         const videoOpened = videoList.find((video) => video.id === id); 
@@ -34,7 +35,7 @@ function VideosDashboard({ videoList }) {
                             videoData: {
                                 ...video
                             },
-                            setDurationInFrame: (v) => console.log(v)
+                            setDurationInFrame: (v) => setDurationFrame(v)
                         }}
                     />
                 </div>

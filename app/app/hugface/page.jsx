@@ -72,7 +72,6 @@ export default function UpscaleImage() {
             const a = document.createElement("a");
             a.href = url;
 
-            console.log(zemiFajlImeFirebase(modifiedImage));
             a.download = zemiFajlImeFirebase(modifiedImage);
             
             document.body.appendChild(a);
@@ -107,8 +106,7 @@ export default function UpscaleImage() {
 
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
-                setUploading(false);
-                setLoading(false)
+                setOpenedResult(true);
             }
         })
     }

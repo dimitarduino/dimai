@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
 function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDurationInFrames }) {
@@ -18,17 +18,23 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
     useEffect(() => {
         try {
             const duration = getDurationFrames();
+            console.log('useeffect')
+            console.log(duration);
             if (setDurationInFrame) {
                 setDurationInFrame(duration);
             }
         } catch (err) {
+            console.log(`Errorce: `, err);
             // Handle error silently
         }
     }, [captions, propDurationInFrames]); // Add propDurationInFrames to dependencies
 
     const totalDurationInFrames = getDurationFrames();
+    console.log('total duration')
+    console.log(totalDurationInFrames);
+    // console.log(propDurationInFrames);
     const imagesDuration = (totalDurationInFrames / images?.length) + 200;
-
+    
     const getFrameCaption = () => {
         const currentTime = frame / 30 * 1000;
         const currentCaption = captions.find((word) => currentTime >= word.start && currentTime <= word.end);

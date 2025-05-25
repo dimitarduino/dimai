@@ -15,12 +15,13 @@ function DashboaardLayout({ children }) {
   const { user } = useUser();
 
   useEffect(() => {
-    user && getUserDetails();
+    if (user) {
+        getUserDetail();
+    }
   }, [user]);
 
-  const getUserDetails = async () => {
+  const getUserDetail = async () => {
     const res = await db.select().from(Users).where(eq(Users.email, user.primaryEmailAddress.emailAddress))
-    console.log('eve novo')
 
     setUserDetail(res[0]);
   }
