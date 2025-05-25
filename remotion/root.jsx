@@ -1781,11 +1781,12 @@ const videoData = {
     }
   ]
 }
+const captionsMs = videoData.captions.at(-1)?.end || 0;
+const bufferFrames = 10;
+const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
+
 
 export const RemotionRoot = () => {
-  const captionsMs = videoData.captions.at(-1)?.end || 0;
-  const bufferFrames = 10;
-  const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
 
   return (
     <>
