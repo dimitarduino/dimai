@@ -1784,13 +1784,8 @@ const videoData = {
 
 export const RemotionRoot = () => {
   const captionsMs = videoData.captions.at(-1)?.end || 0;
-  console.log(captionsMs);
-  const totalDurationMs = captionsMs;
-
   const bufferFrames = 10;
-  const durationInFrames = Math.round((totalDurationMs / 1000) * 30) + bufferFrames;
-
-
+  const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
 
   return (
     <>
@@ -1802,7 +1797,8 @@ export const RemotionRoot = () => {
         width={720}
         height={1280}
         defaultProps={{
-          videoData: videoData
+          videoData: videoData,
+          durationInFrames: durationInFrames
         }}
       />
     </>

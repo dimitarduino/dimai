@@ -11,7 +11,11 @@ export async function POST(req) {
   const serviceName = services[0]?.serviceName;
 
   const { inputProps } = await req.json();
-  // console.log(inputProps.audio);
+  
+  // Calculate duration based on the provided videoData
+  const captionsMs = inputProps.captions?.at(-1)?.end || 0;
+  const bufferFrames = 10;
+  const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
 
   const result = await renderMediaOnCloudrun({
     serviceName,
@@ -22,11 +26,12 @@ export async function POST(req) {
       videoData: inputProps
     },
     codec: 'h264',
+    durationInFrames: durationInFrames, // Add the calculated duration
   });
 
   if (result.type === 'success') {
-   
+    return NextResponse.json({ result: result?.publicUrl });
   }
 
-  return NextResponse.json({ result: result?.publicUrl });
+  return NextResponse.json({ error: 'Failed to render video' }, { status: 500 });
 }
