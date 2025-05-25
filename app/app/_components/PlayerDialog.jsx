@@ -123,7 +123,7 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <Button className={`py-6 cursor-pointer`}>Download video</Button>
+                                <Button className={`py-6 cursor-pointer dark:text-white`}>Download video</Button>
                             </a>
                         )}
 
