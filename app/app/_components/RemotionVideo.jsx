@@ -18,26 +18,20 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
     useEffect(() => {
         try {
             const duration = getDurationFrames();
-            console.log('useeffect')
-            console.log(duration);
             if (setDurationInFrame) {
                 setDurationInFrame(duration);
             }
         } catch (err) {
-            console.log(`Errorce: `, err);
-            // Handle error silently
+            console.log(`Error: `, err);
         }
-    }, [captions, propDurationInFrames]); // Add propDurationInFrames to dependencies
+    }, [captions, propDurationInFrames]);
 
     const totalDurationInFrames = getDurationFrames();
-    console.log('total duration')
-    console.log(totalDurationInFrames);
-    // console.log(propDurationInFrames);
-    const imagesDuration = (totalDurationInFrames / images?.length) + 200;
+    const imagesDuration = Math.floor(totalDurationInFrames / (images?.length || 1));
     
     const getFrameCaption = () => {
-        const currentTime = frame / 30 * 1000;
-        const currentCaption = captions.find((word) => currentTime >= word.start && currentTime <= word.end);
+        const currentTime = frame / fps * 1000;
+        const currentCaption = captions?.find((word) => currentTime >= word.start && currentTime <= word.end);
         return currentCaption?.text;
     }
 
@@ -45,11 +39,15 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
         <AbsoluteFill className="bg-black">
             {images?.map((image, index) => {
                 const startTime = index * imagesDuration;
-                const duration = getDurationFrames();
-                const scale = (index) => interpolate(frame, [startTime, startTime + duration / 2, startTime + duration], index % 2 == 0 ? [1, 1.8, 1] : [1.8, 1.2, 1.8], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+                const scale = (index) => interpolate(
+                    frame, 
+                    [startTime, startTime + imagesDuration / 2, startTime + imagesDuration], 
+                    index % 2 === 0 ? [1, 1.8, 1] : [1.8, 1.2, 1.8], 
+                    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                );
                 return (
                     <React.Fragment key={index}>
-                        <Sequence from={index * imagesDuration} durationInFrames={imagesDuration}>
+                        <Sequence from={startTime} durationInFrames={imagesDuration}>
                             <Img src={image} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale(index)})` }} />
                         </Sequence>
 

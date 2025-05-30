@@ -15,7 +15,7 @@ export async function POST(req) {
   // Calculate duration based on the provided videoData
   const captionsMs = inputProps.captions?.at(-1)?.end || 0;
   const bufferFrames = 10;
-  const durationInFrames = Math.round(Math.round((captionsMs / 1000) * 30) + bufferFrames);
+  const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
   console.log(inputProps.captions?.at(-1).end || 0);
   console.log(durationInFrames);
 
@@ -29,7 +29,10 @@ export async function POST(req) {
       durationInFrames: durationInFrames
     },
     codec: 'h264',
-    durationInFrames: durationInFrames, // Add the calculated duration
+    durationInFrames: durationInFrames,
+    maxRetries: 3,
+    concurrency: 1,
+    framesPerLambda: 1,
   });
 
   if (result.type === 'success') {
