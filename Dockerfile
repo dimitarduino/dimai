@@ -14,10 +14,6 @@ RUN npm install
 # Copy the rest of the app (excluding .env.production)
 COPY . .
 
-# Optional: set ARGs if you're injecting at build time (but not needed on Render)
-# ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-# ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
 # Build the Next.js app
 RUN npm run build
 

@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req) {
   // Fetch services inside the POST function
   const services = await getServices({
-    region: 'us-east1',
+    region: 'europe-west1',
     compatibleOnly: true,
   });
 
@@ -21,7 +21,7 @@ export async function POST(req) {
 
   const result = await renderMediaOnCloudrun({
     serviceName,
-    region: 'us-east1',
+    region: 'europe-west1',
     serveUrl: process.env.GCP_SERVER_URL,
     composition: 'shortVideo',
     inputProps: {
