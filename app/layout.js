@@ -5,6 +5,7 @@ import Provider from "./provider";
 import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "./_context/ThemeContext";
 import ClerkWithThemeProvider from "./ClerkProvider";
+import Script from "next/script";
 
 
 const outfit = Outfit({
@@ -38,7 +39,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-P3GN4RXL6E"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-P3GN4RXL6E');
+          `}
+        </Script>
+      </head>
       <body
         className={`${outfit.className}`}
       >
