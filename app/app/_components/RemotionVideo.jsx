@@ -54,7 +54,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                         <AbsoluteFill style={{
                             color: "yellow",
                             justifyContent: "center",
-                            bottom: 50,
+                            bottom: 300,
                             top: undefined,
                             height: 150,
                             textAlign: "center",
