@@ -41,7 +41,7 @@ function VideosDashboard({ videoList }) {
                 </div>
             ))}
 
-            <PlayerDialog playVideo={openDialog} videoId={videoId} downloadUrlProp={openedVideo ? openedVideo.downloadUrl : false} />
+            <PlayerDialog playVideo={!!openDialog} videoId={videoId} downloadUrlProp={openedVideo ? openedVideo.downloadUrl : false} />
         </div>
     )
 }

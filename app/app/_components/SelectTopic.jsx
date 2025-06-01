@@ -16,7 +16,7 @@ function SelectTopic({onUserSelect}) {
   return (
     <div>
       <h2 className='font-bold text-xl text-primary'>Content</h2>
-      <p className='text-gray-500'>What is the topic of your video?</p>
+      <p className='text-gray-500 dark:text-neutral-200'>What is the topic of your video?</p>
       <Select value={selectedOption} onValueChange={(val) => {
         setSelectedOption(val);
         val!=options[0]&&onUserSelect("topic", val)
