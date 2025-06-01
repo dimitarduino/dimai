@@ -17,10 +17,12 @@ import { toast } from 'sonner';
 import { eq } from 'drizzle-orm';
 import { iskoristPoeni, proveriPoeni } from 'lib/utils';
 import SelectComponent from 'app/app/_components/SelectComponent';
+import { Input } from '@/ui/input';
 
 function CreateNew() {
   const [formData, setFormData] = useState({
-    topic: "Random AI Story"
+    topic: "Random AI Story",
+    comment: "video should be go viral, so start the first part of the script with some catchy question."
   });
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
@@ -77,7 +79,7 @@ function CreateNew() {
 
   const getVideoScript = async () => {
     setLoading(true);
-    const prompt = `Write a script to generate ${formData.duration} video on topic: ${formData.topic} along with AI image prompt in ${formData.style} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, No plain text`;
+    const prompt = `Write a script to generate 60 seconds video on topic: "${formData.topic}" along with AI image prompt in ${formData.style} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${formData.comment}. Give me JSON only. Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
 
     const res = axios.post("/api/get-video-script", {
       prompt
@@ -98,7 +100,7 @@ function CreateNew() {
     let script = ``;
     const id = uuidv4();
     videoScriptData.forEach(item => {
-      script += item.ContentText + " ";
+      script += item.contentText + " ";
     })
 
     const res = await axios.post("/api/generate-audio", {
@@ -206,11 +208,16 @@ function CreateNew() {
     <div className='md:px-20 max-w-7xl mx-auto'>
       <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
         {/* Select Topic */}
-        <h1 className="font-bold text-3xl text-primary">Create Stunning Shorts with AI</h1>
+        <h1 className="font-bold text-3xl text-primary ">Create Stunning Shorts with AI</h1>
         <h2>
           Effortlessly generate eye-catching shorts using the power of AI. Upload your video, and let the technology craft a short, high-quality clip with precise edits and enhancements in just a few seconds.
         </h2>
         <SelectTopic onUserSelect={naPromenaInput} />
+
+<div className="d-flex flex-column">
+        <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
+        <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
+</div>
         {/* Select style */}
         <SelectStyle onUserSelect={naPromenaInput} />
         {/* Duration */}

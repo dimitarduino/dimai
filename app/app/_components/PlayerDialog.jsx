@@ -39,7 +39,7 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
         if (downloadUrlProp) {
             setDownloadUrl(downloadUrlProp);
         }
-    }, []);
+    }, [downloadUrlProp, videoId]);
 
     useEffect(() => {
         setOpenDialog(!!playVideo)
