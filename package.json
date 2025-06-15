@@ -28,6 +28,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@remotion/cli": "^4.0.311",
     "@remotion/cloudrun": "^4.0.311",
+    "@remotion/lambda": "4.0.311",
     "@remotion/player": "^4.0.311",
     "@remotion/renderer": "^4.0.311",
     "assemblyai": "^4.9.0",

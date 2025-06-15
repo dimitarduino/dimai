@@ -80,6 +80,9 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
                 "credits": slednoPoeni
             }));
 
+        }).catch((err) => {
+            setLoading(false);
+            toast.error(err.response.data.error || "Error enountered");
         })
     }
     const handleDownload = async (videoUrl) => {
