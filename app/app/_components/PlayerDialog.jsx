@@ -25,7 +25,7 @@ import { useUser } from '@clerk/nextjs'
 import CustomLoading from './CustomLoading'
 
 
-function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
+function PlayerDialog({ playVideo, setOpenDialogPlayer = false, videoId, downloadUrlProp = false }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoData, setVideoData] = useState();
     const [loading, setLoading] = useState(false);
@@ -43,8 +43,18 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
 
     useEffect(() => {
         setOpenDialog(!!playVideo)
+        if (setOpenDialogPlayer != false) {
+            setOpenDialogPlayer(!!playVideo);
+        }
         videoId && getVideoData();
     }, [playVideo, durationFrame]);
+
+    useEffect(() => {
+        if (setOpenDialogPlayer != false) {
+
+            setOpenDialogPlayer(openDialog);
+        }
+    }, [openDialog])
 
     const getVideoData = async (id) => {
         const result = await db.select().from(VideoData).where(eq(VideoData.id, videoId));
@@ -109,6 +119,7 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
                         compositionWidth={360}
                         compositionHeight={640}
                         fps={30}
+                        acknowledgeRemotionLicense={true}
                         controls={true}
                         inputProps={{
                             videoData: { ...videoData },
@@ -133,9 +144,10 @@ function PlayerDialog({ playVideo, videoId, downloadUrlProp=false }) {
                             <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer dark:text-white`}>Export (2 credits)</Button>
                         )}
                     </div>
-                    <DialogDescription>
-
-                        <CustomLoading title="Rendering your video..." loading={loading} />
+                    <DialogDescription asChild>
+                        <div className="">
+                            <CustomLoading title="Rendering your video..." loading={loading} />
+                        </div>
 
                     </DialogDescription>
 
