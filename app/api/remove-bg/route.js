@@ -10,6 +10,8 @@ export async function POST(req) {
 
     const { imageUrl } = await req.json();
     const input = { image: imageUrl };
+
+    // bria/remove-background
     const output = await replicate.run("men1scus/birefnet:f74986db0355b58403ed20963af156525e2891ea3c2d499bfbfb2a28cd87c5d7", {input})
     const resp = await axios.get(output, { responseType: 'arraybuffer' });
     const base64 = `data:image/png;base64,${Buffer.from(resp.data).toString('base64')}`;
