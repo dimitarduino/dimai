@@ -163,7 +163,6 @@ export default function ImageToImage() {
         naPromenaInput("style", options[id]);
     }
 
-    
     return (
         <div className="w-full flex">
             <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
