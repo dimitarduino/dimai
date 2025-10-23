@@ -1,5 +1,5 @@
 "use client"
-import { CircleUser, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, PanelsTopLeft, ShieldPlus, SmilePlus, Video } from 'lucide-react'
+import { CircleUser, ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, PanelsTopLeft, ShieldPlus, SmilePlus, Video } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,6 +30,12 @@ function SideNav() {
         name: "Remove Background",
         path: "/app/removebg",
         icon: ImageIcon,
+        sub: []
+    },{
+        id: 5,
+        name: "Expand Images",
+        path: "/app/expand-image",
+        icon: ExpandIcon,
         sub: []
     }, {
         id: 5,
