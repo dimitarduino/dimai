@@ -18,6 +18,7 @@ import { eq } from 'drizzle-orm';
 import { iskoristPoeni, proveriPoeni } from 'lib/utils';
 import SelectComponent from 'app/app/_components/SelectComponent';
 import { Input } from '@/ui/input';
+import Captions from 'app/app/_components/Captions';
 
 function CreateNew() {
   const [formData, setFormData] = useState({
@@ -26,8 +27,8 @@ function CreateNew() {
   });
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [gender, setGender] = useState();
-  const [currentVoices, setCurrentVoices] = useState(false);
+  const [gender, setGender] = useState("");
+  const [currentVoices, setCurrentVoices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [audioFileUrl, setAudioFileUrl] = useState("");
   const [videoScript, setVideoScript] = useState([]);
@@ -162,7 +163,9 @@ function CreateNew() {
       return;
     }
 
-    getVideoScript();
+    console.log(formData);
+
+    // getVideoScript();
   }
 
   const updateUserCredits = async () => {
@@ -204,6 +207,13 @@ function CreateNew() {
     setLoading(false);
   }
 
+  const handleCaptionChange = (caption) => {
+    setFormData(prev => ({
+      ...prev,
+      'caption': caption
+    }));
+  }
+
   return (
     <div className='md:px-20 max-w-7xl mx-auto'>
       <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
@@ -225,13 +235,21 @@ function CreateNew() {
 
         <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
 
-        {
-          !!currentVoices && (
-            <SelectComponent defaultValue={selectedVoice} optionsAvailable={currentVoices} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Model" name="voice" description="Select the voice for your video" title="Choose Voice Model" />
-          )
-        }
+        <SelectComponent 
+          defaultValue={selectedVoice} 
+          optionsAvailable={currentVoices || []} 
+          className="w-full" 
+          onUserSelect={naPromenaInput} 
+          placeholder="Voice Model" 
+          name="voice" 
+          description="Select the voice for your video" 
+          title="Choose Voice Model" 
+        />
 
         <SelectDuration onUserSelect={naPromenaInput} />
+
+        <Captions onCaptionChange={handleCaptionChange} />
+
         {/* Create Button */}
         <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
 
