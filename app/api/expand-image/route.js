@@ -15,7 +15,7 @@ export async function POST(req) {
         const output = await replicate.run("bria/expand-image", { input })
         const resp = await axios.get(output, { responseType: 'arraybuffer' });
         const base64 = `data:image/png;base64,${Buffer.from(resp.data).toString('base64')}`;
-        const storageRef = ref(storage, `background-removed/${Date.now()}.png`);
+        const storageRef = ref(storage, `expand-images/${Date.now()}.png`);
 
         await uploadString(storageRef, base64, 'data_url');
 
