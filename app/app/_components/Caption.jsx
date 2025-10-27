@@ -12,12 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 function Caption({ onCaptionChange, selectedCaption, classesCaption = ``, captionName = ``, activeCaptionProp = false }) {
     const [activeCaption, setActiveCaption] = useState(activeCaptionProp);
     
-    useEffect(() => {
-        console.log(selectedCaption);
-    }, [selectedCaption])
     const handleClick = () => {
-        console.log('dodaj mi caption: ', captionName);
-        // setActiveCaption(!activeCaption);
         if (onCaptionChange) {
             onCaptionChange(captionName);
         }

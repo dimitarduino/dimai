@@ -41,6 +41,23 @@ function CreateNew() {
   const { user } = useUser();
   const { videoData, setVideoData } = useContext(VideoDataContext);
 
+  const captionsData = [{
+    name: "YOUTUBER",
+    classesCaption: "text-yellow-500 pointer font-extrabold uppercase drop-shadow-lg"
+  }, {
+    name: "Superme",
+    classesCaption: "text-black dark:text-white pointer font-bold italic drop-shadow-lg"
+  }, {
+    name: "NEON",
+    classesCaption: "text-green-500 pointer font-extrabold uppercase drop-shadow-lg"
+  }, {
+    name: "GLITCH",
+    classesCaption: "text-pink-500 pointer font-extrabold uppercase drop-shadow-lg"
+  }, {
+    name: "FIRE",
+    classesCaption: "text-red-500 pointer font-extrabold uppercase drop-shadow-lg"
+  }]
+
   const naPromenaInput = (ime, vrednost) => {
     if (ime == 'gender') setGender(vrednost);
     if (ime == 'voice') setSelectedVoice(vrednost);
@@ -57,7 +74,7 @@ function CreateNew() {
   useEffect(() => {
     const cur = voices.filter(v => (v.ssmlGender == gender));
     const current = cur.map(c => c.name);
- 
+
     try {
       setCurrentVoices(current);
       setGender(cur[0].ssmlGender)
@@ -117,8 +134,6 @@ function CreateNew() {
       setAudioFileUrl(res.data.result);
       await GenerateCaptionVideo(res.data.result);
     })
-
-    // setLoading(false);
   }
 
 
@@ -163,9 +178,7 @@ function CreateNew() {
       return;
     }
 
-    console.log(formData);
-
-    // getVideoScript();
+    getVideoScript();
   }
 
   const updateUserCredits = async () => {
@@ -196,6 +209,7 @@ function CreateNew() {
     const result = await db.insert(VideoData).values({
       script: videoData.videoScript,
       audio: videoData.audioFile,
+      captionStyle: captionsData.filter(c => c.name == formData.caption)[0].classesCaption,
       captions: videoData.captions,
       images: videoData.imageList,
       createdBy: user.primaryEmailAddress.emailAddress
@@ -224,10 +238,10 @@ function CreateNew() {
         </h2>
         <SelectTopic onUserSelect={naPromenaInput} />
 
-<div className="d-flex flex-column">
-        <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
-        <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
-</div>
+        <div className="d-flex flex-column">
+          <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
+          <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
+        </div>
         {/* Select style */}
         <SelectStyle onUserSelect={naPromenaInput} />
         {/* Duration */}
@@ -235,20 +249,20 @@ function CreateNew() {
 
         <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
 
-        <SelectComponent 
-          defaultValue={selectedVoice} 
-          optionsAvailable={currentVoices || []} 
-          className="w-full" 
-          onUserSelect={naPromenaInput} 
-          placeholder="Voice Model" 
-          name="voice" 
-          description="Select the voice for your video" 
-          title="Choose Voice Model" 
+        <SelectComponent
+          defaultValue={selectedVoice}
+          optionsAvailable={currentVoices || []}
+          className="w-full"
+          onUserSelect={naPromenaInput}
+          placeholder="Voice Model"
+          name="voice"
+          description="Select the voice for your video"
+          title="Choose Voice Model"
         />
 
         <SelectDuration onUserSelect={naPromenaInput} />
 
-        <Captions onCaptionChange={handleCaptionChange} />
+        <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
 
         {/* Create Button */}
         <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
