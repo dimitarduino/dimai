@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
 function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDurationInFrames }) {
-    const { captions, images, audio } = videoData;
+    const { captions, images, audio, captionStyle } = videoData;
     const { fps } = useVideoConfig();
     const frame = useCurrentFrame();
 
@@ -60,12 +60,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 style={{
-                                fontSize: 60,
-                                fontWeight: 'bold',
-                                lineHeight: 1.2,
-                                textShadow: '0px 0px 15px rgba(0,0,0,0.75)',
-                            }}>{getFrameCaption()}</h2>
+                            <h2 className={`${captionStyle} text-3xl`}>{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
                 )

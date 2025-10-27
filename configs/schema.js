@@ -16,6 +16,7 @@ export const VideoData = pgTable("videos", {
    script: json("script").notNull(),
    audio: varchar("audio").notNull(),
    captions: json("captions").notNull(),
+   captionStyle: varchar("captionStyle").notNull().default('text-yellow-500 pointer font-extrabold drop-shadow-lg uppercase'),
    images: varchar("images").array(),
    createdBy: varchar("createdBy").notNull(),
    downloadUrl: varchar("downloadUrl").default('').notNull()

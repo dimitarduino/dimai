@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Select,
     SelectContent,
@@ -10,33 +10,19 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import Caption from './Caption';
 
-function Captions({ onCaptionChange }) {
+function Captions({ onCaptionChange, captions }) {
     const [activeCaption, setActiveCaption] = useState(false);
-    const [selectedCaption, setSelectedCaption] = useState("Youtuber");
+    const [selectedCaption, setSelectedCaption] = useState("YOUTUBER");
     const handleCaptionChange = (caption) => {
+        console.log(caption)
         setSelectedCaption(caption);
         setActiveCaption(true);
         onCaptionChange(caption);
-
-        console.log('promenvam', caption);
     }
 
-    const captions = [{
-        name: "YOUTUBER",
-        classesCaption: "text-yellow-500 pointer font-extrabold drop-shadow-lg"
-    }, {
-        name: "Superme",
-        classesCaption: "text-black dark:text-white pointer font-bold italic drop-shadow-lg"
-    }, {
-        name: "NEON",
-        classesCaption: "text-green-500 pointer font-extrabold drop-shadow-lg"
-    }, {
-        name: "GLITCH",
-        classesCaption: "text-pink-500 pointer font-extrabold drop-shadow-lg"
-    }, {
-        name: "FIRE",
-        classesCaption: "text-red-500 pointer font-extrabold drop-shadow-lg"
-    }]
+    useEffect(() => {
+        handleCaptionChange("YOUTUBER");
+    }, []);
 
     return (
         <div className="">
