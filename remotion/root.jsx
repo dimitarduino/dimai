@@ -1356,8 +1356,13 @@ export const RemotionRoot = () => {
               "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1761596396528.png?alt=media&token=8fe27afd-ebf0-4665-9538-e5084f2cd084",
               "https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/aishortvideofiles%2F1761596401491.png?alt=media&token=6e1cc192-7368-493b-b4ae-e6ae7a375c38"
             ],
-            captionStyle: "text-green-500 pointer font-extrabold uppercase drop-shadow-lg"
-
+            captionStyle: {
+              color: '#eab308',
+              cursor: 'pointer',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+            }
           },
           durationInFrames: 30
         }}
