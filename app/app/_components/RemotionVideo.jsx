@@ -60,9 +60,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 style={
-                                {color: "white"}
-                            } 
+                            <h2 style={captionStyle} 
                              className={`text-white text-3xl`}>{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
