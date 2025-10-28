@@ -68,6 +68,7 @@ function PlayerDialog({ playVideo, setOpenDialogPlayer = false, videoId, downloa
         }
 
         setLoading(true);
+        console.log(videoData);
         const res = await axios.post("/api/export-video", {
             inputProps: videoData
         }).then(async (res) => {

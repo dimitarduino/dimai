@@ -43,235 +43,266 @@ function CreateNew() {
 
   const captionsData = [{
     name: "YOUTUBER",
-    classesCaption: "text-yellow-500 pointer font-extrabold uppercase drop-shadow-lg"
+    classesCaption: {
+      color: '#eab308',
+      cursor: 'pointer',
+      fontWeight: 800,
+      textTransform: 'uppercase',
+      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+    }
   }, {
     name: "Superme",
-    classesCaption: "text-black dark:text-white pointer font-bold italic drop-shadow-lg"
+    classesCaption: {
+      color: '#ffffff',
+      cursor: 'pointer',
+      fontWeight: 700,
+      fontStyle: 'italic',
+      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+    }
   }, {
     name: "NEON",
-    classesCaption: "text-green-500 pointer font-extrabold uppercase drop-shadow-lg"
+    classesCaption: {
+      color: '#22c55e',
+      cursor: 'pointer',
+      fontWeight: 800,
+      textTransform: 'uppercase',
+      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+    }
   }, {
     name: "GLITCH",
-    classesCaption: "text-pink-500 pointer font-extrabold uppercase drop-shadow-lg"
+    classesCaption: {
+      color: '#ec4899', 
+      cursor: 'pointer',
+      fontWeight: 800,
+      textTransform: 'uppercase',
+      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+    }
   }, {
     name: "FIRE",
-    classesCaption: "text-red-500 pointer font-extrabold uppercase drop-shadow-lg"
-  }]
-
-  const naPromenaInput = (ime, vrednost) => {
-    if (ime == 'gender') setGender(vrednost);
-    if (ime == 'voice') setSelectedVoice(vrednost);
-    setFormData(prev => ({
-      ...prev,
-      [ime]: vrednost
-    }));
-  }
-
-  useEffect(() => {
-    getVoices();
-  }, [])
-
-  useEffect(() => {
-    const cur = voices.filter(v => (v.ssmlGender == gender));
-    const current = cur.map(c => c.name);
-
-    try {
-      setCurrentVoices(current);
-      setGender(cur[0].ssmlGender)
-    } catch (e) {
-      // Handle error silently
+    classesCaption: {
+      color: '#ef4444',
+      cursor: 'pointer',
+      fontWeight: 800,
+      textTransform: 'uppercase',
+      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
     }
-    // setSelectedVoice(cur[0].name);
-  }, [gender])
-
-  const getVoices = async () => {
-    const res = await axios.post("/api/getvoices", {
-    }).then((res) => {
-      let voices = res.data.result;
-
-      setVoices(voices);
-      setSelectedVoice(voices[0].name);
-      setGender(voices[0].ssmlGender);
-    })
   }
+];
 
-  const getVideoScript = async () => {
-    setLoading(true);
-    const prompt = `Write a script to generate 60 seconds video on topic: "${formData.topic}" along with AI image prompt in ${formData.style} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${formData.comment}. Give me JSON only. Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
+const naPromenaInput = (ime, vrednost) => {
+  if (ime == 'gender') setGender(vrednost);
+  if (ime == 'voice') setSelectedVoice(vrednost);
+  setFormData(prev => ({
+    ...prev,
+    [ime]: vrednost
+  }));
+}
 
-    const res = axios.post("/api/get-video-script", {
-      prompt
-    }).then(async (res) => {
-      setVideoScript(res.data.result);
-      setVideoData((prev) => ({
-        ...prev,
-        'videoScript': res.data.result
-      }))
-      await GenerateAudioFile(res.data.result);
-      await GenerateImage(res.data.result);
-    })
-    // setLoading(false);
+useEffect(() => {
+  getVoices();
+}, [])
+
+useEffect(() => {
+  const cur = voices.filter(v => (v.ssmlGender == gender));
+  const current = cur.map(c => c.name);
+
+  try {
+    setCurrentVoices(current);
+    setGender(cur[0].ssmlGender)
+  } catch (e) {
+    // Handle error silently
   }
+  // setSelectedVoice(cur[0].name);
+}, [gender])
 
-  const GenerateAudioFile = async (videoScriptData) => {
-    setLoading(true);
-    let script = ``;
-    const id = uuidv4();
-    videoScriptData.forEach(item => {
-      script += item.contentText + " ";
-    })
+const getVoices = async () => {
+  const res = await axios.post("/api/getvoices", {
+  }).then((res) => {
+    let voices = res.data.result;
 
-    const res = await axios.post("/api/generate-audio", {
-      id,
-      text: script,
-      gender,
-      voice: selectedVoice
-    }).then(async (res) => {
-      setVideoData((prev) => ({
-        ...prev,
-        'audioFile': res.data.result
-      }))
-      setAudioFileUrl(res.data.result);
-      await GenerateCaptionVideo(res.data.result);
-    })
-  }
+    setVoices(voices);
+    setSelectedVoice(voices[0].name);
+    setGender(voices[0].ssmlGender);
+  })
+}
 
+const getVideoScript = async () => {
+  setLoading(true);
+  const prompt = `Write a script to generate 60 seconds video on topic: "${formData.topic}" along with AI image prompt in ${formData.style} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${formData.comment}. Give me JSON only. Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
 
-  const GenerateCaptionVideo = async (audioUrl) => {
-    setLoading(true);
-    const res = await axios.post("/api/generate-caption", {
-      audioUrl: audioUrl
-    }).then(async (res) => {
-      setVideoData((prev) => ({
-        ...prev,
-        'captions': res.data.result
-      }))
-      setCaptions(res.data.result);
-    })
-  }
-
-  const GenerateImage = async (videoScriptData) => {
-    // setLoading(true);
-    let images = [];
-
-    for (const item of videoScriptData) {
-      await axios.post("/api/generate-image", {
-        prompt: item.imagePrompt
-      }).then(async (res) => {
-        images.push(res.data.result);
-      })
-    }
-
+  const res = axios.post("/api/get-video-script", {
+    prompt
+  }).then(async (res) => {
+    setVideoScript(res.data.result);
     setVideoData((prev) => ({
       ...prev,
-      'imageList': images
+      'videoScript': res.data.result
     }))
-    setImageList(images);
-    setLoading(false);
-  }
+    await GenerateAudioFile(res.data.result);
+    await GenerateImage(res.data.result);
+  })
+  // setLoading(false);
+}
 
-  const onCreateClickHandler = () => {
-    const daliImaPoeni = proveriPoeni(userDetail.credits, 10);
+const GenerateAudioFile = async (videoScriptData) => {
+  setLoading(true);
+  let script = ``;
+  const id = uuidv4();
+  videoScriptData.forEach(item => {
+    script += item.contentText + " ";
+  })
 
-    if (!daliImaPoeni) {
-      toast("Insufficient credits! Please recharge to generate a video.");
-      return;
-    }
-
-    getVideoScript();
-  }
-
-  const updateUserCredits = async () => {
-    const slednoPoeni = await iskoristPoeni({
-      momentalnoKrediti: userDetail.credits,
-      kolkuMinus: 10,
-      email: user.primaryEmailAddress.emailAddress
-    });
-
-    setUserDetail(prev => ({
+  const res = await axios.post("/api/generate-audio", {
+    id,
+    text: script,
+    gender,
+    voice: selectedVoice
+  }).then(async (res) => {
+    setVideoData((prev) => ({
       ...prev,
-      "credits": slednoPoeni
-    }));
+      'audioFile': res.data.result
+    }))
+    setAudioFileUrl(res.data.result);
+    await GenerateCaptionVideo(res.data.result);
+  })
+}
 
-    setVideoData(null);
-  }
 
-  useEffect(() => {
-    if (!!videoData) {
-      if (Object.keys(videoData).length == 4) {
-        saveVideoData(videoData);
-      }
-    }
-  }, [videoData])
-
-  const saveVideoData = async (videoData) => {
-    setLoading(true);
-    const result = await db.insert(VideoData).values({
-      script: videoData.videoScript,
-      audio: videoData.audioFile,
-      captionStyle: captionsData.filter(c => c.name == formData.caption)[0].classesCaption,
-      captions: videoData.captions,
-      images: videoData.imageList,
-      createdBy: user.primaryEmailAddress.emailAddress
-    }).returning({ id: VideoData.id });
-
-    await updateUserCredits();
-    setVideoId(result[0].id);
-    setPlayVideo(true);
-    setLoading(false);
-  }
-
-  const handleCaptionChange = (caption) => {
-    setFormData(prev => ({
+const GenerateCaptionVideo = async (audioUrl) => {
+  setLoading(true);
+  const res = await axios.post("/api/generate-caption", {
+    audioUrl: audioUrl
+  }).then(async (res) => {
+    setVideoData((prev) => ({
       ...prev,
-      'caption': caption
-    }));
+      'captions': res.data.result
+    }))
+    setCaptions(res.data.result);
+  })
+}
+
+const GenerateImage = async (videoScriptData) => {
+  // setLoading(true);
+  let images = [];
+
+  for (const item of videoScriptData) {
+    await axios.post("/api/generate-image", {
+      prompt: item.imagePrompt
+    }).then(async (res) => {
+      images.push(res.data.result);
+    })
   }
 
-  return (
-    <div className='md:px-20 max-w-7xl mx-auto'>
-      <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
-        {/* Select Topic */}
-        <h1 className="font-bold text-3xl text-primary ">Create Stunning Shorts with AI</h1>
-        <h2>
-          Effortlessly generate eye-catching shorts using the power of AI. Upload your video, and let the technology craft a short, high-quality clip with precise edits and enhancements in just a few seconds.
-        </h2>
-        <SelectTopic onUserSelect={naPromenaInput} />
+  setVideoData((prev) => ({
+    ...prev,
+    'imageList': images
+  }))
+  setImageList(images);
+  setLoading(false);
+}
 
-        <div className="d-flex flex-column">
-          <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
-          <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
-        </div>
-        {/* Select style */}
-        <SelectStyle onUserSelect={naPromenaInput} />
-        {/* Duration */}
+const onCreateClickHandler = () => {
+  const daliImaPoeni = proveriPoeni(userDetail.credits, 10);
 
+  if (!daliImaPoeni) {
+    toast("Insufficient credits! Please recharge to generate a video.");
+    return;
+  }
 
-        <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
+  getVideoScript();
+}
 
-        <SelectComponent
-          defaultValue={selectedVoice}
-          optionsAvailable={currentVoices || []}
-          className="w-full"
-          onUserSelect={naPromenaInput}
-          placeholder="Voice Model"
-          name="voice"
-          description="Select the voice for your video"
-          title="Choose Voice Model"
-        />
+const updateUserCredits = async () => {
+  const slednoPoeni = await iskoristPoeni({
+    momentalnoKrediti: userDetail.credits,
+    kolkuMinus: 10,
+    email: user.primaryEmailAddress.emailAddress
+  });
 
-        <SelectDuration onUserSelect={naPromenaInput} />
+  setUserDetail(prev => ({
+    ...prev,
+    "credits": slednoPoeni
+  }));
 
-        <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+  setVideoData(null);
+}
 
-        {/* Create Button */}
-        <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
+useEffect(() => {
+  if (!!videoData) {
+    if (Object.keys(videoData).length == 4) {
+      saveVideoData(videoData);
+    }
+  }
+}, [videoData])
 
-        <CustomLoading loading={loading} />
-        <PlayerDialog playVideo={playVideo} videoId={videoId} />
+const saveVideoData = async (videoData) => {
+  setLoading(true);
+  const result = await db.insert(VideoData).values({
+    script: videoData.videoScript,
+    audio: videoData.audioFile,
+    captionStyle: captionsData.filter(c => c.name == formData.caption)[0].classesCaption,
+    captions: videoData.captions,
+    images: videoData.imageList,
+    createdBy: user.primaryEmailAddress.emailAddress
+  }).returning({ id: VideoData.id });
+
+  await updateUserCredits();
+  setVideoId(result[0].id);
+  setPlayVideo(true);
+  setLoading(false);
+}
+
+const handleCaptionChange = (caption) => {
+  setFormData(prev => ({
+    ...prev,
+    'caption': caption
+  }));
+}
+
+return (
+  <div className='md:px-20 max-w-7xl mx-auto'>
+    <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
+      {/* Select Topic */}
+      <h1 className="font-bold text-3xl text-primary ">Create Stunning Shorts with AI</h1>
+      <h2>
+        Effortlessly generate eye-catching shorts using the power of AI. Upload your video, and let the technology craft a short, high-quality clip with precise edits and enhancements in just a few seconds.
+      </h2>
+      <SelectTopic onUserSelect={naPromenaInput} />
+
+      <div className="d-flex flex-column">
+        <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
+        <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
       </div>
+      {/* Select style */}
+      <SelectStyle onUserSelect={naPromenaInput} />
+      {/* Duration */}
+
+
+      <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
+
+      <SelectComponent
+        defaultValue={selectedVoice}
+        optionsAvailable={currentVoices || []}
+        className="w-full"
+        onUserSelect={naPromenaInput}
+        placeholder="Voice Model"
+        name="voice"
+        description="Select the voice for your video"
+        title="Choose Voice Model"
+      />
+
+      <SelectDuration onUserSelect={naPromenaInput} />
+
+      <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+
+      {/* Create Button */}
+      <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
+
+      <CustomLoading loading={loading} />
+      <PlayerDialog playVideo={playVideo} videoId={videoId} />
     </div>
-  )
+  </div>
+)
 }
 
 export default CreateNew
