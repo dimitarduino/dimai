@@ -1,4 +1,5 @@
 "use client";
+import { color } from "framer-motion";
 import React, { useEffect } from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
@@ -51,8 +52,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             <Img src={image} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale(index)})` }} />
                         </Sequence>
 
-                        <AbsoluteFill style={{
-                            color: "yellow",
+                        <AbsoluteFill className={`text-white text-3xl`} style={{
                             justifyContent: "center",
                             bottom: 300,
                             top: undefined,
@@ -60,7 +60,10 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 className={`${captionStyle} text-3xl`}>{getFrameCaption()}</h2>
+                            <h2 style={
+                                {color: "white"}
+                            } 
+                             className={`text-white text-3xl`}>{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
                 )

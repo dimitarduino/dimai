@@ -16,6 +16,7 @@ export async function POST(req) {
   const bufferFrames = 10;
   const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
 
+  console.log(process.env.AWS_SERVE_URL);
   const { renderId, bucketName } = await renderMediaOnLambda({
     region: 'us-east-1',
     functionName,
