@@ -52,7 +52,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             <Img src={image} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale(index)})` }} />
                         </Sequence>
 
-                        <AbsoluteFill className={`text-white text-3xl`} style={{
+                        <AbsoluteFill style={{
                             justifyContent: "center",
                             bottom: 300,
                             top: undefined,
@@ -60,7 +60,7 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 style={captionStyle} 
+                            <h2 style={{...captionStyle, fontSize: 60, fontFamily: 'Helvetica, sans-serif'}} 
                              className={`text-white text-3xl`}>{getFrameCaption()}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
