@@ -31,7 +31,7 @@ function Captions({ onCaptionChange, captions }) {
 
             <div className='w-full grid grid-cols-5 gap-2 mt-4'>
                 {captions.map((caption, index) => (
-                    <Caption selectedCaption={selectedCaption} activeCaptionProp={selectedCaption == caption.name} key={index} captionName={caption.name} onCaptionChange={() => handleCaptionChange(caption.name)} classesCaption={`${caption.classesCaption}`} />
+                    <Caption selectedCaption={selectedCaption} activeCaptionProp={selectedCaption == caption.name} key={index} captionName={caption.name} onCaptionChange={() => handleCaptionChange(caption.name)} classesCaption={`${caption.classes}`} />
                 ))}
             </div>
         </div>

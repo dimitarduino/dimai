@@ -43,6 +43,7 @@ function CreateNew() {
 
   const captionsData = [{
     name: "YOUTUBER",
+    classes: "text-yellow-500 pointer font-extrabold drop-shadow-lg uppercase",
     classesCaption: {
       color: '#eab308',
       cursor: 'pointer',
@@ -52,6 +53,7 @@ function CreateNew() {
     }
   }, {
     name: "Superme",
+    classes: "text-pink-500 pointer font-extrabold drop-shadow-lg uppercase",
     classesCaption: {
       color: '#ffffff',
       cursor: 'pointer',
@@ -61,6 +63,7 @@ function CreateNew() {
     }
   }, {
     name: "NEON",
+    classes: "text-green-500 pointer font-extrabold drop-shadow-lg uppercase",
     classesCaption: {
       color: '#22c55e',
       cursor: 'pointer',
@@ -70,6 +73,7 @@ function CreateNew() {
     }
   }, {
     name: "GLITCH",
+    classes: "text-red-500 pointer font-extrabold drop-shadow-lg uppercase",
     classesCaption: {
       color: '#ec4899', 
       cursor: 'pointer',
@@ -79,6 +83,7 @@ function CreateNew() {
     }
   }, {
     name: "FIRE",
+    classes: "text-red-600 pointer font-extrabold drop-shadow-lg uppercase",
     classesCaption: {
       color: '#ef4444',
       cursor: 'pointer',
