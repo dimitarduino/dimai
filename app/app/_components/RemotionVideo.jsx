@@ -1,5 +1,5 @@
 "use client";
-import { color } from "framer-motion";
+import { calcGeneratorDuration, color } from "framer-motion";
 import React, { useEffect } from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
@@ -33,7 +33,22 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
     const getFrameCaption = () => {
         const currentTime = frame / fps * 1000;
         const currentCaption = captions?.find((word) => currentTime >= word.start && currentTime <= word.end);
-        return currentCaption?.text;
+
+        let scale = 0;
+
+        let razlika = currentCaption?.end - currentCaption?.start;
+        
+        let delitel25 = razlika / 4;
+        let procent = 100 / (razlika / (currentTime - currentCaption?.start + delitel25));
+        scale = procent / 100;
+        if (scale >= 1) scale = 1;
+
+        if (razlika < 300) scale = 1;
+        
+        return {
+            text: currentCaption?.text,
+            scale
+        };
     }
 
     return (
@@ -60,8 +75,8 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 style={{...captionStyle, fontSize: 60, fontFamily: 'Helvetica, sans-serif'}} 
-                             className={`text-white text-3xl`}>{getFrameCaption()}</h2>
+                            <h2 style={{...captionStyle, fontSize: 48, transform: `scale(${getFrameCaption().scale})`, fontFamily: 'Helvetica, sans-serif'}} 
+                             className={`text-white text-3xl`}>{getFrameCaption().text}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
                 )
