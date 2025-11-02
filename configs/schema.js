@@ -32,3 +32,16 @@ export const Subscribers = pgTable('subscribers', {
    id: serial("id").primaryKey(),
    email: varchar("email", { length: 255 }).notNull()
 });
+
+export const VideoGenerationJobs = pgTable('video_generation_jobs', {
+   id: serial("id").primaryKey(),
+   jobId: varchar("jobId", { length: 255 }).notNull().unique(),
+   userId: varchar("userId", { length: 255 }).notNull(),
+   status: varchar("status", { length: 50 }).notNull().default('pending'), // pending, processing, completed, failed
+   progress: json("progress").default({}),
+   formData: json("formData").notNull(),
+   result: json("result"), // stores videoId when completed
+   error: varchar("error", { length: 500 }),
+   createdAt: varchar("createdAt", { length: 255 }).notNull(),
+   updatedAt: varchar("updatedAt", { length: 255 }).notNull()
+});
