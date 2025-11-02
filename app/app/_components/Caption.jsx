@@ -19,7 +19,7 @@ function Caption({ onCaptionChange, selectedCaption, classesCaption = ``, captio
     };
     
     return (
-        <div className={`w-full p-4 cursor-pointer px-6 border border-gray-300 rounded-md flex justify-center items-center ${(selectedCaption == captionName) ? `bg-gray-200 dark:bg-zinc-700` : `hover:bg-gray-100 dark:hover:bg-zinc-800`}`} onClick={handleClick}>
+        <div className={`w-full p-4 cursor-pointer px-6 border border-gray-300 rounded-md flex justify-center items-center ${(selectedCaption == captionName) ? `bg-gray-200 dark:bg-zinc-700` : `hover:bg-gray-100 dark:hover:bg-zinc-800 bg-gray-100 dark:bg-zinc-900`}`} onClick={handleClick}>
             <span className={`text-xl ${classesCaption}`}>{captionName}</span>
         </div>
     )

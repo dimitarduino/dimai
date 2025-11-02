@@ -23,10 +23,7 @@ export async function POST(req) {
     const output = await replicate.run("bytedance/sdxl-lightning-4step:6f7a773af6fc3e8de9d5a3c00be77c17308914bf67772726aff83496ba1e3bbe", { input });
 
     const local = `./${new Date().getTime()}.png`;
-
-    // Save the output file (this is hypothetical, depending on how your 'output' data is structured)
-    // await writeFile(local, output[0]);
-    // Get the image as a buffer (this replaces the local file reading process)
+    
     const resp = await axios.get(output[0], { responseType: 'arraybuffer' });
     const base64 = Buffer.from(resp.data).toString('base64');
 
