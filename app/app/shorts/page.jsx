@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 
 function Dashboard() {
   const { user } = useUser();
-  const[userLocal, setUserLocal] = useState(null);
+  const[userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
   const [videos, setVideos] = useState([]);
   const [progressVideos, setProgressVideos] = useState(localStorage.currentVideoJobId ? JSON.parse(localStorage.currentVideoJobId) : []);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
