@@ -29,30 +29,32 @@ function GeneratedImages({ imagesList, onClickImage, selectedImage }) {
     const [activeImage, setActiveImage] = useState(selectedImage);
 
     return (
-        <div className="grid grid-cols-4 overflow-auto max-h-36 md:grid-cols-3 lg:grid-cols-8 xl-grid-cols-12 gap-1">
-            {[...new Map(imagesList.map(v => [v.image, v])).values()]
-                .sort((a, b) => b.id - a.id)
-                .map((video, index) => (
-                    <div
-                        onClick={() => { setActiveImage(video.image); onClickImage(video.image); }}
-                        className={`overflow-hidden flex w-full h-full rounded-xl ${(activeImage == video.image || selectedImage == video.image) ? "border-2 border-primary" : ""}`}
-                        key={video.id ?? index}
-                    >
-                        <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
-                            <Image
-                                src={video.image}
-                                alt={video.caption ?? ""}
-                                className="w-full aspect-12/16 object-cover h-full"
-                                width={100}
-                                height={300}
-                                layout="responsive"
-                                objectFit="cover"
-                            />
+        <ScrollArea className="max-h-36 overflow-auto">
+            <div className="grid grid-cols-4 md:grid-cols-3 lg:grid-cols-8 xl:grid-cols-12 gap-1">
+                {[...new Map(imagesList.map(v => [v.image, v])).values()]
+                    .sort((a, b) => b.id - a.id)
+                    .map((video, index) => (
+                        <div
+                            onClick={() => { setActiveImage(video.image); onClickImage(video.image); }}
+                            className={`overflow-hidden flex w-full h-full rounded-xl ${(activeImage == video.image || selectedImage == video.image) ? "border-2 border-primary" : ""}`}
+                            key={video.id ?? index}
+                        >
+                            <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
+                                <Image
+                                    src={video.image}
+                                    alt={video.caption ?? ""}
+                                    className="w-full aspect-9/16 min-h-12 object-cover"
+                                    width={100}
+                                    height={300}
+                                    layout="responsive"
+                                    objectFit="cover"
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
-
-        </div>
+                    ))}
+            </div>
+            <ScrollBar orientation="vertical" />
+        </ScrollArea>
     )
 }
 

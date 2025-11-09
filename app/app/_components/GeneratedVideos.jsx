@@ -18,6 +18,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { X } from 'lucide-react'
+import axios from 'axios'
 
 function GeneratedVideos({ videoList, onClickVideo }) {
     const [modifiedImage, setModifiedImage] = useState();
@@ -26,6 +27,61 @@ function GeneratedVideos({ videoList, onClickVideo }) {
     const [openedVideo, setOpenedVideo] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
     const [durationFrame, setDurationFrame] = useState(0);
+
+    const handleDownload = async (videoUrl) => {
+        try {
+            const response = await axios.get(videoUrl, { responseType: "blob" });
+            const blob = response.data;
+
+            const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const supportsDownload = 'download' in document.createElement('a');
+
+            // iOS Safari doesn't reliably support the download attribute or blob URLs for downloads,
+            // so convert to a data URL and open it (or set location) as a fallback.
+            if (isIOS && isSafari) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const dataUrl = reader.result;
+                    const newWindow = window.open(dataUrl, '_blank');
+                    if (!newWindow) {
+                        // If popup blocked, navigate directly
+                        window.location.href = dataUrl;
+                    }
+                };
+                reader.onerror = () => {
+                    // final fallback: try opening the original URL
+                    window.open(videoUrl);
+                };
+                reader.readAsDataURL(blob);
+                return;
+            }
+
+            // Normal desktop / modern mobile browsers: create an object URL and use anchor download
+            if (supportsDownload) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                const filename = (videoUrl && videoUrl.split('/').pop().split('?')[0]) || "downloaded-video.mp4";
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                // Revoke after a short delay to ensure download started
+                setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                return;
+            }
+
+            // Fallback: open the blob URL in a new tab/window
+            const url = window.URL.createObjectURL(blob);
+            window.open(url);
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+            // final fallback: open the original URL
+            window.open(videoUrl);
+            console.error("Video download error:", error);
+        }
+    };
 
     useEffect(() => {
         console.log(videoList);
@@ -66,10 +122,10 @@ function GeneratedVideos({ videoList, onClickVideo }) {
                         {
                             modifiedImage && (
                                 <div className="flex flex-col">
-                                    <video controls className="rounded-md max-h-128">
+                                    <video controls className="rounded-md max-h-80 sm:max-h-128">
                                         <source src={modifiedImage} type="video/mp4" />
                                     </video>
-                                    <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(modifiedImage)}>Download video</Button>
+                                    <a download={modifiedImage} href={modifiedImage} className={` mt-5 bg-primary rounded-md flex items-center justify-center py-2 cursor-pointer dark:text-white`}>Download video</a>
                                 </div>
                             )
                         }

@@ -165,7 +165,7 @@ function Dashboard() {
                   <div className="overflow-hidden rounded-md">
                     <video className="aspect-[16/12] transition h-40 h-fit hover:scale-120 w-80 object-cover"
                       width={300}
-                      height={400} poster={service.poster} loop="" autoPlay muted>
+                      height={400} poster={service.poster} loop="">
                       <source src={service.video} type="video/webm" />
                     </video>
 
