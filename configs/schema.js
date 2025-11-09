@@ -1,3 +1,4 @@
+import { int } from "drizzle-orm/mysql-core";
 import { serial, integer, varchar, boolean, json } from "drizzle-orm/pg-core";
 
 const { pgTable } = require("drizzle-orm/pg-core");
@@ -26,7 +27,19 @@ export const VideoData = pgTable("videos", {
    images: varchar("images").array(),
    createdBy: varchar("createdBy").notNull(),
    downloadUrl: varchar("downloadUrl").default('').notNull()
-})
+});
+
+
+export const ImageVideo = pgTable("image_video", {
+   id: serial("id").primaryKey(),
+   image: json("image").notNull(),
+   prompt: varchar("prompt").default(""),
+   negative_prompt: varchar("negative_prompt").default(""),
+   duration: integer("duration").default(5).notNull(),
+   mode: varchar("mode").default("standard").notNull(),
+   video: varchar("video").notNull(),
+   createdBy: varchar("createdBy").notNull()
+});
 
 export const Subscribers = pgTable('subscribers', {
    id: serial("id").primaryKey(),

@@ -22,40 +22,53 @@ function Dashboard() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const services = [
     {
-      title: "Text to Image",
+      title: "Expand Image",
+      link: "app/expand-images",
       poster: "/dashboards/text-to-image-v2.webp",
       video: "./dashboards/texttoimage.webm"
     },
     {
-      title: "Face to Portrait",
+      title: "Face swap",
+      link: "app/swapface",
       poster: "/dashboards/face-portrait.webp",
       video: "./dashboards/face-portrait.webm"
     },
     {
       title: "Creative Upscale",
+      link: "app/upscale",
       poster: "/dashboards/creative-upscale.webp",
       video: "./dashboards/creative-upscale.webm"
     },
 
     {
-      title: "Reimagine",
+      title: "Generate Shorts",
+      link: "app/shorts",
       poster: "/dashboards/reimagine.webp",
       video: "/dashboards/reimagine.webm"
     },
     {
       title: "Generate transparent images",
+      link: "app/expand-images",
       poster: "/dashboards/png.webp",
       video: "./dashboards/png.webm"
     },
     {
-      title: "Image to video",
+      title: "Emoji Generator",
+      link: "app/imagemod",
       poster: "/dashboards/image-to-video.webp",
       video: "./dashboards/image-to-video.webm"
     },
     {
-      title: "Text to video",
+      title: "Video Dubbing",
+      link: "app/dubbing",
       poster: "/dashboards/text-to-video.webp",
       video: "./dashboards/text-to-video.webm"
+    },
+    {
+      title: "Image to Video",
+      link: "app/image-to-video",
+      poster: "/dashboards/image-to-video.webp",
+      video: "./dashboards/image-to-video.webm"
     },
   ];
 
@@ -148,11 +161,11 @@ function Dashboard() {
           <div className="w-fit whitespace-nowrap rounded-md pt-4">
             <div useref={scrollRef} className="flex snap-x space-x-4 overflow-auto scrollable-container">
               {services.map((service) => (
-                <figure key={service.title} className="shrink-0 snap-start cursor-pointer relative">
+                <Link href={service.link} key={service.title} className="shrink-0 snap-start cursor-pointer relative">
                   <div className="overflow-hidden rounded-md">
                     <video className="aspect-[16/12] transition h-40 h-fit hover:scale-120 w-80 object-cover"
                       width={300}
-                      height={400} poster={service.poster} loop="" autoPlay muted playsInline="">
+                      height={400} poster={service.poster} loop="" autoPlay muted>
                       <source src={service.video} type="video/webm" />
                     </video>
 
@@ -162,7 +175,7 @@ function Dashboard() {
                   <figcaption className="absolute bottom-4 left-4 right-4 text-xl text-white font-semibold">
                     {service.title}
                   </figcaption>
-                </figure>
+                </Link>
               ))}
             </div>
           </div>
