@@ -1,5 +1,5 @@
 import { int } from "drizzle-orm/mysql-core";
-import { serial, integer, varchar, boolean, json } from "drizzle-orm/pg-core";
+import { serial, integer, varchar, boolean, json, timestamp } from "drizzle-orm/pg-core";
 
 const { pgTable } = require("drizzle-orm/pg-core");
 
@@ -46,6 +46,31 @@ export const Subscribers = pgTable('subscribers', {
    email: varchar("email", { length: 255 }).notNull()
 });
 
+export const upscaledImages = pgTable('upscaled_images', {
+   id: serial("id").primaryKey(),
+   image: varchar("image").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
+
+export const removedbgImages = pgTable('removedbg_images', {
+   id: serial("id").primaryKey(),
+   image: varchar("image").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
+
+export const expandedImages = pgTable('expanded_images', {
+   id: serial("id").primaryKey(),
+   image: varchar("image").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   aspectRatio: varchar("aspectRatios").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
+
 export const VideoGenerationJobs = pgTable('video_generation_jobs', {
    id: serial("id").primaryKey(),
    jobId: varchar("jobId", { length: 255 }).notNull().unique(),
@@ -57,4 +82,32 @@ export const VideoGenerationJobs = pgTable('video_generation_jobs', {
    error: varchar("error", { length: 500 }),
    createdAt: varchar("createdAt", { length: 255 }).notNull(),
    updatedAt: varchar("updatedAt", { length: 255 }).notNull()
+});
+
+export const SwapFacesImages = pgTable('swap_faces_images', {
+   id: serial("id").primaryKey(),
+   input_image: varchar("input_image").notNull(),
+   swap_image: varchar("swap_image").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
+
+export const EmojiGenerationImages = pgTable('emoji_generation_images', {
+   id: serial("id").primaryKey(),
+   image: varchar("image").notNull(),
+   prompt: varchar("prompt").notNull(),
+   style: varchar("style").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
+
+export const DubbingVideos = pgTable('dubbing_videos', {
+   id: serial("id").primaryKey(),
+   video: varchar("video").notNull(),
+   finalVideo: varchar("finalVideo").notNull(),
+   language: varchar("language").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
 });

@@ -28,6 +28,8 @@ import { UserDetailContext } from "app/_context/UserDetailContext";
 import CustomLoading from "../_components/CustomLoading";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { db } from "configs/db";
+import { DubbingVideos } from "configs/schema";
 
 export default function DubbedVideo() {
     const [file, setFile] = useState(null);
@@ -103,13 +105,23 @@ export default function DubbedVideo() {
         const data = await axios.post(`/api/dub-video`, {
             videoUrl: videoUrl,
             dubbedAudioUrl: audioUrl
-        }).then(res => {
+        }).then(async (res) => {
 
             if (!!res.data.result) {
                 setResultVideo(res.data.result);
                 setOpenedResult(true);
                 setUploading(false)
                 setLoading(false);
+
+                const result = await db.insert(DubbingVideos).values({
+                    video: videoUrl,
+                    finalVideo: res.data.result,
+                    language: formData.targetLanguageAudio,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: DubbingVideos.id });
+
+                console.log(result);
             }
         });
     }
@@ -272,7 +284,7 @@ export default function DubbedVideo() {
                 <CustomLoading title="Generating your video..." loading={loading} />
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                    <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                    <DialogContent className="w-full [&>button]:hidden max-w-md sm:max-w-md max-h-[80dvh] sm:max-h-[90dvh] overflow-y-auto flex flex-col  z-150">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                             <DialogDescription className={`text-md`}>
@@ -290,13 +302,13 @@ export default function DubbedVideo() {
                         <div className="grid pb-2 grid-cols-1 w-full gap-12">
                             {
                                 resultVideo && (
-                                    <div className="flex flex-col">
-                                        <video controls className="rounded-md">
+                                    <div className="flex items-center justify-center flex-col">
+                                        <video controls className="rounded-md max-w-80">
                                             <source src={resultVideo} type="video/mp4" />
                                         </video>
 
 
-                                        <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(resultVideo)}>Download Video</Button>
+                                        <Button className={`py-6 mt-5 cursor-pointer text-white dark:text-white`} onClick={() => handleDownload(resultVideo)}>Download Video</Button>
                                     </div>
                                 )
                             }

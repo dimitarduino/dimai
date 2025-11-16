@@ -27,6 +27,8 @@ import { iskoristPoeni, proveriPoeni } from "lib/utils";
 import { UserDetailContext } from "app/_context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { db } from "configs/db";
+import { SwapFacesImages } from "configs/schema";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -57,7 +59,7 @@ export default function UpscaleImage() {
             swapImageUrl: swapImageUrl,
             imageUrl: imageUrl
 
-        }).then(res => {
+        }).then(async (res) => {
             setOpenedResult(true);
             setLoading(false);
 
@@ -73,6 +75,14 @@ export default function UpscaleImage() {
 
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
+
+                const result = await db.insert(SwapFacesImages).values({
+                    input_image: imageUrl,
+                    swap_image: swapImageUrl,
+                    finalImage: res.data.result,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: SwapFacesImages.id });
             }
         })
     }
@@ -104,7 +114,7 @@ export default function UpscaleImage() {
         if (!swap) return alert("Please select a file first!");
         // setDownloadUrl(null);
         // setModifiedImage(null)
-   
+
         // generateImageFromStyle();
         setUploading(true);
         const storageRef = ref(storage, `uploads/${swap.name}-${Date.now()}`);
@@ -140,7 +150,7 @@ export default function UpscaleImage() {
         // setDownloadUrl(null);
         // setSwapUrl(null);
         setModifiedImage(null)
-  
+
         // generateImageFromStyle();
         setUploading(true);
         const storageRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
@@ -272,7 +282,7 @@ export default function UpscaleImage() {
             </div>
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                         <DialogDescription className={`text-md`}>

@@ -23,7 +23,7 @@ function Dashboard() {
   const services = [
     {
       title: "Expand Image",
-      link: "app/expand-images",
+      link: "app/expand-image",
       poster: "/dashboards/text-to-image-v2.webp",
       video: "./dashboards/texttoimage.webm"
     },
@@ -128,8 +128,8 @@ function Dashboard() {
   };
 
   return (
-    <div className='dashboard px-6'>
-      <div className="dashboard-top rounded-3xl px-10 items-center justify-center w-full flex py-14 flex flex-col bg-gradient-to-tl dark:from-black dark:to-emerald-800 from-emerald-300 to-green-100">
+    <div className='dashboard px-4 sm:px-6'>
+      <div className="dashboard-top rounded-3xl px-3 sm:px-10 items-center justify-center w-full flex py-14 flex flex-col bg-gradient-to-tl dark:from-black dark:to-emerald-800 from-emerald-300 to-green-100">
         <h1 className='font-bold text-4xl text-primary'>Describe your ideas and generate 🚀</h1>
         <h2 className='py-4'>Transform your words into visual masterpieces: Leverage AI technology to craft breathtaking images.</h2>
 
@@ -163,9 +163,13 @@ function Dashboard() {
               {services.map((service) => (
                 <Link href={service.link} key={service.title} className="shrink-0 snap-start cursor-pointer relative">
                   <div className="overflow-hidden rounded-md">
-                    <video className="aspect-[16/12] transition h-40 h-fit hover:scale-120 w-80 object-cover"
+                    <video className="aspect-[16/12] transition h-40 h-fit hover:scale-120 w-60 object-cover"
                       width={300}
-                      height={400} poster={service.poster} loop="">
+                      height={400} poster={service.poster}
+                      autoPlay 
+                      muted 
+                      playsInline
+                      loop >
                       <source src={service.video} type="video/webm" />
                     </video>
 

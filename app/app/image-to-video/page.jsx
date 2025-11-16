@@ -360,7 +360,8 @@ export default function ImageToVideo() {
             duration
         });
 
-        console.log(image);
+        // console.log(image);
+        
         setSelectedImage(image);
 
         if (typeof window !== 'undefined') {
@@ -425,7 +426,7 @@ export default function ImageToVideo() {
                     <Input type="text" placeholder="Negative Prompt..." name="negative_prompt" className={`mt-2`} value={formData.negative_prompt} onChange={(event) => naPromenaInput("negative_prompt", event.target.value)} />
                 </div>
 
-                <SelectComponent defaultValue={5} optionsAvailable={durations} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="duration" description="Select duration" title="Select duration (in seconds)" />
+                <SelectComponent defaultValue={formData.duration} optionsAvailable={durations} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="duration" description="Select duration" title="Select duration (in seconds)" />
 
                 {
                     selectedImage ? (
@@ -455,7 +456,7 @@ export default function ImageToVideo() {
                 </div>
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                    <DialogContent className="w-full [&>button]:hidden max-w-lg sm:max-w-md flex flex-col">
+                    <DialogContent className="w-full  z-150 [&>button]:hidden max-w-lg sm:max-w-md flex flex-col">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                             <DialogDescription className={`text-md`}>
@@ -477,7 +478,7 @@ export default function ImageToVideo() {
                                         <video controls className="rounded-md max-h-128">
                                             <source src={modifiedImage} type="video/mp4" />
                                         </video>
-                                        <Button className={`py-6 mt-5 cursor-pointer dark:text-white`} onClick={() => handleDownload(modifiedImage)}>Download video</Button>
+                                        <Button className={`py-6 mt-5 cursor-pointer text-white dark:text-white`} onClick={() => handleDownload(modifiedImage)}>Download video</Button>
                                     </div>
                                 )
                             }
@@ -504,7 +505,7 @@ export default function ImageToVideo() {
                     videos.length == 0 ? (
                         <h3>You don't have any generated videos</h3>
                     ) : (
-                        <GeneratedVideos videoList={videos} onClickVideo={(prompt, negative_prompt, mode, duration, image) => handleRecreate(prompt, negative_prompt, mode, duration, image)} />
+                        <GeneratedVideos setVideoList={setVideos} videoList={videos} onClickVideo={(prompt, negative_prompt, mode, duration, image) => handleRecreate(prompt, negative_prompt, mode, duration, image)} />
                     )
                 }
             </div>

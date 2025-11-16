@@ -111,7 +111,7 @@ function PlayerDialog({ playVideo, setOpenDialogPlayer = false, videoId, downloa
     };
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogContent className={`[&>button]:hidden`}>
+            <DialogContent className={`[&>button]:hidden  z-150`}>
                 <DialogHeader className={`flex flex-col items-center justify-center`}>
                     <DialogTitle className={`font-bold text-3xl text-primary`}>Your video is ready!</DialogTitle>
                     <Player
@@ -137,12 +137,12 @@ function PlayerDialog({ playVideo, setOpenDialogPlayer = false, videoId, downloa
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <Button className={`py-6 cursor-pointer dark:text-white`}>Download video</Button>
+                                <Button className={`py-6 cursor-pointer dark:text-white text-white`}>Download video</Button>
                             </a>
                         )}
 
                         {!downloadUrl && (
-                            <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer dark:text-white`}>Export (2 credits)</Button>
+                            <Button onClick={() => exportVideo()} className={`py-6 cursor-pointer text-white dark:text-white`}>Export (2 credits)</Button>
                         )}
                     </div>
                     <DialogDescription asChild>

@@ -24,6 +24,8 @@ import CustomLoading from "../_components/CustomLoading";
 import { iskoristPoeni, proveriPoeni } from "lib/utils";
 import { UserDetailContext } from "app/_context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
+import { db } from "configs/db";
+import { upscaledImages } from "configs/schema";
 
 export default function UpscaleImage() {
     const [file, setFile] = useState(null);
@@ -59,6 +61,15 @@ export default function UpscaleImage() {
                 setOpenedResult(true);
                 setUploading(false)
                 setLoading(false)
+
+                const result = await db.insert(upscaledImages).values({
+                    image: imageUrl,
+                    finalImage: res.data.result,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: upscaledImages.id });
+
+                // console.log(result);
             }
         })
     }
@@ -185,7 +196,7 @@ export default function UpscaleImage() {
             <CustomLoading title="Upscaling your image..." loading={loading} />
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                <DialogContent className="w-full [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
+                <DialogContent className="w-full z-150 [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
                     <DialogHeader>
 
                         <DialogTitle className={`font-bold text-3xl text-primary`}>{(scaling && !upscaleUrl) ? `Upscaling your image...` : `Your result!`}</DialogTitle>

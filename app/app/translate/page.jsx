@@ -219,7 +219,7 @@ export default function ImageToImage() {
 
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                    <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                    <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                             <DialogDescription className={`text-md`}>

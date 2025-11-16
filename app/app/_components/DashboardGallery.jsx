@@ -11,7 +11,7 @@ function DashboardGallery({imagesGallery}) {
     <h2 className="text-4xl font-bold text-primary mb-8">#Explore DimnAI</h2>
     
     {/* Masonry Layout with CSS Columns */}
-    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
       {images.map((image, index) => (
         <div key={index} className="">
           <div className="overflow-hidden rounded-sm shadow-sm">

@@ -30,6 +30,8 @@ import CustomLoading from "../_components/CustomLoading";
 import { ClientPageRoot } from "next/dist/client/components/client-page";
 import { toast } from "sonner";
 import SelectComponent from "../_components/SelectComponent";
+import { expandedImages } from "configs/schema";
+import { db } from "configs/db";
 
 export default function ImageToImage() {
     const [file, setFile] = useState(null);
@@ -88,6 +90,14 @@ export default function ImageToImage() {
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
                 setOpenedResult(true);
+
+                const result = await db.insert(expandedImages).values({
+                    image: imageUrl,
+                    finalImage: res.data.result,
+                    aspectRatio: formData.aspectRatio,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: expandedImages.id });
             }
         })
     }
@@ -163,7 +173,7 @@ export default function ImageToImage() {
         naPromenaInput("style", options[id]);
     }
 
-    
+
     return (
         <div className="w-full flex">
             <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
@@ -220,7 +230,7 @@ export default function ImageToImage() {
 
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                    <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                    <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                             <DialogDescription className={`text-md`}>

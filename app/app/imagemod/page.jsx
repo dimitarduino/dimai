@@ -29,6 +29,8 @@ import {
 import CustomLoading from "../_components/CustomLoading";
 import { ClientPageRoot } from "next/dist/client/components/client-page";
 import { toast } from "sonner";
+import { db } from "configs/db";
+import { EmojiGenerationImages } from "configs/schema";
 
 export default function ImageToImage() {
     const [file, setFile] = useState(null);
@@ -77,6 +79,15 @@ export default function ImageToImage() {
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
                 setOpenedResult(true);
+
+                const result = await db.insert(EmojiGenerationImages).values({
+                    image: imageUrl,
+                    prompt: formData.text,
+                    style: formData.style,
+                    finalImage: res.data.result,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: EmojiGenerationImages.id });
             }
         })
     }
@@ -237,7 +248,7 @@ export default function ImageToImage() {
 
 
                 <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                    <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                    <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                             <DialogDescription className={`text-md`}>

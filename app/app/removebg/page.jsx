@@ -26,6 +26,8 @@ import {
 import { Label } from "@/components/ui/label"
 import CustomLoading from "../_components/CustomLoading";
 import { toast } from "sonner";
+import { removedbgImages } from "configs/schema";
+import { db } from "configs/db";
 
 export default function UploadImage() {
     const [file, setFile] = useState(null);
@@ -59,7 +61,15 @@ export default function UploadImage() {
             if (!!res.data.result) {
                 setRemovedUrl(res.data.result);
                 setOpenedResult(true);
-                setLoading(false)
+                setLoading(false);
+
+                const result = await db.insert(removedbgImages).values({
+                    image: imageUrl,
+                    finalImage: res.data.result,
+                    createdBy: user.primaryEmailAddress.emailAddress,
+                    createdAt: new Date().toISOString()
+                }).returning({ id: removedbgImages.id });
+
             }
         })
     }
@@ -209,7 +219,7 @@ export default function UploadImage() {
             <CustomLoading title="Removing background..." loading={loading} />
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                <DialogContent className="w-full [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
+                <DialogContent className="w-ful  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                         <DialogDescription className={`text-md`}>

@@ -17,10 +17,25 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { X } from 'lucide-react'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Trash2, X } from 'lucide-react'
 import axios from 'axios'
+import { db } from 'configs/db'
+import { ImageVideo } from 'configs/schema'
+import { eq } from 'drizzle-orm'
+import { toast } from 'sonner'
 
-function GeneratedVideos({ videoList, onClickVideo }) {
+function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
     const [modifiedImage, setModifiedImage] = useState();
     const [openDialog, setOpenDialog] = useState(false);
     const [videoId, setVideoId] = useState();
@@ -87,14 +102,65 @@ function GeneratedVideos({ videoList, onClickVideo }) {
         console.log(videoList);
     }, []);
 
+    const handleDelete = async (id) => {
+        console.log(id)
+        try {
+            const deleted = await db.delete(ImageVideo).where(eq(ImageVideo.id, id));
+            //    console.log(deleted);
+            if (deleted) {
+                toast.success("Video deleted successfully");
+                setVideoList(videoList.filter((video) => video.id !== id));
+            } else {
+                toast.error("Failed to delete video");
+            }
+        } catch (error) {
+            console.error("Error deleting video:", error);
+        }
+    }
+
     return (
         <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl-grid-cols-6 gap-6">
             {videoList
                 .sort((a, b) => b.id - a.id)
                 .map((video, index) => (
-                    <div className='overflow-hidden flex w-full flex-col h-full rounded-xl' key={index}>
+                    <div className='overflow-hidden relative flex w-full flex-col h-full rounded-xl' key={index}>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button className="absolute top-1 z-10 right-2 w-6 h-6 bg-red-500 text-white hover:bg-red-600 cursor-pointer">
+                                    <Trash2 size={4} />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete your
+                                        video and remove your data from our servers.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction className={`text-white cursor-pointer bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700`} onClick={() => { handleDelete(video.id) }}>Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
                         <div onClick={() => { setOpenedResult(true); setModifiedImage(video.video) }} className='hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer'>
-                            <video loop poster={video.image} autoPlay muted playsInline className="w-full aspect-12/16 object-cover h-full">
+                            <video
+                                ref={el => {
+                                    if (!video._ref) video._ref = el;
+                                }}
+                                loop
+                                poster={video.image}
+                                playsInline
+                                loading="lazy"
+                                className="w-full aspect-12/16 object-cover h-full"
+                                onMouseEnter={e => e.currentTarget.play()}
+                                onMouseLeave={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                                onTouchStart={e => e.currentTarget.play()}
+                                onTouchEnd={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                                muted
+                            >
                                 <source src={video.video} type="video/mp4" />
                             </video>
                         </div>
@@ -104,7 +170,7 @@ function GeneratedVideos({ videoList, onClickVideo }) {
                 ))}
 
             <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                <DialogContent className="w-full [&>button]:hidden max-w-lg sm:max-w-md flex flex-col">
+                <DialogContent className="w-full [&>button]:hidden max-w-lg sm:max-w-md flex flex-col z-230">
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                         <DialogDescription className={`text-md`}>
@@ -116,6 +182,7 @@ function GeneratedVideos({ videoList, onClickVideo }) {
                             >
                                 <X size={24} />
                             </button>
+
                         </DialogClose>
                     </DialogHeader>
                     <div className="grid py-4 grid-cols-1 w-full gap-12">
@@ -125,7 +192,7 @@ function GeneratedVideos({ videoList, onClickVideo }) {
                                     <video controls className="rounded-md max-h-80 sm:max-h-128">
                                         <source src={modifiedImage} type="video/mp4" />
                                     </video>
-                                    <a download={modifiedImage} href={modifiedImage} className={` mt-5 bg-primary rounded-md flex items-center justify-center py-2 cursor-pointer dark:text-white`}>Download video</a>
+                                    <a download={modifiedImage} href={modifiedImage} className={` mt-5 bg-primary text-white rounded-md flex items-center justify-center py-2 cursor-pointer dark:text-white text-white`}>Download video</a>
                                 </div>
                             )
                         }
