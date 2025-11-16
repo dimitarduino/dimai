@@ -17,7 +17,9 @@ function Header() {
     return (
         <div className="p-3 sticky top-0 left-0 bg-white md:bg-transparent dark:bg-zinc-950 z-100 w-full px-5 flex items-center items-center justify-between">
             <div className="flex">
-                <Image className='md:hidden' alt='Logo' src={'/logo.png'} width={120} height={30} />
+                <Link href={`/app`}>
+                    <Image className='md:hidden' alt='Logo' src={'/logo.png'} width={120} height={30} />
+                </Link>
 
             </div>
 
@@ -48,7 +50,7 @@ function Header() {
                 </div>
             </div>
 
-        </div>
+        </div >
     )
 }
 
