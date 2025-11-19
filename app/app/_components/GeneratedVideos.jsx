@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Thumbnail } from "@remotion/player"
 import RemotionVideo from './RemotionVideo'
 import PlayerDialog from './PlayerDialog'
-import { useEffect } from 'react'
 import Image from 'next/image'
 import {
     Dialog,
@@ -28,7 +27,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Trash2, X } from 'lucide-react'
+import { Trash2, X, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import axios from 'axios'
 import { db } from 'configs/db'
 import { ImageVideo } from 'configs/schema'
@@ -42,6 +41,14 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
     const [openedVideo, setOpenedVideo] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
     const [durationFrame, setDurationFrame] = useState(0);
+    const [loadedVideos, setLoadedVideos] = useState(new Set());
+    const [currentVideoIndex, setCurrentVideoIndex] = useState(-1);
+    const [isVideoLoading, setIsVideoLoading] = useState(false);
+    const videoRefs = useRef(new Map());
+    const dialogVideoRef = useRef(null);
+    
+    // Get sorted video list (create new array to avoid mutating original)
+    const sortedVideoList = [...videoList].sort((a, b) => b.id - a.id);
 
     const handleDownload = async (videoUrl) => {
         try {
@@ -102,6 +109,93 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
         console.log(videoList);
     }, []);
 
+    // Intersection Observer for lazy loading videos
+    useEffect(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: '50px', // Start loading 50px before entering viewport
+            threshold: 0.01
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const videoId = entry.target.dataset.videoId;
+                    if (videoId) {
+                        setLoadedVideos(prev => {
+                            if (!prev.has(videoId)) {
+                                return new Set([...prev, videoId]);
+                            }
+                            return prev;
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Use setTimeout to ensure DOM is updated
+        const timeoutId = setTimeout(() => {
+            // Observe all video containers
+            videoRefs.current.forEach((ref) => {
+                if (ref) observer.observe(ref);
+            });
+        }, 0);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, [videoList]);
+
+    // Optimized hover handlers to reduce lag
+    const handleMouseEnter = useCallback((e, videoId) => {
+        const container = e.currentTarget;
+        const video = container.querySelector('video');
+        if (video) {
+            // Mark video as loaded if not already
+            if (!loadedVideos.has(videoId)) {
+                setLoadedVideos(prev => new Set([...prev, videoId]));
+            }
+            // Ensure video is loaded before playing
+            if (video.readyState < 2) {
+                video.load();
+                video.addEventListener('loadeddata', () => {
+                    video.play().catch(() => {});
+                }, { once: true });
+            } else {
+                video.play().catch(() => {}); // Ignore autoplay errors
+            }
+        }
+    }, [loadedVideos]);
+
+    const handleMouseLeave = useCallback((e) => {
+        const container = e.currentTarget;
+        const video = container.querySelector('video');
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
+    }, []);
+
+    const handleTouchStart = useCallback((e, videoId) => {
+        if (loadedVideos.has(videoId)) {
+            const container = e.currentTarget;
+            const video = container.querySelector('video');
+            if (video) {
+                video.play().catch(() => {}); // Ignore autoplay errors
+            }
+        }
+    }, [loadedVideos]);
+
+    const handleTouchEnd = useCallback((e) => {
+        const container = e.currentTarget;
+        const video = container.querySelector('video');
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
+    }, []);
+
     const handleDelete = async (id) => {
         console.log(id)
         try {
@@ -118,11 +212,71 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
         }
     }
 
+    // Handle opening video dialog
+    const handleOpenVideo = (index) => {
+        setCurrentVideoIndex(index);
+        setModifiedImage(sortedVideoList[index].video);
+        setOpenedResult(true);
+        setIsVideoLoading(true);
+    }
+
+    // Handle navigation to previous video
+    const handlePreviousVideo = useCallback(() => {
+        if (currentVideoIndex > 0) {
+            const newIndex = currentVideoIndex - 1;
+            setCurrentVideoIndex(newIndex);
+            setModifiedImage(sortedVideoList[newIndex].video);
+            setIsVideoLoading(true);
+        }
+    }, [currentVideoIndex, sortedVideoList]);
+
+    // Handle navigation to next video
+    const handleNextVideo = useCallback(() => {
+        if (currentVideoIndex < sortedVideoList.length - 1) {
+            const newIndex = currentVideoIndex + 1;
+            setCurrentVideoIndex(newIndex);
+            setModifiedImage(sortedVideoList[newIndex].video);
+            setIsVideoLoading(true);
+        }
+    }, [currentVideoIndex, sortedVideoList]);
+
+    // Handle video loaded
+    const handleVideoLoaded = () => {
+        setIsVideoLoading(false);
+    }
+
+    // Preload video when dialog opens or video changes
+    useEffect(() => {
+        if (openedResult && dialogVideoRef.current && modifiedImage) {
+            setIsVideoLoading(true);
+            dialogVideoRef.current.load();
+        }
+    }, [openedResult, modifiedImage]);
+
+    // Keyboard navigation
+    useEffect(() => {
+        if (!openedResult) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                handlePreviousVideo();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                handleNextVideo();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setOpenedResult(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [openedResult, handlePreviousVideo, handleNextVideo]);
+
     return (
         <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl-grid-cols-6 gap-6">
-            {videoList
-                .sort((a, b) => b.id - a.id)
-                .map((video, index) => (
+            {sortedVideoList.map((video, index) => (
                     <div className='overflow-hidden relative flex w-full flex-col h-full rounded-xl' key={index}>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -145,20 +299,26 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
                             </AlertDialogContent>
                         </AlertDialog>
 
-                        <div onClick={() => { setOpenedResult(true); setModifiedImage(video.video) }} className='hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer'>
+                        <div 
+                            ref={(el) => {
+                                if (el) {
+                                    videoRefs.current.set(video.id || index, el);
+                                }
+                            }}
+                            data-video-id={video.id || index}
+                            onClick={() => handleOpenVideo(index)} 
+                            onMouseEnter={(e) => handleMouseEnter(e, video.id || index)}
+                            onMouseLeave={handleMouseLeave}
+                            onTouchStart={(e) => handleTouchStart(e, video.id || index)}
+                            onTouchEnd={handleTouchEnd}
+                            className='hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer'
+                        >
                             <video
-                                ref={el => {
-                                    if (!video._ref) video._ref = el;
-                                }}
                                 loop
                                 poster={video.image}
                                 playsInline
-                                loading="lazy"
+                                preload={loadedVideos.has(video.id || index) ? "metadata" : "none"}
                                 className="w-full aspect-12/16 object-cover h-full"
-                                onMouseEnter={e => e.currentTarget.play()}
-                                onMouseLeave={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
-                                onTouchStart={e => e.currentTarget.play()}
-                                onTouchEnd={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
                                 muted
                             >
                                 <source src={video.video} type="video/mp4" />
@@ -174,25 +334,68 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>
                         <DialogDescription className={`text-md`}>
+                            {currentVideoIndex >= 0 && (
+                                <span>Video {currentVideoIndex + 1} of {sortedVideoList.length}</span>
+                            )}
                         </DialogDescription>
 
                         <DialogClose asChild>
                             <button
-                                className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
+                                className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer z-10"
                             >
                                 <X size={24} />
                             </button>
-
                         </DialogClose>
                     </DialogHeader>
-                    <div className="grid py-4 grid-cols-1 w-full gap-12">
+                    <div className="grid py-4 grid-cols-1 w-full gap-12 relative">
                         {
-                            modifiedImage && (
-                                <div className="flex flex-col">
-                                    <video controls className="rounded-md max-h-80 sm:max-h-128">
-                                        <source src={modifiedImage} type="video/mp4" />
-                                    </video>
-                                    <a download={modifiedImage} href={modifiedImage} className={` mt-5 bg-primary text-white rounded-md flex items-center justify-center py-2 cursor-pointer dark:text-white text-white`}>Download video</a>
+                            modifiedImage && currentVideoIndex >= 0 && (
+                                <div className="flex flex-col relative">
+                                    {/* Navigation Buttons */}
+                                    {currentVideoIndex > 0 && (
+                                        <Button
+                                            onClick={handlePreviousVideo}
+                                            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 h-10 w-10"
+                                            disabled={isVideoLoading}
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </Button>
+                                    )}
+                                    {currentVideoIndex < sortedVideoList.length - 1 && (
+                                        <Button
+                                            onClick={handleNextVideo}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 h-10 w-10"
+                                            disabled={isVideoLoading}
+                                        >
+                                            <ChevronRight size={20} />
+                                        </Button>
+                                    )}
+                                    
+                                    {/* Video Container */}
+                                    <div className="relative rounded-md overflow-hidden bg-black">
+                                        {isVideoLoading && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                                                <Loader2 className="animate-spin text-white" size={32} />
+                                            </div>
+                                        )}
+                                        <video 
+                                            ref={dialogVideoRef}
+                                            controls 
+                                            className="rounded-md max-h-80 sm:max-h-128 w-full"
+                                            onLoadedData={handleVideoLoaded}
+                                            onCanPlay={handleVideoLoaded}
+                                            preload="auto"
+                                        >
+                                            <source src={modifiedImage} type="video/mp4" />
+                                        </video>
+                                    </div>
+                                    <a 
+                                        download={modifiedImage} 
+                                        href={modifiedImage} 
+                                        className={`mt-5 bg-primary text-white rounded-md flex items-center justify-center py-2 cursor-pointer dark:text-white text-white`}
+                                    >
+                                        Download video
+                                    </a>
                                 </div>
                             )
                         }

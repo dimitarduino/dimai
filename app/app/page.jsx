@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import EmptyState from './_components/EmptyState'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { db } from 'configs/db';
 import { VideoData } from 'configs/schema';
 import { eq } from 'drizzle-orm';
@@ -18,7 +19,9 @@ import DashboardGallery from './_components/DashboardGallery';
 
 function Dashboard() {
   const { user } = useUser();
+  const router = useRouter();
   const [videos, setVideos] = useState([]);
+  const [prompt, setPrompt] = useState('');
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const services = [
     {
@@ -127,25 +130,86 @@ function Dashboard() {
     }
   };
 
+  // Random AI prompts for inspiration
+  const randomPrompts = [
+    "Explain quantum computing in simple terms",
+    "Write a creative story about a robot learning to paint",
+    "What are the latest trends in artificial intelligence?",
+    "How does machine learning differ from deep learning?",
+    "Describe the future of renewable energy",
+    "What are the benefits of meditation for productivity?",
+    "Explain the concept of blockchain technology",
+    "Write a poem about the beauty of nature",
+    "What are the key principles of effective communication?",
+    "How can I improve my problem-solving skills?",
+    "Explain the theory of relativity in simple terms",
+    "What are the best practices for sustainable living?",
+    "Describe the process of photosynthesis",
+    "How does the human brain process memories?",
+    "What are the main causes of climate change?",
+    "Write a short story about time travel",
+    "Explain how vaccines work",
+    "What are the benefits of regular exercise?",
+    "Describe the water cycle",
+    "How can I learn a new language effectively?",
+  ];
+
+  // Generate random prompt
+  const generateRandomPrompt = () => {
+    const randomIndex = Math.floor(Math.random() * randomPrompts.length);
+    setPrompt(randomPrompts[randomIndex]);
+  };
+
+  // Handle form submit - navigate to chat with prompt
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    if (prompt.trim()) {
+      // Navigate to chat page with prompt as query parameter
+      router.push(`/app/chat?prompt=${encodeURIComponent(prompt.trim())}`);
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
     <div className='dashboard px-4 sm:px-6'>
       <div className="dashboard-top rounded-3xl px-3 sm:px-10 items-center justify-center w-full flex py-14 flex flex-col bg-gradient-to-tl dark:from-black dark:to-emerald-800 from-emerald-300 to-green-100">
         <h1 className='font-bold text-4xl text-primary'>Describe your ideas and generate 🚀</h1>
         <h2 className='py-4'>Transform your words into visual masterpieces: Leverage AI technology to craft breathtaking images.</h2>
 
-        <div className="form flex flex-col relative w-full max-w-2xl">
-          <Input placeholder="Write a prompt to generate" className={`bg-white pr-40 w-full focus:ring-0 focus:border-transparent focus-visible:ring-0 focus-visible:outline-none mx-auto py-7 shadow-sm border-none focus:border-none w-full`} />
+        <form onSubmit={handleSubmit} className="form flex flex-col relative w-full max-w-2xl">
+          <Input 
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Write a prompt to generate" 
+            className={`bg-white pr-40 w-full focus:ring-0 focus:border-transparent focus-visible:ring-0 focus-visible:outline-none mx-auto py-7 shadow-sm border-none focus:border-none w-full`} 
+          />
 
           <div className="buttons absolute flex items-center right-2 top-2 gap-3">
-            <Button className={`bg-transparent cursor-pointer text-black hover:text-primary text-3xl hover:bg-transparent`}>
+            <Button 
+              type="button"
+              onClick={generateRandomPrompt}
+              className={`bg-transparent cursor-pointer text-black hover:text-primary text-3xl hover:bg-transparent`}
+            >
               <Dices size={32} className='dark:text-white' />
             </Button>
-            <Button className={`bg-primary dark:text-white cursor-pointer px-10 py-5`}>
+            <Button 
+              type="submit"
+              disabled={!prompt.trim()}
+              className={`bg-primary dark:text-white cursor-pointer px-10 py-5 disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
               <SparkleIcon />
               <p>Generate</p>
             </Button>
           </div>
-        </div>
+        </form>
       </div>
 
       <div className="dashboard-generations py-12 w-full flex flex-col gap-2">

@@ -1,5 +1,5 @@
 "use client"
-import { CircleUser, ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, PanelsTopLeft, ShieldPlus, SmilePlus, Video, VideoIcon } from 'lucide-react'
+import { CircleUser, ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, MessageSquare, PanelsTopLeft, ShieldPlus, SmilePlus, Video, VideoIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -62,16 +62,23 @@ function SideNav() {
         path: "/app/image-to-video",
         icon: VideoIcon,
         sub: []
+    },
+    {
+        id: 9,
+        name: "Chat",
+        path: "/app/chat",
+        icon: MessageSquare,
+        sub: []
     }]
 
     const pathname = usePathname();
     return (
         <div className='w-68 h-screen p-2'>
             <div className="grid gap-2">
-                <div className="flex py-4 gap-3 items-center">
+                <Link href="/app" className="flex py-4 gap-3 items-center cursor-pointer">
                     <Image className='pl-3' alt='Logo' src={'/logo.png'} width={120} height={30} />
                     <h2 className='font-bold text-2xl'></h2>
-                </div>
+                </Link>
                 {MenuOption.map((item, index) => (
                     <Link href={item.path} key={index}>
                         <div className={`flex py-3 px-3 text-md hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-md cursor-pointer items-center gap-3 ${(pathname == item.path || item.sub.includes(pathname)) ? "bg-gray-200 text-primary dark:bg-neutral-700 dark:text-white font-bold" : ""}`}>

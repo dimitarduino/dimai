@@ -142,3 +142,18 @@
 .animated-image {
   animation: moveImage 10s ease-in-out infinite; /* 2s for duration, infinite for loop */
 }
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Safe area support for mobile devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}

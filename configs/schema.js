@@ -111,3 +111,13 @@ export const DubbingVideos = pgTable('dubbing_videos', {
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
 });
+
+export const ChatConversations = pgTable('chat_conversations', {
+   id: serial("id").primaryKey(),
+   title: varchar("title", { length: 255 }).notNull(),
+   model: varchar("model", { length: 255 }).notNull(),
+   messages: json("messages").notNull().default([]),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull(),
+   updatedAt: varchar("updatedAt", {length: 255}).notNull()
+});
