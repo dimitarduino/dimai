@@ -46,6 +46,7 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
     const [isVideoLoading, setIsVideoLoading] = useState(false);
     const videoRefs = useRef(new Map());
     const dialogVideoRef = useRef(null);
+    const touchStartPos = useRef({ x: 0, y: 0, videoId: null });
     
     // Get sorted video list (create new array to avoid mutating original)
     const sortedVideoList = [...videoList].sort((a, b) => b.id - a.id);
@@ -177,23 +178,90 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
         }
     }, []);
 
-    const handleTouchStart = useCallback((e, videoId) => {
-        if (loadedVideos.has(videoId)) {
-            const container = e.currentTarget;
-            const video = container.querySelector('video');
-            if (video) {
-                video.play().catch(() => {}); // Ignore autoplay errors
-            }
+    const playVideoOnTouch = useCallback((video, videoId) => {
+        if (!video) return;
+        
+        // Mark video as loaded if not already
+        if (!loadedVideos.has(videoId)) {
+            setLoadedVideos(prev => new Set([...prev, videoId]));
+        }
+        
+        // Set video attributes for mobile playback
+        video.muted = true;
+        if (video.setAttribute) {
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('webkit-playsinline', 'true');
+        }
+        
+        // Function to play video
+        const playVideo = () => {
+            video.play().catch((err) => {
+                // Silently fail - some browsers block autoplay
+                console.log('Video play attempt:', err.message);
+            });
+        };
+        
+        // Ensure video is loaded before playing
+        if (video.readyState < 2) {
+            // Load the video first
+            video.load();
+            // Try multiple events to catch when video is ready
+            const tryPlay = () => {
+                if (video.readyState >= 2) {
+                    playVideo();
+                }
+            };
+            video.addEventListener('loadeddata', tryPlay, { once: true });
+            video.addEventListener('loadedmetadata', tryPlay, { once: true });
+            video.addEventListener('canplay', tryPlay, { once: true });
+        } else {
+            // Video already has data, try to play immediately
+            playVideo();
         }
     }, [loadedVideos]);
 
-    const handleTouchEnd = useCallback((e) => {
-        const container = e.currentTarget;
-        const video = container.querySelector('video');
-        if (video) {
-            video.pause();
-            video.currentTime = 0;
+    const handleTouchStart = useCallback((e, videoId) => {
+        const touch = e.touches[0];
+        if (touch) {
+            touchStartPos.current = {
+                x: touch.clientX,
+                y: touch.clientY,
+                videoId: videoId
+            };
         }
+    }, []);
+
+    const handleTouchMove = useCallback((e, videoId) => {
+        if (!touchStartPos.current.videoId) return;
+        
+        const touch = e.touches[0];
+        if (!touch) return;
+        
+        const startX = touchStartPos.current.x;
+        const startY = touchStartPos.current.y;
+        const currentX = touch.clientX;
+        const currentY = touch.clientY;
+        
+        const deltaX = Math.abs(currentX - startX);
+        const deltaY = Math.abs(currentY - startY);
+        
+        // Detect horizontal swipe (left or right)
+        // Horizontal movement should be greater than vertical (swipe gesture)
+        if (deltaX > 30 && deltaX > deltaY) {
+            const container = e.currentTarget;
+            const video = container.querySelector('video');
+            if (video && videoId === touchStartPos.current.videoId) {
+                // Play video on horizontal swipe
+                playVideoOnTouch(video, videoId);
+            }
+        }
+    }, [playVideoOnTouch]);
+
+    const handleTouchEnd = useCallback((e) => {
+        // Reset touch position
+        touchStartPos.current = { x: 0, y: 0, videoId: null };
+        // Don't pause on touch end - let video continue playing
+        // This allows videos to play continuously on mobile
     }, []);
 
     const handleDelete = async (id) => {
@@ -215,9 +283,16 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
     // Handle opening video dialog
     const handleOpenVideo = (index) => {
         setCurrentVideoIndex(index);
-        setModifiedImage(sortedVideoList[index].video);
+        const videoUrl = sortedVideoList[index].video;
+        setModifiedImage(videoUrl);
         setOpenedResult(true);
         setIsVideoLoading(true);
+        // Preload the video immediately
+        setTimeout(() => {
+            if (dialogVideoRef.current) {
+                dialogVideoRef.current.load();
+            }
+        }, 0);
     }
 
     // Handle navigation to previous video
@@ -245,11 +320,24 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
         setIsVideoLoading(false);
     }
 
+    // Handle when video can start playing (faster than loadeddata)
+    const handleVideoCanPlay = () => {
+        setIsVideoLoading(false);
+    }
+
     // Preload video when dialog opens or video changes
     useEffect(() => {
         if (openedResult && dialogVideoRef.current && modifiedImage) {
             setIsVideoLoading(true);
-            dialogVideoRef.current.load();
+            const video = dialogVideoRef.current;
+            // Set preload to auto for faster loading
+            video.preload = 'auto';
+            // Load the video
+            video.load();
+            // Try to play immediately if possible
+            video.play().catch(() => {
+                // If autoplay fails, that's okay - user can click play
+            });
         }
     }, [openedResult, modifiedImage]);
 
@@ -277,7 +365,7 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
     return (
         <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl-grid-cols-6 gap-6">
             {sortedVideoList.map((video, index) => (
-                    <div className='overflow-hidden relative flex w-full flex-col h-full rounded-xl' key={index}>
+                    <div className='overflow-hidden relative flex w-full flex-col h-full rounded-xl select-none' key={index}>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button className="absolute top-1 z-10 right-2 w-6 h-6 bg-red-500 text-white hover:bg-red-600 cursor-pointer">
@@ -309,16 +397,24 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
                             onClick={() => handleOpenVideo(index)} 
                             onMouseEnter={(e) => handleMouseEnter(e, video.id || index)}
                             onMouseLeave={handleMouseLeave}
-                            onTouchStart={(e) => handleTouchStart(e, video.id || index)}
-                            onTouchEnd={handleTouchEnd}
-                            className='hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer'
+                            onTouchStart={(e) => {
+                                handleTouchStart(e, video.id || index);
+                            }}
+                            onTouchMove={(e) => {
+                                handleTouchMove(e, video.id || index);
+                            }}
+                            onTouchEnd={(e) => {
+                                handleTouchEnd(e);
+                            }}
+                            className='hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer select-none'
                         >
                             <video
                                 loop
                                 poster={video.image}
                                 playsInline
+                                webkit-playsinline="true"
                                 preload={loadedVideos.has(video.id || index) ? "metadata" : "none"}
-                                className="w-full aspect-12/16 object-cover h-full"
+                                className="w-full aspect-12/16 object-cover h-full select-none pointer-events-auto"
                                 muted
                             >
                                 <source src={video.video} type="video/mp4" />
@@ -383,8 +479,11 @@ function GeneratedVideos({ videoList, setVideoList, onClickVideo }) {
                                             controls 
                                             className="rounded-md max-h-80 sm:max-h-128 w-full"
                                             onLoadedData={handleVideoLoaded}
-                                            onCanPlay={handleVideoLoaded}
+                                            onLoadedMetadata={handleVideoCanPlay}
+                                            onCanPlay={handleVideoCanPlay}
+                                            onCanPlayThrough={handleVideoCanPlay}
                                             preload="auto"
+                                            playsInline
                                         >
                                             <source src={modifiedImage} type="video/mp4" />
                                         </video>

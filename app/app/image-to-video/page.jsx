@@ -408,7 +408,7 @@ export default function ImageToVideo() {
                     )}
                 </div>
 
-                <span className="opacity-30 text-white relative pt-4 text-sm">Or choose an existing image:</span>
+                <span className="opacity-30 text-black dark:text-white relative pt-4 text-sm">Or choose an existing image:</span>
 
                 <GeneratedImages imagesList={videos} selectedImage={selectedImage} onClickImage={(image) => { setSelectedImage(image); setFile(null); setUploadedImage(null) }} />
                 <div className="pt-4"></div>

@@ -319,9 +319,8 @@ function ChatPage() {
 
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)
-    if (promptText === null) {
-      setInput('')
-    }
+    // Always clear input after successful submission
+    setInput('')
     setUploadedImages([])
     setUploadedDocuments([])
     setIsLoading(true)
@@ -1055,7 +1054,7 @@ function ChatPage() {
                                 </div>
                               </div>
                             )}
-                            <div className="whitespace-pre-wrap break-words text-xs sm:text-sm leading-relaxed">
+                            <div className="whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">
                               {message.content}
                               {message.isStreaming && (
                                 <span className="inline-block w-0.5 h-4 ml-1 bg-current animate-pulse align-middle">|</span>
@@ -1161,7 +1160,7 @@ function ChatPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={(isImageDragActive || uploadedImages.length > 0) ? "Drop images here..." : uploadedDocuments.length > 0 ? "Drop documents here..." : "Type your message..."}
-                  className="max-h-[120px] md:max-h-[200px] resize-none pr-10 md:pr-12 py-2 text-sm md:text-base"
+                  className="max-h-[120px] md:max-h-[200px] resize-none pr-10 md:pr-12 py-2 text-base md:text-sm"
                   disabled={isLoading && !isStreaming}
                 />
                 <div className="absolute right-1 md:right-2 bottom-1.5 md:bottom-2 flex items-center gap-1">
