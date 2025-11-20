@@ -65,6 +65,13 @@ function SideNav() {
     },
     {
         id: 9,
+        name: "Edit Images",
+        path: "/app/edit-image",
+        icon: Images,
+        sub: []
+    },
+    {
+        id: 10,
         name: "Chat",
         path: "/app/chat",
         icon: MessageSquare,

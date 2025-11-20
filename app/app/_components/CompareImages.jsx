@@ -55,11 +55,11 @@ const ImageComparisonSlider = ({ originalSrc, upscaledSrc }) => {
 
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto mt-2" ref={containerRef}>
+    <div className="relative w-full max-w-2xl flex justify-center items-center mx-auto mt-2" ref={containerRef}>
 
-      <div className="relative">
+      <div className="relative w-auto flex justify-center items-center">
         {/* Container for the images */}
-        <div className="w-full h-auto relative">
+        <div className="w-auto mx-auto h-auto relative">
           <div className="absolute statuses flex justify-between items-center top-2 left-2 right-2">
             <span className={`text-white px-2 py-1 bg-primary rounded-md z-3 font-bold text-lg ${isBefore ? 'hidden' : ''}`}>After</span>
             <span className={`text-white px-2 py-1 bg-primary rounded-md z-3 font-bold text-lg ${isAfter ? 'hidden' : ''}`}>Before</span>
@@ -68,12 +68,12 @@ const ImageComparisonSlider = ({ originalSrc, upscaledSrc }) => {
           <img
             src={originalSrc}
             alt="Original"
-            className="w-full max-h-[50vh] h-auto object-cover rounded-md"
+            className="w-auto max-h-[50vh] h-auto object-cover rounded-md"
           />
           <img
             src={upscaledSrc}
             alt="Upscaled"
-            className="w-full max-h-[50vh] h-auto object-cover absolute top-0 left-0 rounded-md"
+            className="w-auto max-h-[50vh] h-auto object-cover absolute top-0 left-0 rounded-md"
             style={{
               clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`, // Only show part of the upscaled image based on the slider position
             }}

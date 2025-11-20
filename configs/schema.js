@@ -121,3 +121,12 @@ export const ChatConversations = pgTable('chat_conversations', {
    createdAt: varchar("createdAt", {length: 255}).notNull(),
    updatedAt: varchar("updatedAt", {length: 255}).notNull()
 });
+
+export const editedImages = pgTable('edited_images', {
+   id: serial("id").primaryKey(),
+   image: varchar("image").notNull(),
+   prompt: varchar("prompt").notNull(),
+   finalImage: varchar("finalImage").notNull(),
+   createdBy: varchar("createdBy").notNull(),
+   createdAt: varchar("createdAt", {length: 255}).notNull()
+});
