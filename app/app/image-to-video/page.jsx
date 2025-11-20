@@ -421,7 +421,7 @@ export default function ImageToVideo() {
                 <div className="pt-4"></div>
 
                 <SelectComponent defaultValue={`standard`} optionsAvailable={resolutions} className="w-full" onUserSelect={naPromenaInput} placeholder="Mode" name="resolution" description="Select the mode for your video" title="Mode | Quality" />
-                <span className="opacity-30 text-white relative top-[-10px] text-sm">*Standard: 720p, Pro: 1080p</span>
+                <span className="opacity-30 text-black dark:text-white relative top-[-10px] text-sm">*Standard: 720p, Pro: 1080p</span>
 
                 <div className="d-flex flex-column">
                     <p className='text-gray-500 dark:text-neutral-200'>Prompt:<span className="text-red-600 text-sm">(*)</span></p>
