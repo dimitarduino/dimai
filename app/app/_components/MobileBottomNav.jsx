@@ -1,5 +1,5 @@
 "use client"
-import { ExpandIcon, FileVideo, House, ImageIcon, ImageUpscale, Laugh, MessageSquare, SmilePlus, Video, VideoIcon, X } from 'lucide-react'
+import { ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, MessageSquare, SmilePlus, Video, VideoIcon, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useContext } from 'react'
@@ -74,6 +74,13 @@ function MobileBottomNav() {
         },
         {
             id: 10,
+            name: "Edit",
+            path: "/app/edit-image",
+            icon: Images,
+            sub: []
+        },
+        {
+            id: 11,
             name: "Chat",
             path: "/app/chat",
             icon: MessageSquare,
