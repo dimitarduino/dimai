@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useContext, useCallback, useEffect } from "react";
+import { useState, useContext, useCallback, useEffect, useRef } from "react";
 import { useDropzone } from 'react-dropzone';
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -72,6 +73,7 @@ export default function ImageToVideo() {
     const [userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
 
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const promptTextareaRef = useRef(null);
 
     const deleteFromLocalStorageJobId = (jobid) => {
         let currentJobIdArr = getLocalStorageJobIds();
@@ -212,7 +214,7 @@ export default function ImageToVideo() {
     const naPromenaInput = (ime, vrednost) => {
         setFormData(prev => ({
             ...prev,
-            [ime]: vrednost
+            [ime]: ime === 'duration' ? Number(vrednost) : vrednost
         }));
     }
 
@@ -367,8 +369,13 @@ export default function ImageToVideo() {
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
-                const promptInput = document.querySelector('input[name="prompt"]');
-                if (promptInput) promptInput.focus();
+                const promptInput = document.querySelector('textarea[name="prompt"]');
+                if (promptInput) {
+                    promptInput.focus();
+                    // Auto-resize on focus
+                    promptInput.style.height = 'auto';
+                    promptInput.style.height = `${Math.min(promptInput.scrollHeight, 300)}px`;
+                }
             }, 300);
         }
     }
@@ -418,7 +425,21 @@ export default function ImageToVideo() {
 
                 <div className="d-flex flex-column">
                     <p className='text-gray-500 dark:text-neutral-200'>Prompt:<span className="text-red-600 text-sm">(*)</span></p>
-                    <Input type="text" placeholder="Prompt..." name="prompt" className={`mt-2`} value={formData.prompt} onChange={(event) => naPromenaInput("prompt", event.target.value)} />
+                    <Textarea 
+                        ref={promptTextareaRef}
+                        placeholder="Prompt..." 
+                        name="prompt" 
+                        className={`mt-2 min-h-[80px] resize-none overflow-hidden`} 
+                        value={formData.prompt} 
+                        onChange={(event) => {
+                            naPromenaInput("prompt", event.target.value);
+                            // Auto-resize textarea
+                            const textarea = event.target;
+                            textarea.style.height = 'auto';
+                            textarea.style.height = `${Math.min(textarea.scrollHeight, 300)}px`;
+                        }}
+                        rows={3}
+                    />
                 </div>
 
                 <div className="d-flex flex-column">
@@ -426,7 +447,7 @@ export default function ImageToVideo() {
                     <Input type="text" placeholder="Negative Prompt..." name="negative_prompt" className={`mt-2`} value={formData.negative_prompt} onChange={(event) => naPromenaInput("negative_prompt", event.target.value)} />
                 </div>
 
-                <SelectComponent defaultValue={formData.duration} optionsAvailable={durations} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="duration" description="Select duration" title="Select duration (in seconds)" />
+                <SelectComponent value={String(formData.duration)} defaultValue={String(formData.duration)} optionsAvailable={durations.map(d => String(d))} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="duration" description="Select duration" title="Select duration (in seconds)" />
 
                 {
                     selectedImage ? (

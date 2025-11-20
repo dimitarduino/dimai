@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-function SelectComponent({ onUserSelect, defaultValue = '', optionsAvailable = [], placeholder = '', title = '', description = '', name = "style" }) {
+function SelectComponent({ onUserSelect, value = '', defaultValue = '', optionsAvailable = [], placeholder = '', title = '', description = '', name = "style" }) {
   const options = optionsAvailable;
-  const [selectedOption, setSelectedOption] = useState(defaultValue);
+  const [selectedOption, setSelectedOption] = useState(value || defaultValue);
   return (
     <div className='w-full'>
       <h2 className='font-bold text-xl text-primary'>{title}</h2>
       <p className='text-gray-500'>{description}</p>
-      <Select value={selectedOption} onValueChange={(val) => {
+      <Select value={value || defaultValue} onValueChange={(val) => {
         setSelectedOption(val);
         onUserSelect(name, val)
       }
