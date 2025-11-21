@@ -160,6 +160,7 @@
 
 /* Prevent zoom on input focus on mobile devices */
 @media screen and (max-width: 768px) {
+  /* Target all input types */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -167,8 +168,30 @@
   input[type="search"],
   input[type="tel"],
   input[type="url"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"],
+  input:not([type]),
+  /* Target all textareas */
   textarea,
-  select {
+  textarea[data-slot="textarea"],
+  /* Target all selects */
+  select,
+  /* Target Shadcn UI components */
+  [data-slot="input"],
+  [data-slot="textarea"],
+  /* Target any element with input-like classes */
+  .input,
+  .textarea {
     font-size: 16px !important;
+    -webkit-text-size-adjust: 100% !important;
+  }
+  
+  /* Also ensure contenteditable elements don't zoom */
+  [contenteditable="true"] {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100% !important;
   }
 }
