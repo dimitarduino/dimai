@@ -207,7 +207,7 @@ export default function ImageToImage() {
                     )}
                 </div>
 
-                <SelectComponent defaultValue={`16:9`} optionsAvailable={resolutions} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="aspectRatio" description="Select the aspect ratio for your image" title="Choose Aspect Ratio" />
+                <SelectComponent defaultValue={`16:9`} value={formData.aspectRatio} optionsAvailable={resolutions} className="w-full" onUserSelect={naPromenaInput} placeholder="Aspect Ratio" name="aspectRatio" description="Select the aspect ratio for your image" title="Choose Aspect Ratio" />
 
                 <Button className={`py-6 cursor-pointer dark:text-white`} onClick={handleUpload} disabled={uploading}>
                     {uploading ? "Uploading..." : "Generate image"}

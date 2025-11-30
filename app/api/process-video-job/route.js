@@ -54,6 +54,7 @@ export async function POST(req) {
         .where(eq(VideoGenerationJobs.jobId, jobId));
 
       const scriptRes = await axios.post(`${getBaseUrl()}/api/get-video-script`, { prompt });
+      
       const videoScript = scriptRes.data.result;
 
       // Step 2: Generate audio

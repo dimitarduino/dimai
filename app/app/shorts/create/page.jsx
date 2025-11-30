@@ -100,6 +100,8 @@ function CreateNew() {
   const naPromenaInput = (ime, vrednost) => {
     if (ime == 'gender') setGender(vrednost);
     if (ime == 'voice') setSelectedVoice(vrednost);
+
+    console.log(ime, vrednost);
     setFormData(prev => ({
       ...prev,
       [ime]: vrednost
@@ -344,7 +346,7 @@ function CreateNew() {
         {/* Duration */}
 
 
-        <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" description="Select the voice gender for your video" title="Choose Voice Gender" />
+        <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" value={gender} description="Select the voice gender for your video" title="Choose Voice Gender" />
 
         <SelectComponent
           defaultValue={selectedVoice}
@@ -357,7 +359,7 @@ function CreateNew() {
           title="Choose Voice Model"
         />
 
-        <SelectDuration onUserSelect={naPromenaInput} />
+        <SelectDuration onUserSelect={naPromenaInput} value={formData.duration} />
 
         <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
 

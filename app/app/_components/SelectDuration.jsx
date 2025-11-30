@@ -16,7 +16,9 @@ function SelectDuration({ onUserSelect }) {
     <div>
       <h2 className='font-bold text-xl text-primary'>Duration</h2>
       <p className='text-gray-500'>Select the duration of your video?</p>
-      <Select onValueChange={(val) => {
+      <Select
+      value={`30 seconds`}
+      onValueChange={(val) => {
         setSelectedOption(val);
         onUserSelect("duration", val);
       }

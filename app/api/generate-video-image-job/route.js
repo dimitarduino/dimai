@@ -19,6 +19,8 @@ async function processJobDirectly(jobId) {
     
     if (!response.ok) {
       const errorText = await response.text();
+      console.log(errorText);
+
       throw new Error(`Failed to process job: ${response.statusText} - ${errorText}`);
     }
   } catch (error) {
