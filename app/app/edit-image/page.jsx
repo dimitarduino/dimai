@@ -3,12 +3,11 @@
 import { useCallback, useContext, useState, useEffect, useRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import ImageComparison from '../_components/CompareImages'
 import { storage } from "configs/Firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
-import { DollarSign, UploadCloud, X, Trash2 } from "lucide-react";
+import { DollarSign, UploadCloud, X, Trash2, RotateCw } from "lucide-react";
 import Image from "next/image";
 import {
     Dialog,
@@ -92,6 +91,27 @@ export default function EditImage() {
             console.error("Error deleting image:", error);
             toast.error("Failed to delete image");
         }
+    }
+
+    const handleRetry = (img) => {
+        // Fill form with the same details
+        setSelectedImage(img.image);
+        setPrompt(img.prompt || "");
+        setFile(null);
+        setUploadedImage(null);
+        setEditedUrl(null);
+        setOpenedResult(false);
+        
+        // Scroll to the form area
+        setTimeout(() => {
+            const formElement = document.querySelector('textarea[name="prompt"]');
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                formElement.focus();
+            }
+        }, 100);
+        
+        toast.success("Form filled with previous details. You can edit the prompt and retry!");
     }
 
     const editImage = async (imageUrl) => {
@@ -290,15 +310,17 @@ export default function EditImage() {
 
                 <span className="opacity-30 text-black dark:text-white relative pt-4 text-sm">Or choose an existing image:</span>
 
-                <GeneratedImages 
-                    imagesList={images.map(img => ({ image: img.image, id: img.id }))} 
-                    selectedImage={selectedImage} 
-                    onClickImage={(image) => { 
-                        setSelectedImage(image); 
-                        setFile(null); 
-                        setUploadedImage(null);
-                    }} 
-                />
+                <div className="w-full max-w-full overflow-hidden">
+                    <GeneratedImages 
+                        imagesList={images.map(img => ({ image: img.image, id: img.id }))} 
+                        selectedImage={selectedImage} 
+                        onClickImage={(image) => { 
+                            setSelectedImage(image); 
+                            setFile(null); 
+                            setUploadedImage(null);
+                        }} 
+                    />
+                </div>
                 <div className="pt-4"></div>
 
                 <div className="d-flex flex-column">
@@ -381,9 +403,15 @@ export default function EditImage() {
                     </DialogHeader>
                     <div className="grid grid-cols-1 w-full gap-12">
                         {
-                            (downloadUrl && editedUrl) && (
-                                <div className="flex flex-col">
-                                    <ImageComparison originalSrc={downloadUrl} upscaledSrc={editedUrl} />
+                            editedUrl && (
+                                <div className="flex flex-col items-center">
+                                    <Image 
+                                        src={editedUrl} 
+                                        alt="Edited image" 
+                                        width={600} 
+                                        height={600} 
+                                        className="w-full max-w-lg h-auto object-contain rounded-lg"
+                                    />
                                     <Button 
                                         className={`py-6 mt-5 cursor-pointer dark:text-white`} 
                                         onClick={() => handleDownload(editedUrl)}
@@ -414,31 +442,40 @@ export default function EditImage() {
                                         key={img.id || index}
                                         className="overflow-hidden relative flex w-full flex-col h-full rounded-xl"
                                     >
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button className="absolute top-1 z-10 right-2 w-6 h-6 bg-red-500 text-white hover:bg-red-600 cursor-pointer p-0">
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This action cannot be undone. This will permanently delete your
-                                                        edited image and remove it from our servers.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction 
-                                                        className={`text-white cursor-pointer bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700`} 
-                                                        onClick={() => handleDelete(img.id)}
-                                                    >
-                                                        Delete
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        <div className="absolute top-1 z-10 right-2 flex gap-1">
+                                            <Button 
+                                                className="w-6 h-6 bg-primary text-white hover:bg-primary/90 cursor-pointer p-0"
+                                                onClick={() => handleRetry(img)}
+                                                title="Retry with same image and prompt"
+                                            >
+                                                <RotateCw size={14} />
+                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button className="w-6 h-6 bg-red-500 text-white hover:bg-red-600 cursor-pointer p-0">
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot be undone. This will permanently delete your
+                                                            edited image and remove it from our servers.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction 
+                                                            className={`text-white cursor-pointer bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700`} 
+                                                            onClick={() => handleDelete(img.id)}
+                                                        >
+                                                            Delete
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </div>
                                         <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
                                             <Image
                                                 src={img.finalImage}
