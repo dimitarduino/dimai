@@ -410,7 +410,7 @@ export default function EditImage() {
                                         alt="Edited image" 
                                         width={600} 
                                         height={600} 
-                                        className="w-full max-w-lg h-auto object-contain rounded-lg"
+                                        className="w-full max-h-[50dvh] max-w-lg h-auto object-contain rounded-lg"
                                     />
                                     <Button 
                                         className={`py-6 mt-5 cursor-pointer dark:text-white`} 

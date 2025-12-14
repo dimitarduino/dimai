@@ -31,20 +31,20 @@ function GeneratedImages({ imagesList, onClickImage, selectedImage }) {
     return (
         <div className="w-full max-w-full overflow-hidden">
             {/* <div className="w-full d-flex"> */}
-                <div className="flex gap-1 pb-2 overflow-x-auto" style={{ maxWidth: '80dvw' }}>
+                <div className="flex gap-1 pb-2 overflow-x-auto" style={{ maxWidth: '75dvw' }}>
                     {[...new Map(imagesList.map(v => [v.image, v])).values()]
                         .sort((a, b) => b.id - a.id)
                         .map((video, index) => (
                             <div
                                 onClick={() => { setActiveImage(video.image); onClickImage(video.image); }}
-                                className={`overflow-hidden flex-shrink-0 w-20 h-32 rounded-xl ${(activeImage == video.image || selectedImage == video.image) ? "border-2 border-primary" : ""}`}
+                                className={`overflow-hidden flex-shrink-0 w-20 h-32 rounded-xl ${(activeImage == video.image || selectedImage == video.image) ? "border-2 p-1 border-primary" : ""}`}
                                 key={video.id ?? index}
                             >
-                                <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
+                                <div className={`overflow-hidden w-full h-full flex transition-all cursor-pointer ${(activeImage == video.image || selectedImage == video.image) ? "hover:scale-110 " : ""}}`}>
                                     <Image
                                         src={video.image}
                                         alt={video.caption ?? ""}
-                                        className="w-full h-full aspect-9/16 object-cover"
+                                        className="w-full rounded-xl h-full aspect-9/16 object-cover"
                                         width={80}
                                         height={128}
                                         layout="responsive"
