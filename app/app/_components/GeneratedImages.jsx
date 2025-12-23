@@ -42,7 +42,7 @@ function GeneratedImages({ imagesList, onClickImage, selectedImage }) {
                             >
                                 <div className={`overflow-hidden w-full h-full flex transition-all cursor-pointer ${(activeImage == video.image || selectedImage == video.image) ? "hover:scale-110 " : ""}}`}>
                                     <Image
-                                        src={video.image}
+                                        src={`${video.image}?32`}
                                         alt={video.caption ?? ""}
                                         className="w-full rounded-xl h-full aspect-9/16 object-cover"
                                         width={80}

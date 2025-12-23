@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useContext, useState, useEffect, useRef } from "react";
+import { useCallback, useContext, useState, useEffect, useRef, useMemo } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
@@ -17,6 +17,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog"
 import {
     AlertDialog,
@@ -35,9 +36,40 @@ import { UserDetailContext } from "app/_context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
 import { db } from "configs/db";
 import { editedImages } from "configs/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { toast } from "sonner";
 import GeneratedImages from "../_components/GeneratedImages";
+
+// In-memory image cache (persists for this component's lifetime)
+const imageCache = new Map();
+
+function useImageCache(url) {
+    const [blobUrl, setBlobUrl] = useState(url);
+    useEffect(() => {
+        let revoked = false;
+        // Only cache if not already cached and it's a remote URL (not data:/blob:/)
+        async function fetchAndCache() {
+            if (!url || imageCache.has(url) || url.startsWith("blob:") || url.startsWith("data:")) {
+                setBlobUrl(imageCache.get(url) || url);
+                return;
+            }
+            try {
+                const resp = await fetch(url, { cache: 'force-cache' });
+                const blob = await resp.blob();
+                const localBlobUrl = URL.createObjectURL(blob);
+                imageCache.set(url, localBlobUrl);
+                if (!revoked) setBlobUrl(localBlobUrl);
+            } catch (e) {
+                setBlobUrl(url); // fallback
+            }
+        }
+        fetchAndCache();
+        return () => {
+            revoked = true;
+        };
+    }, [url]);
+    return blobUrl;
+}
 
 export default function EditImage() {
     const [file, setFile] = useState(null);
@@ -55,6 +87,28 @@ export default function EditImage() {
     const [userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const promptTextareaRef = useRef(null);
+
+    // Lazy cache all resulting images (finalImage, image) after any images list update
+    useEffect(() => {
+        images.forEach((img) => {
+            if (img.finalImage && !imageCache.has(img.finalImage) && !img.finalImage.startsWith("blob:")) {
+                fetch(img.finalImage, { cache: "force-cache" })
+                    .then(r => r.blob())
+                    .then(blob => {
+                        const u = URL.createObjectURL(blob);
+                        imageCache.set(img.finalImage, u);
+                    }).catch(() => {});
+            }
+            if (img.image && !imageCache.has(img.image) && !img.image.startsWith("blob:")) {
+                fetch(img.image, { cache: "force-cache" })
+                    .then(r => r.blob())
+                    .then(blob => {
+                        const u = URL.createObjectURL(blob);
+                        imageCache.set(img.image, u);
+                    }).catch(() => {});
+            }
+        });
+    }, [images]);
 
     useEffect(() => {
         if (user) {
@@ -75,8 +129,18 @@ export default function EditImage() {
         }
 
         try {
-            const res = await db.select().from(editedImages).where(eq(editedImages.createdBy, userLocal));
-            setImages(res);
+            // Fetch unique images by image name using DISTINCT ON (PostgreSQL)
+            // This keeps only the most recent record for each unique image name
+            const res = await db.execute(sql`
+                SELECT DISTINCT ON (image) 
+                    id, image, prompt, "finalImage", "createdBy", "createdAt"
+                FROM edited_images
+                WHERE "createdBy" = ${userLocal}
+                ORDER BY image, "createdAt" DESC
+            `);
+
+            // console.log(res);
+            setImages(Array.isArray(res) ? res : (res.rows || []));
         } catch (error) {
             console.error('Error fetching images:', error);
         }
@@ -101,8 +165,6 @@ export default function EditImage() {
         setUploadedImage(null);
         setEditedUrl(null);
         setOpenedResult(false);
-        
-        // Scroll to the form area
         setTimeout(() => {
             const formElement = document.querySelector('textarea[name="prompt"]');
             if (formElement) {
@@ -110,7 +172,6 @@ export default function EditImage() {
                 formElement.focus();
             }
         }, 100);
-        
         toast.success("Form filled with previous details. You can edit the prompt and retry!");
     }
 
@@ -154,6 +215,16 @@ export default function EditImage() {
                 setUploading(false);
                 setLoading(false);
 
+                // Proactively cache the just-created edited image
+                if (res.data.result && !imageCache.has(res.data.result)) {
+                    fetch(res.data.result)
+                        .then(r => r.blob())
+                        .then(blob => {
+                            const u = URL.createObjectURL(blob);
+                            imageCache.set(res.data.result, u);
+                        }).catch(()=>{});
+                }
+
                 const result = await db.insert(editedImages).values({
                     image: imageUrl,
                     prompt: prompt.trim(),
@@ -175,18 +246,26 @@ export default function EditImage() {
 
     const handleDownload = async (imageUrl) => {
         try {
-            const response = await axios.get(imageUrl, { responseType: "blob" });
-
-            const url = window.URL.createObjectURL(response.data);
-
+            // Try to use blob if cached
+            let urlToDownload = imageCache.get(imageUrl) || imageUrl;
+            // If it's a blob url, fetch the cached blob
+            let blob;
+            if (urlToDownload.startsWith('blob:')) {
+                // Get the blob from the blob URL and trigger download
+                blob = await fetch(urlToDownload).then(r => r.blob());
+            } else {
+                // Fallback: get from server
+                const response = await axios.get(imageUrl, { responseType: "blob" });
+                blob = response.data;
+            }
+            const downloadBlobUrl = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url;
+            a.href = downloadBlobUrl;
             a.download = "edited-image.jpg";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
-            window.URL.revokeObjectURL(url);
+            window.URL.revokeObjectURL(downloadBlobUrl);
         } catch (error) {
             console.error("Download error:", error);
         }
@@ -228,10 +307,8 @@ export default function EditImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-
                 setDownloadUrl(url);
                 setUploading(false);
-
                 await editImage(url);
             }
         );
@@ -276,6 +353,9 @@ export default function EditImage() {
         multiple: false,
     });
 
+    // Cached version for the current edited image dialog
+    const cachedEditedUrl = useImageCache(editedUrl);
+
     return (
         <div className="w-full flex flex-col">
             <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
@@ -312,7 +392,45 @@ export default function EditImage() {
 
                 <div className="w-full max-w-full overflow-hidden">
                     <GeneratedImages 
-                        imagesList={images.map(img => ({ image: img.image, id: img.id }))} 
+                        imagesList={
+                            images
+                                .filter((img, idx, arr) => {
+                                    // Extract only the file name and extension before any dash or question mark
+                                    const extractBaseFileName = (url) => {
+                                        try {
+                                            // Find "uploads%2F" in the URL
+                                            const marker = "uploads%2F";
+                                            const start = url.indexOf(marker);
+                                            let segment = url;
+                                            if (start !== -1) {
+                                                segment = url.substring(start + marker.length);
+                                            }
+                                            // Ignore query string
+                                            const qIndex = segment.indexOf("?");
+                                            if (qIndex !== -1) segment = segment.substring(0, qIndex);
+                                            // Take only up to first dash, if any (for cases like IMG_9844.jpeg-1765486139383)
+                                            const dashIdx = segment.indexOf("-");
+                                            if (dashIdx !== -1) {
+                                                segment = segment.substring(0, dashIdx);
+                                            }
+                                            // Remove any directory if still present, take only file name with extension
+                                            if (segment.includes("/")) {
+                                                segment = segment.split("/").pop();
+                                            }
+                                            return segment;
+                                        } catch {
+                                            return url;
+                                        }
+                                    };
+                                    const currentBaseFileName = extractBaseFileName(img.image);
+                                    return (
+                                        arr.findIndex(
+                                            x => extractBaseFileName(x.image) === currentBaseFileName
+                                        ) === idx
+                                    );
+                                })
+                                .map(img => ({ image: img.image, id: img.id }))
+                        }
                         selectedImage={selectedImage} 
                         onClickImage={(image) => { 
                             setSelectedImage(image); 
@@ -383,7 +501,7 @@ export default function EditImage() {
 
             <CustomLoading title="Editing your image..." loading={loading} />
 
-            <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+            <Dialog className='flex w-full' open={!!openedResult} onOpenChange={setOpenedResult}>
                 <DialogContent className="w-full z-150 [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>
@@ -406,11 +524,12 @@ export default function EditImage() {
                             editedUrl && (
                                 <div className="flex flex-col items-center">
                                     <Image 
-                                        src={editedUrl} 
+                                        src={`cachedEditedUrl`}
                                         alt="Edited image" 
                                         width={600} 
                                         height={600} 
                                         className="w-full max-h-[50dvh] max-w-lg h-auto object-contain rounded-lg"
+                                        // Priority can help SSR but we avoid here
                                     />
                                     <Button 
                                         className={`py-6 mt-5 cursor-pointer dark:text-white`} 
@@ -430,17 +549,33 @@ export default function EditImage() {
             <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl w-full shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Your Edited Images</h1>
 
-                {
-                    images.length == 0 ? (
-                        <h3>You don't have any edited images</h3>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {images
-                                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                                .map((img, index) => (
+                {(() => {
+                    const IMAGES_PER_LOAD = 12;
+                    const [visibleCount, setVisibleCount] = useState(IMAGES_PER_LOAD);
+
+                    // Sort images by date, newest first
+                    const sortedImages = [...images].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    const visibleImages = sortedImages.slice(0, visibleCount);
+
+                    useEffect(() => {
+                        // Reset visible count if images array shrinks
+                        if (visibleCount > images.length) setVisibleCount(IMAGES_PER_LOAD);
+                    }, [images]); // eslint-disable-line react-hooks/exhaustive-deps
+
+                    if (images.length === 0) {
+                        return <h3>You don't have any edited images</h3>;
+                    }
+
+                    // Helper: get cached or original url
+                    const getCachedUrl = (url) => imageCache.get(url) || url;
+
+                    return (
+                        <>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {visibleImages.map((img, index) => (
                                     <div 
                                         key={img.id || index}
-                                        className="overflow-hidden relative flex w-full flex-col h-full rounded-xl"
+                                        className="overflow-hidden relative flex w-full flex-col h-full"
                                     >
                                         <div className="absolute top-1 z-10 right-2 flex gap-1">
                                             <Button 
@@ -476,25 +611,59 @@ export default function EditImage() {
                                                 </AlertDialogContent>
                                             </AlertDialog>
                                         </div>
-                                        <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
-                                            <Image
-                                                src={img.finalImage}
-                                                alt={img.prompt || "Edited image"}
-                                                className="w-full aspect-square object-cover"
-                                                width={300}
-                                                height={300}
-                                            />
-                                        </div>
+                                        {/* Dialog for showing the image on click */}
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <div className="hover:scale-110 overflow-hidden w-full h-full flex transition-all cursor-pointer">
+                                                    <Image
+                                                        src={getCachedUrl(img.finalImage)}
+                                                        alt={img.prompt || "Edited image"}
+                                                        className="w-full rounded-xl aspect-square object-cover"
+                                                        width={300}
+                                                        height={300}
+                                                    />
+                                                </div>
+                                            </DialogTrigger>
+                                            <DialogContent className="flex flex-col items-center">
+                                                <Image
+                                                    src={getCachedUrl(img.finalImage)}
+                                                    alt={img.prompt || "Edited image"}
+                                                    className="max-w-xl w-full h-auto rounded-lg object-contain max-h-64 md:max-h-128"
+                                                    width={600}
+                                                    height={600}
+                                                />
+                                                <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-base truncate whitespace-pre-wrap max-w-sm" title={img.prompt}>
+                                                    {img.prompt || "No prompt"}
+                                                </p>
+                                                <Button 
+                                                    className="py-2 px-4 mt-4"
+                                                    onClick={() => handleDownload(img.finalImage)}
+                                                >
+                                                    Download Image
+                                                </Button>
+                                            </DialogContent>
+                                        </Dialog>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 truncate" title={img.prompt}>
                                             {img.prompt || "No prompt"}
                                         </p>
                                     </div>
                                 ))}
-                        </div>
-                    )
-                }
+                            </div>
+                            {visibleCount < sortedImages.length && (
+                                <div className="flex justify-center items-center mt-6">
+                                    <Button 
+                                        className="px-4 py-2 cursor-pointer"
+                                        onClick={() => setVisibleCount((prev) => prev + IMAGES_PER_LOAD)}
+                                        variant="outline"
+                                    >
+                                        Load more
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    );
+                })()}
             </div>
         </div>
     );
 }
-
