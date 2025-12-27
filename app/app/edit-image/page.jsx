@@ -131,13 +131,8 @@ export default function EditImage() {
         try {
             // Fetch unique images by image name using DISTINCT ON (PostgreSQL)
             // This keeps only the most recent record for each unique image name
-            const res = await db.execute(sql`
-                SELECT DISTINCT ON (image) 
-                    id, image, prompt, "finalImage", "createdBy", "createdAt"
-                FROM edited_images
-                WHERE "createdBy" = ${userLocal}
-                ORDER BY image, "createdAt" DESC
-            `);
+            const res = await db.select().from(editedImages).where(eq(editedImages.createdBy, userLocal));
+
 
             // console.log(res);
             setImages(Array.isArray(res) ? res : (res.rows || []));
