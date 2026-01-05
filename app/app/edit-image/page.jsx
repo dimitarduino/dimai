@@ -519,7 +519,7 @@ export default function EditImage() {
                             editedUrl && (
                                 <div className="flex flex-col items-center">
                                     <Image 
-                                        src={`cachedEditedUrl`}
+                                        src={editedUrl}
                                         alt="Edited image" 
                                         width={600} 
                                         height={600} 
