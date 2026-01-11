@@ -73,26 +73,47 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
             <p className="text-muted-foreground mb-4">
-              By accessing and using Dimn AI ("Service", "we", "us", or "our"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+              By accessing and using Dimn AI ("Service", "we", "us", or "our"), operated by <strong>DIMITAR KUZMANOVSKI</strong>, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">2. Description of Service</h2>
+            <h2 className="text-2xl font-semibold mb-4">2. About Dimn AI and Description of Service</h2>
             <p className="text-muted-foreground mb-4">
-              Dimn AI provides an all-in-one AI toolkit platform that includes, but is not limited to:
+              <strong>Dimn AI</strong> is an all-in-one AI toolkit platform operated by <strong>DIMITAR KUZMANOVSKI</strong>, designed for creators, professionals, and businesses seeking powerful artificial intelligence tools in one integrated platform. Our service provides access to cutting-edge AI technology for content creation, image processing, video generation, and conversational AI capabilities.
+            </p>
+            <p className="text-muted-foreground mb-4">
+              Dimn AI delivers a comprehensive suite of AI-powered tools and services that include, but are not limited to:
+            </p>
+            <div className="bg-muted/50 dark:bg-muted/20 p-6 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold mb-3">Product Features & Deliverables Included with Purchase:</h3>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
+                <li><strong>AI-Powered Video Generation:</strong> Create and edit videos using text prompts or image inputs</li>
+                <li><strong>Image Upscaling & Enhancement:</strong> Increase image resolution and improve image quality using AI technology</li>
+                <li><strong>Background Removal:</strong> Automatically remove backgrounds from images with precision</li>
+                <li><strong>Image Editing:</strong> AI-powered image modification, expansion, and transformation based on natural language prompts</li>
+                <li><strong>Face Swapping:</strong> Advanced face swapping technology for images and videos</li>
+                <li><strong>Emoji Generation:</strong> Create custom emojis and animated expressions</li>
+                <li><strong>Video Dubbing & Translation:</strong> Translate and dub videos into multiple languages using AI voice synthesis</li>
+                <li><strong>Image-to-Video Conversion:</strong> Transform static images into dynamic video content</li>
+                <li><strong>AI Chat & Conversation:</strong> Advanced conversational AI with multiple model options for various use cases</li>
+                <li><strong>Text-to-Speech:</strong> Convert text to natural-sounding speech in multiple voices and languages</li>
+                <li><strong>Audio Extraction:</strong> Extract audio from video files</li>
+                <li><strong>Caption Generation:</strong> Automatically generate captions for video content</li>
+              </ul>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              <strong>Service Delivery:</strong> Upon subscription or credit purchase, you receive access to:
             </p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-4 ml-4">
-              <li>AI-powered video generation and editing</li>
-              <li>Image upscaling and enhancement</li>
-              <li>Background removal and image editing</li>
-              <li>Face swapping and emoji generation</li>
-              <li>Video dubbing and translation</li>
-              <li>Image-to-video conversion</li>
-              <li>AI chat and conversation features</li>
+              <li>Immediate access to all available AI tools and features within your plan tier</li>
+              <li>A specified number of credits (depending on your plan) that can be used across all services</li>
+              <li>Generated content that you can download, use, and in some cases, license commercially (based on your subscription plan)</li>
+              <li>Ongoing access to platform updates and new features as they are released</li>
+              <li>Storage for your generated content within reasonable limits based on your plan</li>
             </ul>
             <p className="text-muted-foreground">
-              We reserve the right to modify, suspend, or discontinue any part of the Service at any time with or without notice.
+              We reserve the right to modify, suspend, or discontinue any part of the Service at any time with or without notice. New features may be added or existing features may be updated to improve the service experience.
             </p>
           </section>
 
@@ -145,7 +166,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">6. Intellectual Property</h2>
             <p className="text-muted-foreground mb-4">
-              The Service and its original content, features, and functionality are owned by Dimn AI and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+              The Service and its original content, features, and functionality are owned by <strong>DIMITAR KUZMANOVSKI</strong> operating as Dimn AI and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
             </p>
             <p className="text-muted-foreground mb-4">
               You retain ownership of content you create using the Service. However, by using the Service, you grant us a worldwide, non-exclusive, royalty-free license to use, store, and process your content solely for the purpose of providing and improving the Service.
@@ -197,17 +218,17 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">10. Disclaimers and Limitations of Liability</h2>
             <p className="text-muted-foreground mb-4">
-              THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR COMPLETELY SECURE.
+              THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. <strong>DIMITAR KUZMANOVSKI</strong> operating as Dimn AI does not warrant that the Service will be uninterrupted, error-free, or completely secure.
             </p>
             <p className="text-muted-foreground mb-4">
-              TO THE MAXIMUM EXTENT PERMITTED BY LAW, DIMN AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+              TO THE MAXIMUM EXTENT PERMITTED BY LAW, <strong>DIMITAR KUZMANOVSKI</strong> operating as Dimn AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">11. Indemnification</h2>
             <p className="text-muted-foreground">
-              You agree to indemnify and hold harmless Dimn AI, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of or relating to your use of the Service, your content, or your violation of these Terms.
+              You agree to indemnify and hold harmless <strong>DIMITAR KUZMANOVSKI</strong> operating as Dimn AI, and its representatives, from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of or relating to your use of the Service, your content, or your violation of these Terms.
             </p>
           </section>
 
@@ -221,12 +242,16 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">13. Governing Law</h2>
             <p className="text-muted-foreground">
-              These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which Dimn AI operates, without regard to its conflict of law provisions.
+              These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which <strong>DIMITAR KUZMANOVSKI</strong> operates Dimn AI, without regard to its conflict of law provisions.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">14. Contact Information</h2>
+            <p className="text-muted-foreground mb-4">
+              <strong>Service Provider:</strong> <strong>DIMITAR KUZMANOVSKI</strong><br />
+              Operating as: <strong>Dimn AI</strong>
+            </p>
             <p className="text-muted-foreground mb-4">
               If you have any questions about these Terms of Service, please contact us at:
             </p>
@@ -255,6 +280,9 @@ export default function TermsPage() {
               </Link>
               <Link href="/refund" className="text-muted-foreground hover:text-foreground">
                 Refund Policy
+              </Link>
+              <Link href="/about" className="text-muted-foreground hover:text-foreground">
+                About
               </Link>
             </div>
           </div>

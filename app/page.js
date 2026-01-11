@@ -208,6 +208,9 @@ export default function ComingSoon() {
               <Link href="/refund" className="text-muted-foreground hover:text-foreground">
                 Refund Policy
               </Link>
+              <Link href="/about" className="text-muted-foreground hover:text-foreground">
+                About
+              </Link>
             </div>
           </div>
         </div>

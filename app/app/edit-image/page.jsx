@@ -4,7 +4,7 @@ import { useCallback, useContext, useState, useEffect, useRef, useMemo } from "r
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { storage } from "configs/Firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import { DollarSign, UploadCloud, X, Trash2, RotateCw } from "lucide-react";
@@ -143,7 +143,69 @@ export default function EditImage() {
 
     const handleDelete = async (id) => {
         try {
+            // Find the image record first to get the Firebase Storage URLs
+            const imageToDelete = images.find((img) => img.id === id);
+            if (!imageToDelete) {
+                toast.error("Image not found");
+                return;
+            }
+
+            // Helper function to extract storage path from Firebase Storage URL
+            const extractStoragePath = (url) => {
+                try {
+                    if (!url || !url.includes('firebasestorage.googleapis.com')) {
+                        return null;
+                    }
+                    // Firebase Storage URLs format: https://firebasestorage.googleapis.com/v0/b/bucket/o/path%2Fto%2Ffile?alt=media&token=...
+                    const match = url.match(/\/o\/(.+?)\?/);
+                    if (match && match[1]) {
+                        // URL decode the path (e.g., uploads%2Fimage.jpg becomes uploads/image.jpg)
+                        return decodeURIComponent(match[1]);
+                    }
+                    return null;
+                } catch (error) {
+                    console.error("Error extracting storage path:", error);
+                    return null;
+                }
+            };
+
+            // Delete files from Firebase Storage
+            const deletePromises = [];
+            
+            // Delete the edited/final image
+            if (imageToDelete.finalImage) {
+                const finalImagePath = extractStoragePath(imageToDelete.finalImage);
+                if (finalImagePath) {
+                    const finalImageRef = ref(storage, finalImagePath);
+                    deletePromises.push(
+                        deleteObject(finalImageRef).catch((error) => {
+                            console.error("Error deleting final image from Firebase:", error);
+                            // Don't fail the whole operation if one file deletion fails
+                        })
+                    );
+                }
+            }
+
+            // Delete the original uploaded image
+            if (imageToDelete.image) {
+                const imagePath = extractStoragePath(imageToDelete.image);
+                if (imagePath) {
+                    const imageRef = ref(storage, imagePath);
+                    deletePromises.push(
+                        deleteObject(imageRef).catch((error) => {
+                            console.error("Error deleting original image from Firebase:", error);
+                            // Don't fail the whole operation if one file deletion fails
+                        })
+                    );
+                }
+            }
+
+            // Wait for all file deletions to complete (or fail gracefully)
+            await Promise.all(deletePromises);
+
+            // Delete from database
             await db.delete(editedImages).where(eq(editedImages.id, id));
+            
             toast.success("Image deleted successfully");
             setImages(images.filter((img) => img.id !== id));
         } catch (error) {
