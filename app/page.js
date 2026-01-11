@@ -190,7 +190,29 @@ export default function ComingSoon() {
         </section>
 
       </main>
-    </div >
+
+      <footer className="border-t border-border/40 mt-16 w-[100dvw]">
+        <div className="container mx-auto px-4 py-8 w-full">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Image src={`/logo.png`} width={100} height={20} alt="DimnAI Logo" />
+              <span className="text-sm text-muted-foreground">© 2025 Dimn AI. All rights reserved.</span>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <Link href="/terms" className="text-muted-foreground hover:text-foreground">
+                Terms
+              </Link>
+              <Link href="/privacy" className="text-muted-foreground hover:text-foreground">
+                Privacy
+              </Link>
+              <Link href="/refund" className="text-muted-foreground hover:text-foreground">
+                Refund Policy
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }
 
