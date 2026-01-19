@@ -199,6 +199,9 @@ export default function ComingSoon() {
               <span className="text-sm text-muted-foreground">© 2025 Dimn AI. All rights reserved.</span>
             </div>
             <div className="flex gap-6 text-sm">
+              <Link href="/support" className="text-muted-foreground hover:text-foreground">
+                Support
+              </Link>
               <Link href="/terms" className="text-muted-foreground hover:text-foreground">
                 Terms
               </Link>
