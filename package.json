@@ -76,5 +76,8 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.15",
     "typescript": "5.8.2"
+  },
+  "overrides": {
+    "zod": "^4.3.5"
   }
 }

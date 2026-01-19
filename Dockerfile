@@ -9,7 +9,8 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install
+COPY .npmrc ./
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the app (excluding .env.production)
 COPY . .
