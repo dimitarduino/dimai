@@ -14,6 +14,8 @@
   "dependencies": {
     "@clerk/nextjs": "^6.12.6",
     "@clerk/themes": "^2.2.27",
+    "@freemius/checkout": "^1.4.1",
+    "@freemius/sdk": "^0.1.0",
     "@google-cloud/text-to-speech": "^6.0.1",
     "@google/generative-ai": "^0.24.0",
     "@huggingface/inference": "^3.7.1",
@@ -63,7 +65,8 @@
     "tailwind-merge": "^3.0.2",
     "tw-animate-css": "^1.2.4",
     "uuid": "^11.1.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

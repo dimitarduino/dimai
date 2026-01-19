@@ -12,6 +12,12 @@ export default function SupportPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    // freemius.checkout.getSandboxParams().then((params) => {
+    //   console.log(params);
+    // });
+  }, []);
+
   const onChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };

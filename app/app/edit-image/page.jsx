@@ -88,8 +88,12 @@ export default function EditImage() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const promptTextareaRef = useRef(null);
 
+
+
     // Lazy cache all resulting images (finalImage, image) after any images list update
     useEffect(() => {
+        
+
         images.forEach((img) => {
             if (img.finalImage && !imageCache.has(img.finalImage) && !img.finalImage.startsWith("blob:")) {
                 fetch(img.finalImage, { cache: "force-cache" })
@@ -97,7 +101,7 @@ export default function EditImage() {
                     .then(blob => {
                         const u = URL.createObjectURL(blob);
                         imageCache.set(img.finalImage, u);
-                    }).catch(() => {});
+                    }).catch(() => { });
             }
             if (img.image && !imageCache.has(img.image) && !img.image.startsWith("blob:")) {
                 fetch(img.image, { cache: "force-cache" })
@@ -105,7 +109,7 @@ export default function EditImage() {
                     .then(blob => {
                         const u = URL.createObjectURL(blob);
                         imageCache.set(img.image, u);
-                    }).catch(() => {});
+                    }).catch(() => { });
             }
         });
     }, [images]);
@@ -171,7 +175,7 @@ export default function EditImage() {
 
             // Delete files from Firebase Storage
             const deletePromises = [];
-            
+
             // Delete the edited/final image
             if (imageToDelete.finalImage) {
                 const finalImagePath = extractStoragePath(imageToDelete.finalImage);
@@ -205,7 +209,7 @@ export default function EditImage() {
 
             // Delete from database
             await db.delete(editedImages).where(eq(editedImages.id, id));
-            
+
             toast.success("Image deleted successfully");
             setImages(images.filter((img) => img.id !== id));
         } catch (error) {
@@ -279,7 +283,7 @@ export default function EditImage() {
                         .then(blob => {
                             const u = URL.createObjectURL(blob);
                             imageCache.set(res.data.result, u);
-                        }).catch(()=>{});
+                        }).catch(() => { });
                 }
 
                 const result = await db.insert(editedImages).values({
@@ -448,7 +452,7 @@ export default function EditImage() {
                 <span className="opacity-30 text-black dark:text-white relative pt-4 text-sm">Or choose an existing image:</span>
 
                 <div className="w-full max-w-full overflow-hidden">
-                    <GeneratedImages 
+                    <GeneratedImages
                         imagesList={
                             images
                                 .filter((img, idx, arr) => {
@@ -488,24 +492,24 @@ export default function EditImage() {
                                 })
                                 .map(img => ({ image: img.image, id: img.id }))
                         }
-                        selectedImage={selectedImage} 
-                        onClickImage={(image) => { 
-                            setSelectedImage(image); 
-                            setFile(null); 
+                        selectedImage={selectedImage}
+                        onClickImage={(image) => {
+                            setSelectedImage(image);
+                            setFile(null);
                             setUploadedImage(null);
-                        }} 
+                        }}
                     />
                 </div>
                 <div className="pt-4"></div>
 
                 <div className="d-flex flex-column">
                     <p className='text-gray-500 dark:text-neutral-200'>Edit Prompt:<span className="text-red-600 text-sm">(*)</span></p>
-                    <Textarea 
+                    <Textarea
                         ref={promptTextareaRef}
-                        placeholder="Describe how you want to edit the image (e.g., 'make it sunset', 'add snow', 'change to black and white')..." 
-                        name="prompt" 
-                        className={`mt-2 min-h-[80px] resize-none overflow-hidden`} 
-                        value={prompt} 
+                        placeholder="Describe how you want to edit the image (e.g., 'make it sunset', 'add snow', 'change to black and white')..."
+                        name="prompt"
+                        className={`mt-2 min-h-[80px] resize-none overflow-hidden`}
+                        value={prompt}
                         onChange={(event) => {
                             setPrompt(event.target.value);
                             // Auto-resize textarea
@@ -519,17 +523,17 @@ export default function EditImage() {
 
                 {
                     selectedImage ? (
-                        <Button 
-                            className={`py-6 cursor-pointer dark:text-white`} 
-                            onClick={handleGenerateFromSelected} 
+                        <Button
+                            className={`py-6 cursor-pointer dark:text-white`}
+                            onClick={handleGenerateFromSelected}
                             disabled={uploading || loading || !prompt.trim()}
                         >
                             {loading ? "Editing..." : "Edit image"}
                         </Button>
                     ) : (
-                        <Button 
-                            className={`py-6 text-md dark:text-white cursor-pointer`} 
-                            onClick={handleUpload} 
+                        <Button
+                            className={`py-6 text-md dark:text-white cursor-pointer`}
+                            onClick={handleUpload}
                             disabled={!file || loading || !prompt.trim()}
                         >
                             {loading ? "Please wait..." : "Edit image"}
@@ -538,8 +542,8 @@ export default function EditImage() {
                 }
 
                 {editedUrl && (
-                    <Button 
-                        className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 dark:hover:bg-neutral-700 bg-transparent text-primary cursor-pointer`} 
+                    <Button
+                        className={`py-2 border-bottom border-2 border-primary text-md border-none hover:bg-neutral-100 dark:hover:bg-neutral-700 bg-transparent text-primary cursor-pointer`}
                         onClick={() => setOpenedResult(true)}
                     >
                         See your result
@@ -580,16 +584,16 @@ export default function EditImage() {
                         {
                             editedUrl && (
                                 <div className="flex flex-col items-center">
-                                    <Image 
+                                    <Image
                                         src={editedUrl}
-                                        alt="Edited image" 
-                                        width={600} 
-                                        height={600} 
+                                        alt="Edited image"
+                                        width={600}
+                                        height={600}
                                         className="w-full max-h-[50dvh] max-w-lg h-auto object-contain rounded-lg"
-                                        // Priority can help SSR but we avoid here
+                                    // Priority can help SSR but we avoid here
                                     />
-                                    <Button 
-                                        className={`py-6 mt-5 cursor-pointer dark:text-white`} 
+                                    <Button
+                                        className={`py-6 mt-5 cursor-pointer dark:text-white`}
                                         onClick={() => handleDownload(editedUrl)}
                                     >
                                         Download Image
@@ -630,12 +634,12 @@ export default function EditImage() {
                         <>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {visibleImages.map((img, index) => (
-                                    <div 
+                                    <div
                                         key={img.id || index}
                                         className="overflow-hidden relative flex w-full flex-col h-full"
                                     >
                                         <div className="absolute top-1 z-10 right-2 flex gap-1">
-                                            <Button 
+                                            <Button
                                                 className="w-6 h-6 bg-primary text-white hover:bg-primary/90 cursor-pointer p-0"
                                                 onClick={() => handleRetry(img)}
                                                 title="Retry with same image and prompt"
@@ -658,8 +662,8 @@ export default function EditImage() {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction 
-                                                            className={`text-white cursor-pointer bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700`} 
+                                                        <AlertDialogAction
+                                                            className={`text-white cursor-pointer bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700`}
                                                             onClick={() => handleDelete(img.id)}
                                                         >
                                                             Delete
@@ -692,7 +696,7 @@ export default function EditImage() {
                                                 <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-base truncate whitespace-pre-wrap max-w-sm" title={img.prompt}>
                                                     {img.prompt || "No prompt"}
                                                 </p>
-                                                <Button 
+                                                <Button
                                                     className="py-2 px-4 mt-4"
                                                     onClick={() => handleDownload(img.finalImage)}
                                                 >
@@ -708,7 +712,7 @@ export default function EditImage() {
                             </div>
                             {visibleCount < sortedImages.length && (
                                 <div className="flex justify-center items-center mt-6">
-                                    <Button 
+                                    <Button
                                         className="px-4 py-2 cursor-pointer"
                                         onClick={() => setVisibleCount((prev) => prev + IMAGES_PER_LOAD)}
                                         variant="outline"

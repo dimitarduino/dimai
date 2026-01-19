@@ -1,5 +1,5 @@
 "use client"
-import { CircleUser, ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, MessageSquare, PanelsTopLeft, ShieldPlus, SmilePlus, Video, VideoIcon } from 'lucide-react'
+import { CircleUser, ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, MessageSquare, PanelsTopLeft, ShieldPlus, SmilePlus, Video, VideoIcon, UserCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -75,6 +75,13 @@ function SideNav() {
         name: "Chat",
         path: "/app/chat",
         icon: MessageSquare,
+        sub: []
+    },
+    {
+        id: 11,
+        name: "Portal",
+        path: "/app/portal",
+        icon: UserCircle,
         sub: []
     }]
 
