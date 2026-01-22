@@ -13,13 +13,16 @@ export default clerkMiddleware(async (auth, req) => {
   if (hostname.includes('dimnai.com')) {
     // // Redirect www to non-www (canonical: dimnai.com)
     if (hostname.startsWith('www.')) {
-      url.hostname = hostname.replace('www.', '');
+      url.hostname = hostname.replace('www.', '').split(':')[0]; // Remove port if present
+      url.port = ''; // Clear port
+      url.protocol = 'https:'; // Ensure HTTPS
       return NextResponse.redirect(url, 301); // 301 = permanent redirect for SEO
     }
 
     // // Redirect HTTP to HTTPS (if not already HTTPS)
     if (url.protocol === 'http:') {
       url.protocol = 'https:';
+      url.port = ''; // Clear port
       return NextResponse.redirect(url, 301);
     }
   }
