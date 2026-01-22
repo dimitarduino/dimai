@@ -11,11 +11,11 @@ export default clerkMiddleware(async (auth, req) => {
   const hostname = req.headers.get('host') || '';
 
   if (hostname.includes('dimnai.com')) {
-    // // Redirect www to non-www (canonical: dimnai.com)
-    // if (hostname.startsWith('www.')) {
-    //   url.hostname = hostname.replace('www.', '');
-    //   return NextResponse.redirect(url, 301); // 301 = permanent redirect for SEO
-    // }
+    // Redirect www to non-www (canonical: dimnai.com)
+    if (hostname.startsWith('www.')) {
+      url.hostname = hostname.replace('www.', '');
+      return NextResponse.redirect(url, 301); // 301 = permanent redirect for SEO
+    }
 
     // // Redirect HTTP to HTTPS (if not already HTTPS)
     // if (url.protocol === 'http:') {
