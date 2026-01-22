@@ -3,8 +3,17 @@ import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(['/app(.*)']);
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)',
-  '/sign-up(.*)']);
+const isPublicRoute = createRouteMatcher([
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/',
+  '/about',
+  '/pricing',
+  '/privacy',
+  '/terms',
+  '/support',
+  '/refund',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   const url = req.nextUrl.clone();
@@ -27,7 +36,15 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  if (isProtectedRoute(req)) await auth.protect()
+  // For public routes, skip all auth checks to prevent redirects
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // Only protect routes that need authentication
+  if (isProtectedRoute(req)) {
+    await auth.protect();
+  }
 })
 
 export const config = {

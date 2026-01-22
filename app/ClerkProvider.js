@@ -16,6 +16,10 @@ export default function ClerkWithThemeProvider({ children }) {
           colorPrimary: "#059485",
         },
       }}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      afterSignInUrl="/app"
+      afterSignUpUrl="/app"
     >
       {children}
     </ClerkProvider>
