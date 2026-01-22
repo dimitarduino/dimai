@@ -29,11 +29,17 @@ function ClerkWrapper({ children }) {
 }
 
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
+
 export const metadata = {
+  metadataBase: new URL(baseUrl),
   title: "Dimn AI | Generate AI Videos, Upscale Images, Remove Background, Dubbing Videos",
   description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
   icons: {
     icon: "/favicon.png",
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 export default function RootLayout({ children }) {
