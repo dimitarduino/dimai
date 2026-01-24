@@ -18,6 +18,8 @@ const generationConfig = {
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
 };
+
+// Export the chat session for use in your API routes
 export const chatSession = model.startChat({
     generationConfig,
     history: [
@@ -38,5 +40,21 @@ export const chatSession = model.startChat({
     ],
 });
 
-const result = await chatSession.sendMessage("Write a script to generate 60 seconds video on topic: `The U.S. has no official language.` along with AI image prompt in cartoon format for each scene and give me result in JSON format with imagePrompt and ContentText as field, video should be go viral, so start the first part of the script with some catchy question. Give me JSON only. Result should be in this style: [{imagePrompt: '', contentText: ''}]");
-console.log(result.response.text());
+// Helper function to test the AI model
+// Run this manually when you want to test: node test-aimodel.js
+export async function testAiModel(topic) {
+    try {
+        const prompt = `Write a script to generate 60 seconds video on topic: \`${topic}\` along with AI image prompt in cartoon format for each scene and give me result in JSON format with imagePrompt and ContentText as field`;
+        
+        const result = await chatSession.sendMessage(prompt);
+        const responseText = result.response.text();
+        
+        console.log("AI Model Response:");
+        console.log(responseText);
+        
+        return responseText;
+    } catch (error) {
+        console.error("Error testing AI model:", error);
+        throw error;
+    }
+}
