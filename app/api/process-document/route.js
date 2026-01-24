@@ -3,12 +3,12 @@ import { storage } from "configs/Firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import path from "path";
 
-// Import document processing libraries using require (works in Next.js API routes)
-const pdfParse = require('pdf-parse');
-const mammoth = require('mammoth');
-const XLSX = require('xlsx');
-
 export async function POST(req) {
+  // Dynamically import document processing libraries only when needed
+  // This prevents them from being loaded during build time
+  const pdfParse = (await import('pdf-parse')).default;
+  const mammoth = await import('mammoth');
+  const XLSX = await import('xlsx');
   try {
     const formData = await req.formData();
     const files = formData.getAll('documents');

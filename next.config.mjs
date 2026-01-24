@@ -16,11 +16,23 @@ const nextConfig = {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": path.resolve("./"),
     };
+    
+    // Ignore canvas module warnings (used by pdf-parse)
+    config.ignoreWarnings = [
+      { module: /node_modules\/canvas/ },
+    ];
+    
+    // Mark canvas as external for server builds to prevent build errors
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('canvas');
+    }
+    
     return config;
   },
 };
