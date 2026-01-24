@@ -26,6 +26,7 @@ export default function ComingSoon() {
 
 
   useEffect(() => {
+    console.log(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
     if (!!user) {
       // router.push("/app"); // Redirect programmatically
     }

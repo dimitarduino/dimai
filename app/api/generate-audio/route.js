@@ -7,9 +7,8 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "configs/Firebase";
 
 const client = new textToSpeech.TextToSpeechClient({
-    apiKey: process.env.TEXT_TO_SPEECH_APIKEY
-});
-
+    keyFilename: "./secrets/google-tts.json",
+  });
 
 export async function POST(req) {
     const { text, id, gender, voice } = await req.json();

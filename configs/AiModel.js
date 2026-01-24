@@ -38,4 +38,5 @@ export const chatSession = model.startChat({
     ],
 });
 
-// const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
+const result = await chatSession.sendMessage("Write a script to generate 60 seconds video on topic: `The U.S. has no official language.` along with AI image prompt in cartoon format for each scene and give me result in JSON format with imagePrompt and ContentText as field, video should be go viral, so start the first part of the script with some catchy question. Give me JSON only. Result should be in this style: [{imagePrompt: '', contentText: ''}]");
+console.log(result.response.text());
