@@ -26,8 +26,15 @@ export async function POST(req) {
       if (!(file instanceof File) && !(file instanceof Blob)) continue;
 
       const fileBuffer = Buffer.from(await file.arrayBuffer());
-      const fileName = file.name || `document-${Date.now()}`;
+      let fileName = file.name || `document-${Date.now()}`;
       const fileType = file.type || 'application/octet-stream';
+      
+      // Sanitize filename to prevent path traversal
+      fileName = fileName
+        .replace(/\.\./g, '')  // Remove path traversal attempts
+        .replace(/[^a-zA-Z0-9._-]/g, '_')  // Only allow safe characters
+        .substring(0, 255);  // Limit length
+      
       const fileExtension = path.extname(fileName).toLowerCase();
 
       // Upload file to Firebase Storage

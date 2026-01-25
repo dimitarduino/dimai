@@ -12,7 +12,7 @@ export async function POST(req) {
     try {
         const { prompt } = await req.json();
 
-        const client = new InferenceClient(process.env.HUGFACE_API_TOKEN);
+        const client = new InferenceClient();
 
         const image = await client.textToImage({
             model: "black-forest-labs/FLUX.1-dev",

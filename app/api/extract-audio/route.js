@@ -10,6 +10,49 @@ import ffmpeg from 'fluent-ffmpeg';
 import { ref, uploadString, getDownloadURL, uploadBytes } from "firebase/storage";
 import fs from 'fs'
 
+// Validate URL to prevent SSRF attacks
+function isValidUrl(url) {
+    try {
+        const parsed = new URL(url);
+        // Only allow http and https protocols
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+            return false;
+        }
+        // Block private/internal IPs and localhost
+        const hostname = parsed.hostname.toLowerCase();
+        if (hostname === 'localhost' || 
+            hostname === '127.0.0.1' || 
+            hostname === '0.0.0.0' ||
+            hostname.startsWith('192.168.') || 
+            hostname.startsWith('10.') ||
+            hostname.startsWith('172.16.') || 
+            hostname.startsWith('172.17.') ||
+            hostname.startsWith('172.18.') ||
+            hostname.startsWith('172.19.') ||
+            hostname.startsWith('172.20.') ||
+            hostname.startsWith('172.21.') ||
+            hostname.startsWith('172.22.') ||
+            hostname.startsWith('172.23.') ||
+            hostname.startsWith('172.24.') ||
+            hostname.startsWith('172.25.') ||
+            hostname.startsWith('172.26.') ||
+            hostname.startsWith('172.27.') ||
+            hostname.startsWith('172.28.') ||
+            hostname.startsWith('172.29.') ||
+            hostname.startsWith('172.30.') ||
+            hostname.startsWith('172.31.') ||
+            hostname === '169.254.169.254' ||  // AWS metadata
+            hostname === '[::1]' ||  // IPv6 localhost
+            hostname.endsWith('.local') ||
+            hostname.endsWith('.internal')) {
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export async function POST(req) {
     try {
         const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
@@ -17,6 +60,12 @@ export async function POST(req) {
         if (!videoUrl) {
             return NextResponse.json({ error: "No video file provided" }, { status: 400 });
         }
+        
+        // Validate URL to prevent SSRF
+        if (!isValidUrl(videoUrl)) {
+            return NextResponse.json({ error: "Invalid video URL" }, { status: 400 });
+        }
+        
         const tempVideoPath = path.join("/tmp", `${uuidv4()}.mp4`);
         const audioFileName = `${uuidv4()}.mp3`;
         const tempAudioPath = path.join("/tmp", audioFileName);

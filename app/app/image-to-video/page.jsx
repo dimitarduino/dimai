@@ -51,8 +51,7 @@ export default function ImageToVideo() {
 
     const [uploading, setUploading] = useState(false);
     const [downloadUrl, setDownloadUrl] = useState(null);
-    // const [modifiedImage, setModifiedImage] = useState("https://firebasestorage.googleapis.com/v0/b/aishort-43df4.firebasestorage.app/o/image-video%2F1762682178912.mp4?alt=media&token=e6928068-2fef-492d-b931-885276cdad76");
-    const [modifiedImage, setModifiedImage] = useState();
+   const [modifiedImage, setModifiedImage] = useState();
     const [resolutions, setResolutions] = useState(["standard"
         , "pro"]);
 

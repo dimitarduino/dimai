@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
-import { writeFile } from "node:fs/promises";
-import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import { storage } from "configs/Firebase";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
@@ -21,8 +19,6 @@ export async function POST(req) {
       height: 1280
     };
     const output = await replicate.run("bytedance/sdxl-lightning-4step:6f7a773af6fc3e8de9d5a3c00be77c17308914bf67772726aff83496ba1e3bbe", { input });
-
-    const local = `./${new Date().getTime()}.png`;
     
     const resp = await axios.get(output[0], { responseType: 'arraybuffer' });
     const base64 = Buffer.from(resp.data).toString('base64');

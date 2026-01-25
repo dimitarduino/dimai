@@ -11,12 +11,60 @@ import path from "path";
 // Temporary storage directory
 const TEMP_DIR = "/tmp";
 
+// Validate URL to prevent SSRF attacks
+function isValidUrl(url) {
+    try {
+        const parsed = new URL(url);
+        // Only allow http and https protocols
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+            return false;
+        }
+        // Block private/internal IPs and localhost
+        const hostname = parsed.hostname.toLowerCase();
+        if (hostname === 'localhost' || 
+            hostname === '127.0.0.1' || 
+            hostname === '0.0.0.0' ||
+            hostname.startsWith('192.168.') || 
+            hostname.startsWith('10.') ||
+            hostname.startsWith('172.16.') || 
+            hostname.startsWith('172.17.') ||
+            hostname.startsWith('172.18.') ||
+            hostname.startsWith('172.19.') ||
+            hostname.startsWith('172.20.') ||
+            hostname.startsWith('172.21.') ||
+            hostname.startsWith('172.22.') ||
+            hostname.startsWith('172.23.') ||
+            hostname.startsWith('172.24.') ||
+            hostname.startsWith('172.25.') ||
+            hostname.startsWith('172.26.') ||
+            hostname.startsWith('172.27.') ||
+            hostname.startsWith('172.28.') ||
+            hostname.startsWith('172.29.') ||
+            hostname.startsWith('172.30.') ||
+            hostname.startsWith('172.31.') ||
+            hostname === '169.254.169.254' ||  // AWS metadata
+            hostname === '[::1]' ||  // IPv6 localhost
+            hostname.endsWith('.local') ||
+            hostname.endsWith('.internal')) {
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export async function POST(req) {
     try {
         const { videoUrl, dubbedAudioUrl } = await req.json();
 
         if (!videoUrl || !dubbedAudioUrl) {
             return NextResponse.json({ error: "Missing video or audio URL" }, { status: 400 });
+        }
+        
+        // Validate URLs to prevent SSRF
+        if (!isValidUrl(videoUrl) || !isValidUrl(dubbedAudioUrl)) {
+            return NextResponse.json({ error: "Invalid video or audio URL" }, { status: 400 });
         }
 
         const videoPath = path.join(TEMP_DIR, "video.mp4");

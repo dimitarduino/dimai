@@ -12,7 +12,17 @@ const client = new textToSpeech.TextToSpeechClient({
 
 export async function POST(req) {
     const { text, id, gender, voice } = await req.json();
-    const storageRef = ref(storage, 'aishortvideofiles/' + id + ".mp3");
+    
+    // Sanitize id parameter to prevent path traversal
+    if (!id || typeof id !== 'string') {
+        return NextResponse.json({ error: "Invalid id parameter" }, { status: 400 });
+    }
+    const sanitizedId = id.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!sanitizedId || sanitizedId.length > 100) {
+        return NextResponse.json({ error: "Invalid id format" }, { status: 400 });
+    }
+    
+    const storageRef = ref(storage, `aishortvideofiles/${sanitizedId}.mp3`);
 
     const request = {
         input: { text: text },
