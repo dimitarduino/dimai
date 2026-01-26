@@ -121,7 +121,7 @@ export default function ComingSoon() {
                   href="/app"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Continue to App
+                  Continue
                 </Link>
               ) : (
                 <div className="flex items-center gap-4">
