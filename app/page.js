@@ -121,7 +121,7 @@ export default function ComingSoon() {
                   href="/app"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Continue to App
+                  Continue
                 </Link>
               ) : (
                 <div className="flex items-center gap-4">
@@ -129,7 +129,7 @@ export default function ComingSoon() {
                     href="/sign-in"
                     className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Login
+                    Login /
                   </Link>
                   <Button asChild className="rounded-md dark:text-white py-2 px-4">
                     <Link href="/sign-up">Sign Up</Link>
