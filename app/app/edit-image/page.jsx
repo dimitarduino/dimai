@@ -83,6 +83,10 @@ export default function EditImage() {
     const [prompt, setPrompt] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
     const [images, setImages] = useState([]);
+    const [sourceImages, setSourceImages] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const IMAGES_PER_PAGE = 12;
     const { user } = useUser();
     const [userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -123,25 +127,57 @@ export default function EditImage() {
     useEffect(() => {
         if (userLocal) {
             getImages();
+            getSourceImages();
         }
     }, [userLocal]);
 
-    const getImages = async () => {
+    const getSourceImages = async () => {
+        if (!userLocal) return;
+        try {
+            const res = await db.select({
+                image: editedImages.image,
+                id: editedImages.id
+            })
+                .from(editedImages)
+                .where(eq(editedImages.createdBy, userLocal))
+                .orderBy(desc(editedImages.id));
+
+            setSourceImages(Array.isArray(res) ? res : (res.rows || []));
+        } catch (error) {
+            console.error('Error fetching source images:', error);
+        }
+    }
+
+    const getImages = async (loadMore = false) => {
         if (!userLocal) {
             console.log('getImages: userLocal is not set yet');
             return;
         }
 
+        if (loadMore) setLoadingMore(true);
+
         try {
-            // Fetch unique images by image name using DISTINCT ON (PostgreSQL)
-            // This keeps only the most recent record for each unique image name
-            const res = await db.select().from(editedImages).where(eq(editedImages.createdBy, userLocal));
+            const currentOffset = loadMore ? images.length : 0;
+            const res = await db.select()
+                .from(editedImages)
+                .where(eq(editedImages.createdBy, userLocal))
+                .orderBy(desc(editedImages.createdAt))
+                .limit(IMAGES_PER_PAGE)
+                .offset(currentOffset);
 
+            const newImages = Array.isArray(res) ? res : (res.rows || []);
 
-            // console.log(res);
-            setImages(Array.isArray(res) ? res : (res.rows || []));
+            if (loadMore) {
+                setImages(prev => [...prev, ...newImages]);
+            } else {
+                setImages(newImages);
+            }
+
+            setHasMore(newImages.length === IMAGES_PER_PAGE);
         } catch (error) {
             console.error('Error fetching images:', error);
+        } finally {
+            setLoadingMore(false);
         }
     }
 
@@ -212,6 +248,7 @@ export default function EditImage() {
 
             toast.success("Image deleted successfully");
             setImages(images.filter((img) => img.id !== id));
+            setSourceImages(prev => prev.filter((img) => img.id !== id));
         } catch (error) {
             console.error("Error deleting image:", error);
             toast.error("Failed to delete image");
@@ -286,16 +323,20 @@ export default function EditImage() {
                         }).catch(() => { });
                 }
 
-                const result = await db.insert(editedImages).values({
+                const newRecord = {
                     image: imageUrl,
                     prompt: prompt.trim(),
                     finalImage: res.data.result,
                     createdBy: user.primaryEmailAddress.emailAddress,
                     createdAt: new Date().toISOString()
-                }).returning({ id: editedImages.id });
+                };
 
-                // Refresh images list
-                await getImages();
+                const result = await db.insert(editedImages).values(newRecord)
+                    .returning({ id: editedImages.id });
+
+                const newId = result[0].id;
+                setImages(prev => [{ ...newRecord, id: newId }, ...prev]);
+                setSourceImages(prev => [{ image: imageUrl, id: newId }, ...prev]);
             }
         } catch (error) {
             console.error('Edit image error:', error);
@@ -454,7 +495,7 @@ export default function EditImage() {
                 <div className="w-full max-w-full overflow-hidden">
                     <GeneratedImages
                         imagesList={
-                            images
+                            sourceImages
                                 .filter((img, idx, arr) => {
                                     // Extract only the file name and extension before any dash or question mark
                                     const extractBaseFileName = (url) => {
@@ -610,30 +651,14 @@ export default function EditImage() {
             <div className="flex bg-white dark:bg-zinc-900 py-12 rounded-xl w-full shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
                 <h1 className="font-bold text-3xl text-primary">Your Edited Images</h1>
 
-                {(() => {
-                    const IMAGES_PER_LOAD = 12;
-                    const [visibleCount, setVisibleCount] = useState(IMAGES_PER_LOAD);
-
-                    // Sort images by date, newest first
-                    const sortedImages = [...images].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    const visibleImages = sortedImages.slice(0, visibleCount);
-
-                    useEffect(() => {
-                        // Reset visible count if images array shrinks
-                        if (visibleCount > images.length) setVisibleCount(IMAGES_PER_LOAD);
-                    }, [images]); // eslint-disable-line react-hooks/exhaustive-deps
-
-                    if (images.length === 0) {
-                        return <h3>You don't have any edited images</h3>;
-                    }
-
-                    // Helper: get cached or original url
-                    const getCachedUrl = (url) => imageCache.get(url) || url;
-
-                    return (
-                        <>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {visibleImages.map((img, index) => (
+                {images.length === 0 ? (
+                    <h3>You don&apos;t have any edited images</h3>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {images.map((img, index) => {
+                                const getCachedUrl = (url) => imageCache.get(url) || url;
+                                return (
                                     <div
                                         key={img.id || index}
                                         className="overflow-hidden relative flex w-full flex-col h-full"
@@ -708,22 +733,23 @@ export default function EditImage() {
                                             {img.prompt || "No prompt"}
                                         </p>
                                     </div>
-                                ))}
+                                );
+                            })}
+                        </div>
+                        {hasMore && (
+                            <div className="flex justify-center items-center mt-6">
+                                <Button
+                                    className="px-4 py-2 cursor-pointer"
+                                    onClick={() => getImages(true)}
+                                    disabled={loadingMore}
+                                    variant="outline"
+                                >
+                                    {loadingMore ? "Loading..." : "Load more"}
+                                </Button>
                             </div>
-                            {visibleCount < sortedImages.length && (
-                                <div className="flex justify-center items-center mt-6">
-                                    <Button
-                                        className="px-4 py-2 cursor-pointer"
-                                        onClick={() => setVisibleCount((prev) => prev + IMAGES_PER_LOAD)}
-                                        variant="outline"
-                                    >
-                                        Load more
-                                    </Button>
-                                </div>
-                            )}
-                        </>
-                    );
-                })()}
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
