@@ -23,7 +23,8 @@ import Captions from 'app/app/_components/Captions';
 function CreateNew() {
   const [formData, setFormData] = useState({
     topic: "Random AI Story",
-    comment: "video should be go viral, so start the first part of the script with some catchy question."
+    comment: "video should be go viral, so start the first part of the script with some catchy question.",
+    captionTransition: "Scale (Zoom)"
   });
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
@@ -305,10 +306,15 @@ function CreateNew() {
 
   const saveVideoData = async (videoData) => {
     setLoading(true);
+    const finalCaptionStyle = {
+      ...captionsData.filter(c => c.name == formData.caption)[0].classesCaption,
+      transition: formData.captionTransition || "Scale (Zoom)"
+    };
+
     const result = await db.insert(VideoData).values({
       script: videoData.videoScript,
       audio: videoData.audioFile,
-      captionStyle: captionsData.filter(c => c.name == formData.caption)[0].classesCaption,
+      captionStyle: finalCaptionStyle,
       captions: videoData.captions,
       images: videoData.imageList,
       createdBy: user.primaryEmailAddress.emailAddress
@@ -362,6 +368,17 @@ function CreateNew() {
         <SelectDuration onUserSelect={naPromenaInput} value={formData.duration} />
 
         <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+
+        <SelectComponent
+          optionsAvailable={["Scale (Zoom)", "Slide Up", "Fade", "None"]}
+          className="w-full"
+          onUserSelect={naPromenaInput}
+          placeholder="Caption Transition"
+          name="captionTransition"
+          value={formData.captionTransition}
+          description="Select how captions appear on screen"
+          title="Caption Transition"
+        />
 
         {/* Create Button */}
         <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>

@@ -56,6 +56,9 @@
     WORKDIR /app
     ENV NODE_ENV=production
     
+    # Install ffmpeg for runtime video processing
+    RUN apk add --no-cache ffmpeg
+    
     # Create non-root user
     RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
     

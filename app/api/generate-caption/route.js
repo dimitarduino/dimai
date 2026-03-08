@@ -8,7 +8,7 @@ import { storage } from "configs/Firebase";
 import { AssemblyAI } from "assemblyai";
 
 const client = new AssemblyAI({
-    apiKey: "8cb3cda3f75641108649914992e4bd5a"
+    apiKey: process.env.ASSEBLY_APIKEY
 })
 
 

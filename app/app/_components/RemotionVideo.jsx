@@ -34,20 +34,54 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
         const currentTime = frame / fps * 1000;
         const currentCaption = captions?.find((word) => currentTime >= word.start && currentTime <= word.end);
 
-        let scale = 0;
-
-        let razlika = currentCaption?.end - currentCaption?.start;
+        let scale = 1;
+        let translateY = 0;
+        let opacity = 1;
         
-        let delitel25 = razlika / 4;
-        let procent = 100 / (razlika / (currentTime - currentCaption?.start + delitel25));
-        scale = procent / 100;
-        if (scale >= 1) scale = 1;
+        if (currentCaption) {
+            let razlika = currentCaption?.end - currentCaption?.start;
+            
+            // Progress logic relative to the current caption
+            let timePassed = currentTime - currentCaption?.start;
+            let progress = timePassed / razlika; // 0 to 1
+            if (progress > 1) progress = 1;
 
-        if (razlika < 300) scale = 1;
+            const transitionStyle = captionStyle?.transition || "Scale (Zoom)";
+
+            if (transitionStyle === "Scale (Zoom)") {
+                let delitel25 = razlika / 4;
+                let procent = 100 / (razlika / (timePassed + delitel25));
+                scale = procent / 100;
+                if (scale >= 1) scale = 1;
+                if (razlika < 300) scale = 1;
+            } else if (transitionStyle === "Slide Up") {
+                // Enter from bottom (50px to 0px) over first 30% of duration
+                if (progress < 0.3) {
+                    translateY = 50 * (1 - progress / 0.3);
+                    opacity = progress / 0.3;
+                } else {
+                    translateY = 0;
+                    opacity = 1;
+                }
+            } else if (transitionStyle === "Fade") {
+                // Fade in over first 30% of duration
+                if (progress < 0.3) {
+                    opacity = progress / 0.3;
+                } else {
+                    opacity = 1;
+                }
+            } else if (transitionStyle === "None") {
+                // Return default values
+            }
+        } else {
+            opacity = 0;
+        }
         
         return {
             text: currentCaption?.text,
-            scale
+            scale,
+            translateY,
+            opacity
         };
     }
 
@@ -75,7 +109,13 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                             textAlign: "center",
                             width: "100%"
                         }}>
-                            <h2 style={{...captionStyle, fontSize: 48, transform: `scale(${getFrameCaption().scale})`, fontFamily: 'Helvetica, sans-serif'}} 
+                            <h2 style={{
+                                ...captionStyle, 
+                                fontSize: 48, 
+                                transform: `scale(${getFrameCaption().scale}) translateY(${getFrameCaption().translateY}px)`, 
+                                opacity: getFrameCaption().opacity,
+                                fontFamily: 'Helvetica, sans-serif'
+                            }} 
                              className={`text-white text-3xl`}>{getFrameCaption().text}</h2>
                         </AbsoluteFill>
                     </React.Fragment>
