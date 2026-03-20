@@ -55,10 +55,10 @@ function Upgrade() {
       id: 'pro',
       name: "Pro",
       price: 19,
-      credits: 500,
+      credits: 100,
       description: "For creators and professionals",
       features: [
-        "500 credits per month",
+        "100 credits per month",
         "All Basic features",
         "Priority processing",
         "Higher quality outputs",
@@ -74,10 +74,10 @@ function Upgrade() {
       id: 'enterprise',
       name: "Enterprise",
       price: 99,
-      credits: 10000, // Large number for "unlimited" feel
+      credits: 650, // Large number for "unlimited" feel
       description: "For teams and businesses",
       features: [
-        "Unlimited credits",
+        "650 credits per month",
         "All Pro features",
         "Team collaboration",
         "API access",

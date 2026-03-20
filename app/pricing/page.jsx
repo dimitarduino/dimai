@@ -40,7 +40,7 @@ export default function PricingPage() {
       price: { monthly: 19, yearly: 190 },
       description: "For creators and professionals",
       features: [
-        "500 credits per month",
+        "100 credits per month",
         "All Free features",
         "Priority processing",
         "Higher quality outputs",
@@ -58,7 +58,7 @@ export default function PricingPage() {
       price: { monthly: 99, yearly: 990 },
       description: "For teams and businesses",
       features: [
-        "Unlimited credits",
+        "650 credits per month",
         "All Pro features",
         "Team collaboration",
         "API access",
