@@ -191,13 +191,15 @@ export async function POST(req) {
         .where(eq(Users.email, userEmail))
         .limit(1);
 
+        console.log(user);
+
       if (user[0]) {
-        await db
+        const updatedUSer = await db
           .update(Users)
           .set({
             credits: user[0].credits - 10
           })
-          .where(eq(Users.email, jobData.userId));
+          .where(eq(Users.email, userEmail));
       }
 
       // Update job status to completed
