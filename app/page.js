@@ -152,14 +152,8 @@ export default function ComingSoon() {
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(var(--primary-rgb),0.15),transparent_50%)]"></div>
           <div className="container px-4 md:px-6 relative">
             <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
-              <motion-div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0, duration: 1 }}>
-                <Badge className="px-4 py-2 rounded-full text-sm dark:text-white" variant="secondary">
-                  Launching Soon — Join the Waitlist - Alpha version
-                </Badge>
-              </motion-div>
+              <a href="https://www.producthunt.com/products/dimnai-the-all-in-one-ai-creator-tool?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-dimnai-the-all-in-one-ai-creator-tool" target="_blank" rel="noopener noreferrer">
+              <Image alt="Dimnai – The All-in-One AI Creator Tool - AI TikToks, Reels, dubbing &amp; editing — all in one | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1103228&amp;theme=light&amp;t=1774079045357"></Image></a>
               <div className="space-y-4 max-w-3xl">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
                   All-in-One AI Toolkit for Creators & Professionals
