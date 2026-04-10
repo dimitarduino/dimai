@@ -70,7 +70,7 @@ export default function Home() {
         "Dedicated support",
         "Custom training",
       ],
-      cta: "Contact Sales",
+      cta: "Upgrade to Agency",
       popular: false,
     },
   ];
@@ -401,7 +401,7 @@ export default function Home() {
                     <Button
                       className="w-full h-12 text-lg cursor-pointer"
                       variant={plan.popular ? "default" : "outline"}
-                      onClick={() => router.push(plan.name === "Agency" ? "/support" : "/sign-up")}
+                      onClick={() => router.push("/sign-up")}
                     >
                       {plan.cta}
                     </Button>
