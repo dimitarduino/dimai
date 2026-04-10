@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
 function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDurationInFrames }) {
-    const { captions, images, audio, captionStyle } = videoData;
+    const { captions, images, audio, captionStyle, backgroundMusic } = videoData || {};
     const { fps } = useVideoConfig();
     const frame = useCurrentFrame();
 
@@ -122,6 +122,9 @@ function RemotionVideo({ videoData, setDurationInFrame, durationInFrames: propDu
                 )
             })}
             {audio && <Audio src={audio} />}
+            {backgroundMusic && (
+                <Audio src={backgroundMusic} loop volume={0.22} />
+            )}
         </AbsoluteFill>
     );
 }

@@ -3,6 +3,7 @@ import { db } from '@/configs/db';
 import { VideoGenerationJobs, VideoData, Users } from '@/configs/schema';
 import { eq } from 'drizzle-orm';
 import axios from 'axios';
+import { resolveShortsBackgroundMusic } from '@/lib/shorts-background-music';
 
 export async function POST(req) {
   try {
@@ -172,6 +173,8 @@ export async function POST(req) {
 
       // Get the user email from formData (we store it there)
       const userEmail = jobData.formData?.email || jobData.userId;
+
+      const bgMusic = resolveShortsBackgroundMusic(formData.backgroundMusicId || 'none');
       
       const result = await db.insert(VideoData).values({
         script: videoScript,
@@ -179,7 +182,8 @@ export async function POST(req) {
         captionStyle: captionStyle,
         captions: captions,
         images: images,
-        createdBy: userEmail
+        createdBy: userEmail,
+        backgroundMusic: bgMusic.url || null,
       }).returning({ id: VideoData.id });
 
       const videoId = result[0].id;

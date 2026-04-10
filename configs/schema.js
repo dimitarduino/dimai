@@ -26,7 +26,9 @@ export const VideoData = pgTable("videos", {
     }),
    images: varchar("images").array(),
    createdBy: varchar("createdBy").notNull(),
-   downloadUrl: varchar("downloadUrl").default('').notNull()
+   downloadUrl: varchar("downloadUrl").default('').notNull(),
+   /** Optional background music URL (voiceover remains primary; mixed in Remotion export). */
+   backgroundMusic: varchar("backgroundMusic", { length: 2048 })
 });
 
 

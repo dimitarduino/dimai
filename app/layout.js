@@ -33,8 +33,36 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
 
 export const metadata = {
   metadataBase: new URL(baseUrl),
-  title: "Dimn AI | Generate AI Videos, Upscale Images, Remove Background, Dubbing Videos",
-  description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
+  title: "Dimn AI | #1 Faceless Video & Viral Shorts Generator",
+  description: "Automate your faceless channel and generate viral TikToks, YouTube Shorts, and Reels in minutes. Advanced AI Video Dubbing, Image Upscaler, and Background Remover.",
+  keywords: [
+    "AI Video Generator", "Faceless TikTok Generator", "YouTube Shorts AI", 
+    "Viral Video Creator", "Faceless Channel", "AI Video Dubbing", 
+    "Make Money with AI", "Image Upscaler", "Background Remover", "AI Chat", 
+    "Content Automation"
+  ],
+  openGraph: {
+    title: "Dimn AI | Generate Viral Faceless Content",
+    description: "The ultimate AI toolkit to automate your online income. Generate viral TikToks & Shorts, upscale images, and dub videos effortlessly.",
+    url: baseUrl,
+    siteName: "Dimn AI",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Dimn AI Toolkit for Creators",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dimn AI | Ultimate Faceless AI Toolkit",
+    description: "Generate viral TikToks and Shorts in seconds. Start automating your faceless brand today.",
+    images: ["/logo.png"],
+  },
   icons: {
     icon: "/favicon.png",
   },

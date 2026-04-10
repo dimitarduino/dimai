@@ -19,12 +19,15 @@ import { iskoristPoeni, proveriPoeni } from 'lib/utils';
 import SelectComponent from 'app/app/_components/SelectComponent';
 import { Input } from '@/ui/input';
 import Captions from 'app/app/_components/Captions';
+import SelectBackgroundMusic from 'app/app/_components/SelectBackgroundMusic';
+import { resolveShortsBackgroundMusic } from 'lib/shorts-background-music';
 
 function CreateNew() {
   const [formData, setFormData] = useState({
     topic: "Random AI Story",
     comment: "video should be go viral, so start the first part of the script with some catchy question.",
-    captionTransition: "Scale (Zoom)"
+    captionTransition: "Scale (Zoom)",
+    backgroundMusicId: "none",
   });
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
@@ -311,13 +314,16 @@ function CreateNew() {
       transition: formData.captionTransition || "Scale (Zoom)"
     };
 
+    const bgMusic = resolveShortsBackgroundMusic(formData.backgroundMusicId || 'none');
+
     const result = await db.insert(VideoData).values({
       script: videoData.videoScript,
       audio: videoData.audioFile,
       captionStyle: finalCaptionStyle,
       captions: videoData.captions,
       images: videoData.imageList,
-      createdBy: user.primaryEmailAddress.emailAddress
+      createdBy: user.primaryEmailAddress.emailAddress,
+      backgroundMusic: bgMusic.url || null,
     }).returning({ id: VideoData.id });
 
     await updateUserCredits();
@@ -368,6 +374,11 @@ function CreateNew() {
         <SelectDuration onUserSelect={naPromenaInput} value={formData.duration} />
 
         <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+
+        <SelectBackgroundMusic
+          value={formData.backgroundMusicId}
+          onUserSelect={naPromenaInput}
+        />
 
         <SelectComponent
           optionsAvailable={["Scale (Zoom)", "Slide Up", "Fade", "None"]}
