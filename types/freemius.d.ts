@@ -24,4 +24,13 @@ declare global {
   }
 }
 
-export {};
+export type FreemiusMock = {
+  api: {
+    product: {
+      retrieve: () => Promise<{ error: string }>;
+    };
+  };
+  checkout: {
+    getSandboxParams: () => Promise<{ error: string }>;
+  };
+};
