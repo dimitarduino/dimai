@@ -13,6 +13,8 @@
 .vscode 
 .cursor
 
+secrets/
+
 # testing
 /coverage
 
