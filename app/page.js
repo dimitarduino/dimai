@@ -442,6 +442,15 @@ export default function Home() {
               <Link href="/support" className="text-muted-foreground hover:text-foreground">Support</Link>
               <Link href="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link>
               <Link href="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link>
+              <button
+                type="button"
+                onClick={() =>
+                  window.dispatchEvent(new Event("dimn:open-cookie-preferences"))
+                }
+                className="text-muted-foreground hover:text-foreground cursor-pointer bg-transparent p-0 text-sm"
+              >
+                Cookie settings
+              </button>
               <Link href="/refund" className="text-muted-foreground hover:text-foreground">Refund Policy</Link>
             </div>
             <div className="text-sm text-muted-foreground">
