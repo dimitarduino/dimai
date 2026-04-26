@@ -1,7 +1,11 @@
-import { int } from "drizzle-orm/mysql-core";
-import { serial, integer, varchar, boolean, json, timestamp } from "drizzle-orm/pg-core";
-
-const { pgTable } = require("drizzle-orm/pg-core");
+import {
+  boolean,
+  integer,
+  json,
+  pgTable,
+  serial,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const Users = pgTable('users', {
    id: serial("id").primaryKey(),

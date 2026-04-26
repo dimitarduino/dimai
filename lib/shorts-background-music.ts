@@ -1,9 +1,11 @@
-/**
- * Royalty-free background tracks suitable for short-form video.
- * - Pixabay: https://pixabay.com/service/terms/license/
- * - Kevin MacLeod / Incompetech: CC BY 4.0 — attribution required when publishing (see https://incompetech.com/music/royalty-free/licenses/)
- */
-export const SHORTS_BACKGROUND_TRACKS = [
+export interface ShortsBackgroundTrack {
+  id: string;
+  title: string;
+  url: string | null;
+  licenseNote: string | null;
+}
+
+export const SHORTS_BACKGROUND_TRACKS: readonly ShortsBackgroundTrack[] = [
   {
     id: 'none',
     title: 'No background music',
@@ -102,7 +104,12 @@ export const SHORTS_BACKGROUND_TRACKS = [
   },
 ];
 
-export function resolveShortsBackgroundMusic(id) {
+export type ResolvedShortsBackgroundMusic = Pick<
+  ShortsBackgroundTrack,
+  'url' | 'title' | 'licenseNote'
+>;
+
+export function resolveShortsBackgroundMusic(id: string): ResolvedShortsBackgroundMusic {
   const track = SHORTS_BACKGROUND_TRACKS.find((t) => t.id === id) || SHORTS_BACKGROUND_TRACKS[0];
   return {
     url: track.url,

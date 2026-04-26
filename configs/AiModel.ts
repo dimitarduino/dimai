@@ -1,3 +1,5 @@
+import { ChatSession } from "@google/generative-ai";
+
 const {
     GoogleGenerativeAI,
     HarmCategory,
@@ -11,13 +13,26 @@ const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
 });
 
-const generationConfig = {
+type GenerationConfig = {
+    temperature: number;
+    topP: number;
+    topK: number;
+    maxOutputTokens: number;
+    responseMimeType: string;
+}
+
+const generationConfig: GenerationConfig = {
     temperature: 1,
     topP: 0.95,
     topK: 40,
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
 };
+
+type HistoryItem = {
+    role: string;
+    parts: { text: string }[];
+}
 
 // Export the chat session for use in your API routes
 export const chatSession = model.startChat({
@@ -37,24 +52,20 @@ export const chatSession = model.startChat({
                   }
             ],
         },
-    ],
-});
+    ] as HistoryItem[],
+}) satisfies ChatSession;
 
 // Helper function to test the AI model
 // Run this manually when you want to test: node test-aimodel.js
-export async function testAiModel(topic) {
+export async function testAiModel(topic: string): Promise<string> {
     try {
-        const prompt = `Write a script to generate 60 seconds video on topic: \`${topic}\` along with AI image prompt in cartoon format for each scene and give me result in JSON format with imagePrompt and ContentText as field`;
+        const prompt : string = `Write a script to generate 60 seconds video on topic: \`${topic}\` along with AI image prompt in cartoon format for each scene and give me result in JSON format with imagePrompt and ContentText as field`;
         
         const result = await chatSession.sendMessage(prompt);
         const responseText = result.response.text();
         
-        console.log("AI Model Response:");
-        console.log(responseText);
-        
         return responseText;
     } catch (error) {
-        console.error("Error testing AI model:", error);
         throw error;
     }
 }
