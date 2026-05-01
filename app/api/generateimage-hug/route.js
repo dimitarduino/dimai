@@ -1,4 +1,9 @@
-// import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  return NextResponse.json({ error: "Not implemented" }, { status: 501 });
+}
+
 // import Replicate from "replicate";
 // import { writeFile } from "node:fs/promises";
 // import { v4 as uuidv4 } from 'uuid';

@@ -17,9 +17,13 @@ const nextConfig = {
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   },
   webpack: (config, { isServer }) => {
+    /** Match tsconfig/jsconfig paths so Docker/webpack resolve the same imports as IDE */
     config.resolve.alias = {
-      ...config.resolve.alias,
+      ...(config.resolve.alias ?? {}),
+      "@/ui": path.resolve("./components/ui"),
       "@": path.resolve("./"),
+      configs: path.resolve("./configs"),
+      app: path.resolve("./app"),
     };
     
     // Ignore canvas module warnings (used by pdf-parse)

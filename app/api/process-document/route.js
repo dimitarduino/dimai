@@ -1,4 +1,9 @@
-// import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  return NextResponse.json({ error: "Not implemented" }, { status: 501 });
+}
+
 // import { storage } from "configs/Firebase";
 // import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // import path from "path";
