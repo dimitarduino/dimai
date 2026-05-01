@@ -48,7 +48,7 @@ export const metadata = {
     siteName: "Dimn AI",
     images: [
       {
-        url: "/logo.png",
+        url: "/ogimage.png",
         width: 1200,
         height: 630,
         alt: "Dimn AI Toolkit for Creators",
@@ -61,10 +61,11 @@ export const metadata = {
     card: "summary_large_image",
     title: "Dimn AI | Ultimate Faceless AI Toolkit",
     description: "Generate viral TikToks and Shorts in seconds. Start automating your faceless brand today.",
-    images: ["/logo.png"],
+    images: ["/ogimage.png"],
   },
   icons: {
     icon: "/favicon.png",
+    apple: "/favicon.png",
   },
   alternates: {
     canonical: "/",

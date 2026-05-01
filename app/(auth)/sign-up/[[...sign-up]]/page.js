@@ -6,6 +6,7 @@ export const metadata = {
   description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
   icons: {
       icon: "/favicon.png",
+      apple: "/favicon.png",
   },
 };
 

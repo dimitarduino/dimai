@@ -16,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
   '/robots.txt',
   '/sitemap.xml',
   '/favicon.png',
+  '/ogimage.png',
   '/api/process-video-job(.*)',
   '/api/get-video-script(.*)',
   '/api/generate-audio(.*)',

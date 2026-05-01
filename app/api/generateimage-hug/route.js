@@ -34,7 +34,6 @@
 
 //         // Get the download URL
 //         const downloadUrl = await getDownloadURL(snapshot.ref);
-
 //         return NextResponse.json({ result: downloadUrl });
 //     } catch (error) {
 //         return NextResponse.json({ error: error.message }, { status: 500 });
