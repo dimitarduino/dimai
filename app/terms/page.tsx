@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../_context/ThemeContext";
 
-export default function TermsPage() {
+export default function TermsPage() : React.JSX.Element {
   const { isDark, toggleTheme } = useTheme();
 
   return (

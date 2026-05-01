@@ -1,12 +1,7 @@
-const baseUrl =
+const baseUrl : string =
   process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
 
-/**
- * Next.js App Router sitemap route
- * @see https://nextjs.org/docs/app/building-your-application/optimizing/metadata#sitemaps
- */
 export default function sitemap() {
-  /** Core marketing / public pages to index */
   const staticRoutes = [
     "/",
     "/about",

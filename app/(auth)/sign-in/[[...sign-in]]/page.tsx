@@ -1,16 +1,17 @@
-import { SignIn } from '@clerk/nextjs'
-import Image from 'next/image'
+import { SignIn } from "@clerk/nextjs";
+import type { Metadata } from "next";
+import Image from "next/image";
 
-
-export const metadata = {
+export const metadata: Metadata = {
   title: "Dimn AI | Sign in",
-  description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
+  description:
+    "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
   icons: {
-      icon: "/favicon.png",
+    icon: "/favicon.png",
   },
 };
 
-export default function Page() {
+export default function Page(): React.JSX.Element {
   return (
     <div className='grid overflow-hidden grid-cols-1 md:grid-cols-2'>
       <div className='h-full flex hidden md:flex bg-emerald-800'>

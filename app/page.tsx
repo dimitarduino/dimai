@@ -13,6 +13,7 @@ import {
   Video, Mic, ImageIcon, MessageSquare, Zap, PlayCircle, Star
 } from "lucide-react";
 import { useTheme } from "./_context/ThemeContext";
+import { PricingPlan } from "@/types/freemius";
 
 export default function Home() {
   const router = useRouter();
@@ -22,12 +23,11 @@ export default function Home() {
 
   useEffect(() => {
     if (!!user) {
-      // Optional: automatically redirect logged in users to app
       // router.push("/app");
     }
   }, [user]);
 
-  const plans = [
+  const plans : PricingPlan[] = [
     {
       name: "Free",
       price: { monthly: 0, yearly: 0 },
@@ -144,7 +144,7 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="flex flex-col items-center space-y-6 max-w-4xl mx-auto"
             >
-              <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20">
+              <Badge asChild={false} variant="secondary" className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20">
                 <Sparkles className="w-4 h-4 mr-2 inline-block" /> The Ultimate AI Toolkit for Creators
               </Badge>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
@@ -308,7 +308,7 @@ export default function Home() {
                          <div className="flex text-yellow-400">
                            {[...Array(5)].map((_, idx) => <Star key={idx} className="w-4 h-4 fill-current" />)}
                          </div>
-                         <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/10">
+                         <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/10" asChild={false}>
                            {t.income}
                          </Badge>
                       </div>
@@ -329,7 +329,8 @@ export default function Home() {
         <section id="pricing" className="w-full py-24">
           <div className="container mx-auto px-4 md:px-6">
              <div className="text-center mb-16">
-              <Badge className="mb-4" variant="secondary">Simple, Transparent Pricing</Badge>
+              <Badge className="mb-4" variant="secondary" asChild={false}>
+                <p>Simple, Transparent Pricing</p></Badge>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Choose Your Plan</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
                 Start for free and confidently scale your faceless empire.
@@ -354,8 +355,8 @@ export default function Home() {
                   Yearly
                 </span>
                 {billingCycle === "yearly" && (
-                  <Badge variant="secondary" className="ml-2 bg-green-500/10 text-green-500 border-green-500/20">
-                    Save 17%
+                  <Badge variant="secondary" className="ml-2 bg-green-500/10 text-green-500 border-green-500/20" asChild={true}>
+                    <span>Save 17%</span>
                   </Badge>
                 )}
               </div>
@@ -369,8 +370,8 @@ export default function Home() {
                   className={`relative flex flex-col ${plan.popular ? "border-primary shadow-xl md:scale-105 z-10" : "border-border/50"}`}
                 >
                   {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground border-0 shadow-sm">
-                      Most Popular
+                    <Badge asChild={false} variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground border-0 shadow-sm">
+                      <span>Most Popular</span>
                     </Badge>
                   )}
                   <CardHeader>
@@ -445,7 +446,7 @@ export default function Home() {
               <Link href="/refund" className="text-muted-foreground hover:text-foreground">Refund Policy</Link>
             </div>
             <div className="text-sm text-muted-foreground">
-              © 2025 Dimn AI. All rights reserved.
+              © {`${new Date().getFullYear()}`} Dimn AI. All rights reserved.
             </div>
           </div>
         </div>

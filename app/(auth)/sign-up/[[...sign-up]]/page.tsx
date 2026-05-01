@@ -1,7 +1,9 @@
 import { SignUp } from '@clerk/nextjs'
+import { Metadata } from 'next';
 import Image from 'next/image'
+import React from 'react';
 
-export const metadata = {
+export const metadata : Metadata = {
   title: "Dimn AI | Sign up",
   description: "Create stunning AI-generated videos, upscale images, remove backgrounds, and dub videos effortlessly with Dimn AI. Transform your content with cutting-edge AI tools!",
   icons: {
@@ -9,7 +11,7 @@ export const metadata = {
   },
 };
 
-export default function Page() {
+export default function Page() : React.JSX.Element {
   return (
     <div className='grid grid-cols-1 md:grid-cols-2'>
       <div className='h-full hidden md:flex bg-emerald-800'>

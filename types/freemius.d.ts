@@ -34,3 +34,12 @@ export type FreemiusMock = {
     getSandboxParams: () => Promise<{ error: string }>;
   };
 };
+
+export type PricingPlan = {
+  name: string;
+  price: { monthly: number; yearly: number };
+  description: string;
+  features: string[];
+  cta: string;
+  popular: boolean;
+};

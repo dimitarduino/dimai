@@ -12,17 +12,11 @@ export default function SupportPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    // freemius.checkout.getSandboxParams().then((params) => {
-    //   console.log(params);
-    // });
-  }, []);
-
-  const onChange = (field, value) => {
+  const onChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Please fill in all fields.");
@@ -47,7 +41,7 @@ export default function SupportPage() {
       toast.success("Your message has been sent. We'll get back to you soon.");
       setForm({ name: "", email: "", message: "" });
     } catch (err) {
-      toast.error(err.message || "Something went wrong. Please try again.");
+      toast.error((err as Error).message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

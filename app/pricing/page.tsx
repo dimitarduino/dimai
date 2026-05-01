@@ -7,12 +7,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Check, Moon, Sun } from "lucide-react";
 import { useTheme } from "../_context/ThemeContext";
+import React from "react";
+import type { ThemeContextType } from "../_context/ThemeContext";
+import { PricingPlan } from "@/types/freemius";
 
-export default function PricingPage() {
-  const { isDark, toggleTheme } = useTheme();
+export default function PricingPage() : React.JSX.Element {
+  const { isDark, toggleTheme } = useTheme() ?? { isDark: false, toggleTheme: () => {} } as ThemeContextType;
   const [billingCycle, setBillingCycle] = useState("monthly");
 
-  const plans = [
+  const plans: PricingPlan[] = [
     {
       name: "Free",
       price: { monthly: 0, yearly: 0 },
@@ -133,8 +136,8 @@ export default function PricingPage() {
       <main className="container mx-auto px-4 py-16">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <Badge className="mb-4" variant="secondary">
-            Simple, Transparent Pricing
+          <Badge className="mb-4" variant="secondary" asChild={true}>
+            <Link href="/pricing">Simple, Transparent Pricing</Link>    
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
             Choose Your Plan
@@ -162,8 +165,8 @@ export default function PricingPage() {
               Yearly
             </span>
             {billingCycle === "yearly" && (
-              <Badge variant="secondary" className="ml-2">
-                Save 17%
+                    <Badge variant="secondary" className="ml-2" asChild={true}>
+                <span>Save 17%</span>
               </Badge>
             )}
           </div>
@@ -177,8 +180,8 @@ export default function PricingPage() {
               className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
             >
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                  Most Popular
+                <Badge variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground" asChild={true}>
+                  <span>Most Popular</span>
                 </Badge>
               )}
               <CardHeader>

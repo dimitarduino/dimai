@@ -3,9 +3,10 @@ import React, { useEffect } from 'react'
 import { db } from "@/configs/db"
 import { useUser } from "@clerk/nextjs";
 import { Users } from "@/configs/schema"
-import { eq } from 'drizzle-orm';
+import { eq, type InferSelectModel } from "drizzle-orm";
+import { ElementProps } from '@/types/elements';
 
-function Provider({ children }) {
+function Provider({ children } : ElementProps) : React.JSX.Element | null {
   const { user } = useUser();
 
   useEffect(() => {
@@ -13,10 +14,13 @@ function Provider({ children }) {
   }, [user]);
 
   const proveriNovUser = async () => {
-    const res = await db.select().from(Users)
+    if (!user?.primaryEmailAddress?.emailAddress) return null;
+    const res: InferSelectModel<typeof Users>[] = await db
+      .select()
+      .from(Users)
       .where(eq(Users.email, user?.primaryEmailAddress?.emailAddress));
 
-    if (!!res[0] == false) {
+    if (!res[0]) {
       let vrednosti = {
         ime: user?.fullName || user?.primaryEmailAddress?.emailAddress,
         email: user?.primaryEmailAddress?.emailAddress,

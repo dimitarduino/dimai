@@ -6,6 +6,10 @@ import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "./_context/ThemeContext";
 import ClerkWithThemeProvider from "./ClerkProvider";
 import Script from "next/script";
+import React from "react";
+import { Metadata } from "next";
+import { ElementProps } from "@/types/elements";
+import { dark, neobrutalism } from "@clerk/themes";
 
 
 const outfit = Outfit({
@@ -13,7 +17,7 @@ const outfit = Outfit({
 });
 
 
-function ClerkWrapper({ children }) {
+function ClerkWrapper({ children } : ElementProps) : React.JSX.Element {
   const { isDark } = useTheme();
 
   return (
@@ -29,9 +33,9 @@ function ClerkWrapper({ children }) {
 }
 
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
+const baseUrl : string = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
 
-export const metadata = {
+export const metadata : Metadata = {
   metadataBase: new URL(baseUrl),
   title: "Dimn AI | #1 Faceless Video & Viral Shorts Generator",
   description: "Automate your faceless channel and generate viral TikToks, YouTube Shorts, and Reels in minutes. Advanced AI Video Dubbing, Image Upscaler, and Background Remover.",
@@ -70,7 +74,7 @@ export const metadata = {
     canonical: "/",
   },
 };
-export default function RootLayout({ children }) {
+export default function RootLayout({ children } : ElementProps) : React.JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

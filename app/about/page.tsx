@@ -4,9 +4,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../_context/ThemeContext";
+import React from "react";
 
-export default function AboutPage() {
-  const { isDark, toggleTheme } = useTheme();
+export default function AboutPage() : React.JSX.Element {
+  const { isDark, toggleTheme } = useTheme() ?? { isDark: false, toggleTheme: () => {} };
 
   return (
     <div className="min-h-screen bg-background">
