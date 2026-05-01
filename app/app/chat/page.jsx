@@ -19,7 +19,7 @@ import { storage } from 'configs/Firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import Image from 'next/image'
 import ChatSidebar from '../_components/ChatSidebar'
-import { MobileNavContext } from '../layout'
+import { MobileNavContext } from '../_context/MobileNavContext'
 
 const AVAILABLE_MODELS = [
   { value: 'openai/gpt-4o-mini', label: 'GPT-4o-mini', description: 'Mini model', supportsVision: false, supportsDocuments: false },

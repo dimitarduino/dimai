@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, createContext, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './_components/Header'
 import SideNav from './_components/SideNav'
 import MobileBottomNav from './_components/MobileBottomNav'
@@ -11,12 +11,7 @@ import { usePathname } from 'next/navigation';
 import { db } from 'configs/db';
 import { Users } from 'configs/schema';
 import { eq } from 'drizzle-orm';
-
-// Context for mobile bottom nav visibility
-export const MobileNavContext = createContext({
-  showBottomNav: true,
-  setShowBottomNav: () => {}
-});
+import { MobileNavContext } from './_context/MobileNavContext';
 
 function DashboaardLayout({ children }) {
   const [videoData, setVideoData] = useState([]);

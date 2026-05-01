@@ -1,7 +1,7 @@
 "use client"
 import React, { useContext } from 'react'
 import { Menu } from 'lucide-react'
-import { MobileNavContext } from '../layout'
+import { MobileNavContext } from '../_context/MobileNavContext'
 
 function MobileNavToggle() {
   const { showBottomNav, setShowBottomNav } = useContext(MobileNavContext)

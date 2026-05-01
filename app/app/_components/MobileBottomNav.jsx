@@ -3,7 +3,7 @@ import { ExpandIcon, FileVideo, House, ImageIcon, Images, ImageUpscale, Laugh, M
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useContext } from 'react'
-import { MobileNavContext } from '../layout'
+import { MobileNavContext } from '../_context/MobileNavContext'
 import { Button } from '@/components/ui/button'
 
 function MobileBottomNav() {
