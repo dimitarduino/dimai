@@ -7,10 +7,18 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "replicate.delivery",
+        pathname: "/**",
       },
     ],
+    /** Seconds the image optimizer caches remote fetches; drives `Cache-Control` on `/_next/image` (30d). */
+    minimumCacheTTL: 2592000,
   },
   env: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
