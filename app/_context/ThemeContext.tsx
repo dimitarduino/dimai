@@ -8,7 +8,7 @@ export type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export const ThemeProvider = ({ children }: { children: React.JSX.Element }) => {
   const [isDark, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
