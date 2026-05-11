@@ -83,7 +83,7 @@ export default function PricingPage() : React.JSX.Element {
         <div className="container mx-auto flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="font-bold text-xl tracking-tight">
-              <Image src={`/logo.png`} width={120} height={20} alt="DimnAI Logo" />
+              <Image src={`/logo.png`} loading="eager" width={120} height={20} alt="DimnAI Logo" />
             </Link>
           </div>
           <nav className="hidden md:flex gap-8">
@@ -180,7 +180,7 @@ export default function PricingPage() : React.JSX.Element {
               className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
             >
               {plan.popular && (
-                <Badge variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground" asChild={true}>
+                <Badge variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white" asChild={true}>
                   <span>Most Popular</span>
                 </Badge>
               )}
@@ -260,7 +260,7 @@ export default function PricingPage() : React.JSX.Element {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <Image src={`/logo.png`} width={100} height={20} alt="DimnAI Logo" />
+              <Image src={`/logo.png`} loading="eager" width={100} height={20} alt="DimnAI Logo" />
               <span className="text-sm text-muted-foreground">© 2025 Dimn AI. All rights reserved.</span>
             </div>
             <div className="flex gap-6 text-sm">

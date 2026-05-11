@@ -78,7 +78,7 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="font-bold text-xl tracking-tight">
-              <Image src={`/logo.png`} width={120} height={20} alt="DimnAI Logo" />
+              <Image src={`/logo.png`} loading="eager" width={120} height={20} alt="DimnAI Logo" />
             </Link>
           </div>
           <nav className="hidden md:flex gap-8">
@@ -366,7 +366,7 @@ export default function Home() {
                   className={`relative flex flex-col ${plan.popular ? "border-primary shadow-xl md:scale-105 z-10" : "border-border/50"}`}
                 >
                   {plan.popular && (
-                    <Badge asChild={false} variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground border-0 shadow-sm">
+                    <Badge asChild={false} variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white border-0 shadow-sm">
                       <span>Most Popular</span>
                     </Badge>
                   )}
@@ -433,7 +433,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
-              <Image src={`/logo.png`} width={100} height={20} alt="DimnAI Logo" />
+              <Image src={`/logo.png`} loading="eager" width={100} height={20} alt="DimnAI Logo" />
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <Link href="/support" className="text-muted-foreground hover:text-foreground">Support</Link>

@@ -56,7 +56,7 @@ function Upgrade() {
       credits: 100,
       description: "Perfect for getting started",
       features: [
-        "100 credits per month",
+        "30 credits per month",
         "Access to all AI tools",
         "Standard processing speed",
         "Community support",
@@ -462,7 +462,7 @@ function Upgrade() {
                   </Badge>
                 )}
                 {plan.popular && !isCurrentPlan && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white">
                     Most Popular
                   </Badge>
                 )}
