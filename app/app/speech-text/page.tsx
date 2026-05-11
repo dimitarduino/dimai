@@ -13,14 +13,14 @@ import SelectComponent from "../_components/SelectComponent";
 import { CloudFog } from "lucide-react";
 
 export default function UpscaleImage() {
-    const [file, setFile] = useState(null);
-    const [resultText, setResultText] = useState();
-    const [resultAudio, setResultAudio] = useState();
+    const [file, setFile] = useState<File | null>(null);
+    const [resultText, setResultText] = useState<string | null>(null);
+    const [resultAudio, setResultAudio] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState(null);
-    const [modifiedImage, setModifiedImage] = useState(null);
+    const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+    const [modifiedImage, setModifiedImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState([]);
+    const [formData, setFormData] = useState<Record<string, unknown>>({});
     const languages = ["None", "Afrikaans", "Amharic", "Armenian", "Assamese", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian",
         "Burmese", "Cantonese", "Catalan", "Cebuano", "Central Kurdish", "Croatian", "Czech", "Danish", "Dutch",
         "Egyptian Arabic", "English", "Estonian", "Finnish", "French", "Galician", "Ganda", "Georgian", "German",
@@ -42,7 +42,7 @@ export default function UpscaleImage() {
         "Tagalog", "Telugu", "Thai", "Turkish", "Ukrainian", "Urdu", "Vietnamese", "Welsh", "Western Persian"
     ];
 
-    const naPromenaInput = (ime, vrednost) => {
+    const naPromenaInput = (ime: string, vrednost: unknown) => {
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
@@ -110,6 +110,10 @@ export default function UpscaleImage() {
 
 
         if (proveriDaliETekst() == false) {
+            if (!file) {
+              setUploading(false);
+              return;
+            }
             const storageRef = ref(storage, `speech/${file.name}-${Date.now()}`);
             const uploadTask = uploadBytesResumable(storageRef, file);
 

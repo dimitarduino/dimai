@@ -29,6 +29,8 @@ type ShortsCreateFormData = {
   duration: string;
 };
 
+type VoiceOption = { ssmlGender: string; name: string };
+
 function CreateNew() {
   const [formData, setFormData] = useState<ShortsCreateFormData>({
     topic: "Random AI Story",
@@ -38,7 +40,7 @@ function CreateNew() {
     backgroundMusicId: "none",
     duration: "30 seconds",
   });
-  const [voices, setVoices] = useState([]);
+  const [voices, setVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState("");
   const [gender, setGender] = useState("");
   const [currentVoices, setCurrentVoices] = useState<string[]>([]);
@@ -54,7 +56,7 @@ function CreateNew() {
   const [progress, setProgress] = useState({ step: '', percentage: 0 });
   const { userDetail, setUserDetail } = useUserDetail();
 
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const { videoData, setVideoData } = useContext(VideoDataContext) ?? { videoData: null, setVideoData: (videoData: { captions: unknown; id: number; script: unknown; audio: string; captionStyle: unknown; images: string[] | null; createdBy: string; downloadUrl: string; backgroundMusic: string | null; }[]) => {} };
 
   const captionsData = [{
@@ -235,11 +237,12 @@ function CreateNew() {
   const getVoices = async () => {
     const res = await axios.post("/api/getvoices", {
     }).then((res) => {
-      let voices = res.data.result;
-
-      setVoices(voices);
-      setSelectedVoice(voices[0].name);
-      setGender(voices[0].ssmlGender);
+      const voiceList = (res.data.result ?? []) as VoiceOption[];
+      setVoices(voiceList);
+      const first = voiceList[0];
+      if (!first) return;
+      setSelectedVoice(first.name);
+      setGender(first.ssmlGender);
     })
   }
 
@@ -343,6 +346,8 @@ function CreateNew() {
       'caption': caption
     }));
   }
+
+  if (!isLoaded) return null;
 
   return (
     <div className='md:px-20 max-w-7xl mx-auto'>

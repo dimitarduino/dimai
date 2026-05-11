@@ -24,7 +24,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/generate-image(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
+export const proxy = clerkMiddleware(async (auth, req: NextRequest) => {
   const url = req.nextUrl.clone();
   const hostname = req.headers.get("host") || "";
 

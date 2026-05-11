@@ -1,55 +1,45 @@
+export const dynamic = "force-dynamic";
+
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, useUser } from "@clerk/nextjs";
 import Provider from "./provider";
 import { Toaster } from "sonner";
-import { ThemeProvider, useTheme } from "./_context/ThemeContext";
+import { ThemeProvider } from "./_context/ThemeContext";
 import ClerkWithThemeProvider from "./ClerkProvider";
 import { GtagWithConsent } from "@/components/cookie-consent/GtagWithConsent";
 import { CookieConsentBanner } from "@/components/cookie-consent/CookieConsentBanner";
-import Script from "next/script";
-import React from "react";
+import React, { Suspense } from "react";
 import { Metadata } from "next";
 import { ElementProps } from "@/types/elements";
-import { dark, neobrutalism } from "@clerk/themes";
-
 
 const outfit = Outfit({
   subsets: ["latin"],
 });
 
+const baseUrl: string = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
 
-function ClerkWrapper({ children } : ElementProps) : React.JSX.Element {
-  const { isDark } = useTheme();
-
-  return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: isDark ? dark : neobrutalism,
-        variables: { colorPrimary: "#059485" },
-      }}
-    >
-      {children}
-    </ClerkProvider>
-  );
-}
-
-
-const baseUrl : string = process.env.NEXT_PUBLIC_SITE_URL || "https://dimnai.com";
-
-export const metadata : Metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: "Dimn AI | #1 Faceless Video & Viral Shorts Generator",
-  description: "Automate your faceless channel and generate viral TikToks, YouTube Shorts, and Reels in minutes. Advanced AI Video Dubbing, Image Upscaler, and Background Remover.",
+  description:
+    "Automate your faceless channel and generate viral TikToks, YouTube Shorts, and Reels in minutes. Advanced AI Video Dubbing, Image Upscaler, and Background Remover.",
   keywords: [
-    "AI Video Generator", "Faceless TikTok Generator", "YouTube Shorts AI", 
-    "Viral Video Creator", "Faceless Channel", "AI Video Dubbing", 
-    "Make Money with AI", "Image Upscaler", "Background Remover", "AI Chat", 
-    "Content Automation"
+    "AI Video Generator",
+    "Faceless TikTok Generator",
+    "YouTube Shorts AI",
+    "Viral Video Creator",
+    "Faceless Channel",
+    "AI Video Dubbing",
+    "Make Money with AI",
+    "Image Upscaler",
+    "Background Remover",
+    "AI Chat",
+    "Content Automation",
   ],
   openGraph: {
     title: "Dimn AI | Generate Viral Faceless Content",
-    description: "The ultimate AI toolkit to automate your online income. Generate viral TikToks & Shorts, upscale images, and dub videos effortlessly.",
+    description:
+      "The ultimate AI toolkit to automate your online income. Generate viral TikToks & Shorts, upscale images, and dub videos effortlessly.",
     url: baseUrl,
     siteName: "Dimn AI",
     images: [
@@ -66,7 +56,8 @@ export const metadata : Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Dimn AI | Ultimate Faceless AI Toolkit",
-    description: "Generate viral TikToks and Shorts in seconds. Start automating your faceless brand today.",
+    description:
+      "Generate viral TikToks and Shorts in seconds. Start automating your faceless brand today.",
     images: ["/ogimage.png"],
   },
   icons: {
@@ -77,23 +68,21 @@ export const metadata : Metadata = {
     canonical: "/",
   },
 };
-export default function RootLayout({ children } : ElementProps) : React.JSX.Element {
+
+export default function RootLayout({ children }: ElementProps): React.JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${outfit.className}`}
-      >
+      <body className={`${outfit.className}`}>
         <ThemeProvider>
-          <ClerkWithThemeProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ClerkWithThemeProvider>
+              <Provider>{children}</Provider>
 
-            <Provider>
-              {children}
-            </Provider>
-
-            <Toaster />
-            <GtagWithConsent />
-            <CookieConsentBanner />
-          </ClerkWithThemeProvider>
+              <Toaster />
+              <GtagWithConsent />
+              <CookieConsentBanner />
+            </ClerkWithThemeProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

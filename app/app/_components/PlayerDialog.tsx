@@ -48,11 +48,18 @@ function PlayerDialog({
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | false>(false);
   const [durationFrame, setDurationFrame] = useState(1200);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const userCtx = useContext(UserDetailContext);
   const userDetail = userCtx?.userDetail;
   const setUserDetail = userCtx?.setUserDetail;
   const router = useRouter();
+
+  async function getVideoData() {
+    if (videoId == null) return;
+    const id = videoId;
+    const result = await getVideoDataByIdForOwner(id);
+    setVideoData(result ?? undefined);
+  }
 
   useEffect(() => {
     if (typeof downloadUrlProp === "string" && downloadUrlProp) {
@@ -73,13 +80,6 @@ function PlayerDialog({
       setOpenDialogPlayer(openDialog);
     }
   }, [openDialog]);
-
-  const getVideoData = async () => {
-    if (videoId == null) return;
-    const id = videoId;
-    const result = await getVideoDataByIdForOwner(id);
-    setVideoData(result ?? undefined);
-  };
 
   const exportVideo = async () => {
     if (!proveriPoeni(userDetail?.credits ?? 0, 2)) {
@@ -117,6 +117,8 @@ function PlayerDialog({
       );
     }
   };
+
+  if (!isLoaded) return null;
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>

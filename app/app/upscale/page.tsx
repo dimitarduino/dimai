@@ -25,17 +25,18 @@ import { proveriPoeni } from "lib/utils";
 import { useUserDetail } from "@/app/_context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
 import { deductUserCredits, insertUpscaledImage } from "@/app/app/_actions/dashboard-data";
+import { toast } from "sonner";
 
 export default function UpscaleImage() {
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState();
-    const [upscaleUrl, setUpscaled] = useState();
+    const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+    const [upscaleUrl, setUpscaled] = useState<string | null>(null);
     const [scaling, setScaling] = useState(false);
-    const [uploadedImage, setUploadedImage] = useState();
-    const [loading, setLoading] = useState();
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const [openedResult, setOpenedResult] = useState(false);
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const { userDetail, setUserDetail } = useUserDetail();
 
 
@@ -46,10 +47,7 @@ export default function UpscaleImage() {
         }).then(async (res) => {
             const slednoPoeni = await deductUserCredits(5);
 
-            setUserDetail(prev => ({
-                ...prev,
-                "credits": slednoPoeni
-            }));
+            setUserDetail((prev) => (prev ? { ...prev, credits: slednoPoeni } : prev));
             setScaling(false);
             if (!!res.data.result) {
                 setUpscaled(res.data.result);
@@ -90,7 +88,8 @@ export default function UpscaleImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
-        if (!proveriPoeni(userDetail.credits, 5)) {
+        const credits = userDetail?.credits ?? 0;
+        if (!proveriPoeni(credits, 5)) {
             toast("Insufficient credits! Please recharge to generate a video.");
             return;
         }
@@ -132,10 +131,11 @@ export default function UpscaleImage() {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: 'image/*',
+        accept: { "image/*": [] },
         multiple: false,
     });
 
+    if (!isLoaded) return null;
 
     return (
         <div className="w-full flex">
@@ -179,7 +179,7 @@ export default function UpscaleImage() {
 
                 <div className="text-primary gap-2 font-bold flex items-center justify-center">
                     <div className="bg-primary p-1 rounded-full">
-                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                        <DollarSign className='font-bold text-white' size={10} aria-hidden />
                     </div>
                     <span>
                         5 credits per image
@@ -189,8 +189,8 @@ export default function UpscaleImage() {
 
             <CustomLoading title="Upscaling your image..." loading={loading} />
 
-            <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
-                <DialogContent className="w-full z-150 [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
+            <Dialog open={openedResult} onOpenChange={setOpenedResult}>
+                <DialogContent className="flex w-full z-150 [&>button]:hidden max-w-2xl sm:max-w-2xl flex flex-col">
                     <DialogHeader>
 
                         <DialogTitle className={`font-bold text-3xl text-primary`}>{(scaling && !upscaleUrl) ? `Upscaling your image...` : `Your result!`}</DialogTitle>

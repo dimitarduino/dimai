@@ -140,7 +140,7 @@ function Dashboard() {
   };
 
   // Handle form submit - navigate to chat with prompt
-  const handleSubmit = (e) => {
+  const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (prompt.trim()) {
       // Navigate to chat page with prompt as query parameter
@@ -202,7 +202,7 @@ function Dashboard() {
             <ChevronRight />
           </button>
           <div className="w-fit whitespace-nowrap rounded-md pt-4">
-            <div useref={scrollRef} className="flex snap-x space-x-4 overflow-auto scrollable-container">
+            <div className="flex snap-x space-x-4 overflow-auto scrollable-container">
               {services.map((service) => (
                 <Link href={service.link} key={service.title} className="shrink-0 snap-start cursor-pointer relative">
                   <div className="overflow-hidden rounded-md">

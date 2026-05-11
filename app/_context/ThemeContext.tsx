@@ -9,7 +9,7 @@ export type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.JSX.Element }) => {
-  const [isDark, setIsDark] = useState<boolean | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("dark") === "true";
@@ -18,13 +18,11 @@ export const ThemeProvider = ({ children }: { children: React.JSX.Element }) => 
   }, []);
 
   const toggleTheme = () => {
-    const nextTheme = !(isDark ?? false);
+    const nextTheme = !isDark;
     localStorage.setItem("dark", nextTheme ? "true" : "false");
     setIsDark(nextTheme);
     document.documentElement.classList.toggle("dark", nextTheme);
   };
-
-  if (isDark === null) return null;
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>

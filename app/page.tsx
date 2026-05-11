@@ -17,15 +17,11 @@ import { PricingPlan } from "@/types/freemius";
 
 export default function Home() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const { isDark, toggleTheme } = useTheme();
   const [billingCycle, setBillingCycle] = useState("monthly");
 
-  useEffect(() => {
-    if (!!user) {
-      // router.push("/app");
-    }
-  }, [user]);
+  if (!isLoaded) return null;
 
   const plans : PricingPlan[] = [
     {

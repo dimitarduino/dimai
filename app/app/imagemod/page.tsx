@@ -28,32 +28,32 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import CustomLoading from "../_components/CustomLoading";
-import { ClientPageRoot } from "next/dist/client/components/client-page";
 import { toast } from "sonner";
 
 export default function ImageToImage() {
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState(null);
-    const [modifiedImage, setModifiedImage] = useState(null);
+    const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+    const [modifiedImage, setModifiedImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        style: "3D"
+        style: "3D",
+        text: "",
     });
     const [openedResult, setOpenedResult] = useState(false);
-    const [uploadedImage, setUploadedImage] = useState();
-    const { user } = useUser();
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const { userDetail, setUserDetail } = useUserDetail();
 
 
-    const naPromenaInput = (ime, vrednost) => {
+    const naPromenaInput = (ime: string, vrednost: unknown) => {
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
         }));
     }
 
-    const generateImageFromStyle = async (imageUrl) => {
+    const generateImageFromStyle = async (imageUrl: string) => {
         setLoading(true);
 
         const data = await axios.post("/api/imagemod", {
@@ -66,10 +66,7 @@ export default function ImageToImage() {
 
             const slednoPoeni = await deductUserCredits(5);
 
-            setUserDetail(prev => ({
-                ...prev,
-                "credits": slednoPoeni
-            }));
+            setUserDetail((prev) => (prev ? { ...prev, credits: slednoPoeni } : prev));
 
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
@@ -86,7 +83,7 @@ export default function ImageToImage() {
         })
     }
 
-    const handleDownload = async (imageUrl) => {
+    const handleDownload = async (imageUrl: string) => {
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
 
@@ -108,7 +105,7 @@ export default function ImageToImage() {
     const handleUpload = async () => {
         if (!file) return alert("Please select a file first!");
 
-        if (!proveriPoeni(userDetail.credits, 5)) {
+        if (!userDetail || !proveriPoeni(userDetail.credits ?? 0, 5)) {
             toast("Insufficient credits! Please recharge to generate a video.");
             return;
         }
@@ -139,17 +136,20 @@ export default function ImageToImage() {
         );
     };
 
-    const onDrop = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0];
-        setFile(file);
-        setUploadedImage(URL.createObjectURL(file));
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        const first = acceptedFiles[0];
+        if (!first) return;
+        setFile(first);
+        setUploadedImage(URL.createObjectURL(first));
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: 'image/*',
+        accept: { "image/*": [] },
         multiple: false,
     });
+
+    if (!isLoaded) return null;
 
     const options = ["3D", "Emoji", "Video game", "Pixels", "Clay", "Toy"];
 
@@ -219,7 +219,11 @@ export default function ImageToImage() {
                     )}
                 </div>
 
-                <PromptInput onUserSelect={naPromenaInput} title={`Caption:`} />
+                <PromptInput
+                  onUserSelect={(kind, value) => naPromenaInput(kind, value)}
+                  title="Caption"
+                  description="Describe how you want the image to look."
+                />
 
                 <Button className={`py-6 cursor-pointer dark:text-white`} onClick={handleUpload} disabled={uploading}>
                     {uploading ? "Uploading..." : "Generate image"}
@@ -233,7 +237,7 @@ export default function ImageToImage() {
 
                 <div className="text-primary gap-2 font-bold flex items-center justify-center">
                     <div className="bg-primary p-1 rounded-full">
-                        <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                        <DollarSign className='font-bold text-white' size={10} aria-hidden />
                     </div>
                     <span>
                         5 credits per image
@@ -241,7 +245,7 @@ export default function ImageToImage() {
                 </div>
 
 
-                <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+                <Dialog open={!!openedResult} onOpenChange={setOpenedResult}>
                     <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-4xl flex flex-col">
                         <DialogHeader>
                             <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>

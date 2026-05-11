@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Trash2, MessageSquare, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useUser } from '@clerk/nextjs'
 import axios from 'axios'
 import { toast } from 'sonner'
 

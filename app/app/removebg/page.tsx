@@ -37,7 +37,7 @@ export default function UploadImage() {
     const [removing, setRemoving] = useState<boolean>(false);
     const [openedResult, setOpenedResult] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const { userDetail, setUserDetail } = useUserDetail();
 
 
@@ -130,6 +130,7 @@ export default function UploadImage() {
         multiple: false,
     });
 
+    if (!isLoaded) return null;
 
     return (
         <div className="w-full flex">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback, useContext } from "react";
+import React, { Suspense, useState, useRef, useEffect, useCallback, useContext } from "react";
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,12 +19,8 @@ import { useDropzone } from 'react-dropzone'
 import { storage } from 'configs/Firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import Image from 'next/image'
-import ChatSidebar from '../_components/ChatSidebar'
-<<<<<<< HEAD:app/app/chat/page.jsx
-import { MobileNavContext } from '../_context/MobileNavContext'
-=======
-import { MobileNavContext } from '@/app/_context/MobileNavContext'
->>>>>>> typescript-migration:app/app/chat/page.tsx
+import ChatSidebar from "../_components/ChatSidebar";
+import { MobileNavContext } from "@/app/_context/MobileNavContext";
 
 const AVAILABLE_MODELS = [
   { value: 'openai/gpt-4o-mini', label: 'GPT-4o-mini', description: 'Mini model', supportsVision: false, supportsDocuments: false },
@@ -39,33 +35,65 @@ const AVAILABLE_MODELS = [
 
 const IMAGE_GENERATION_MODEL = 'bytedance/sdxl-lightning-4step:6f7a773af6fc3e8de9d5a3c00be77c17308914bf67772726aff83496ba1e3bbe'
 
-function ChatPage() {
-  const { user } = useUser()
+type ProcessedDocumentAttachment = {
+  text?: string
+  name?: string
+  pageCount?: number
+  url?: string
+}
+
+type ChatCitation = { url: string; title?: string }
+
+type Message = {
+  id?: string | number
+  role: string
+  content: string
+  images?: string[]
+  documents?: ProcessedDocumentAttachment[]
+  timestamp: Date
+  isGenerating?: boolean
+  isStreaming?: boolean
+  citations?: ChatCitation[]
+  image?: string | null
+  isError?: boolean
+  isSearching?: boolean
+}
+
+type Conversation = {
+  id: string
+  title: string
+  model: string
+  messages: Message[]
+  updatedAt?: string
+}
+
+function ChatPageContent() {
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false }
   const searchParams = useSearchParams()
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [selectedModel, setSelectedModel] = useState('openai/gpt-5-nano')
+  const [selectedModel, setSelectedModel] = useState<string>('openai/gpt-5-nano')
   const [isLoading, setIsLoading] = useState(false)
-  const [conversations, setConversations] = useState([])
-  const [currentConversationId, setCurrentConversationId] = useState(null)
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [isLoadingConversations, setIsLoadingConversations] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [streamingMessageId, setStreamingMessageId] = useState(null)
-  const [uploadedImages, setUploadedImages] = useState([])
-  const [uploadedDocuments, setUploadedDocuments] = useState([])
+  const [streamingMessageId, setStreamingMessageId] = useState<number | null>(null)
+  const [uploadedImages, setUploadedImages] = useState<File[]>([])
+  const [uploadedDocuments, setUploadedDocuments] = useState<File[]>([])
   const [isUploadingImages, setIsUploadingImages] = useState(false)
   const [isUploadingDocuments, setIsUploadingDocuments] = useState(false)
   const [showUploadMenu, setShowUploadMenu] = useState(false)
   const [enableWebSearch, setEnableWebSearch] = useState(false)
   const [enableResearch, setEnableResearch] = useState(false)
-  const [copiedMessageId, setCopiedMessageId] = useState(null)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | number | null>(null)
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false)
   const shouldStopStreamingRef = useRef(false)
-  const messagesEndRef = useRef(null)
-  const textareaRef = useRef(null)
-  const uploadMenuRef = useRef(null)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const uploadMenuRef = useRef<HTMLDivElement | null>(null)
 
   const userEmail = user?.primaryEmailAddress?.emailAddress
 
@@ -243,7 +271,7 @@ function ChatPage() {
     return selectedModel
   }
 
-  const handleSend = async (promptText = null) => {
+  const handleSend = async (promptText: string | null = null) => {
     console.log(promptText);
     const textToSend = promptText !== null ? promptText : input.trim()
     if ((!textToSend && uploadedImages.length === 0 && uploadedDocuments.length === 0) || isLoading) return
@@ -261,7 +289,7 @@ function ChatPage() {
     }
 
     // Notify user if model was auto-switched
-    if ((hasImages || hasDocuments) && appropriateModel !== selectedModel) {
+    if ((hasImages || hasDocuments) && appropriateModel !== null && appropriateModel !== selectedModel) {
       const newModel = AVAILABLE_MODELS.find(m => m.value === appropriateModel)
       if (newModel) {
         if (hasDocuments) {
@@ -274,7 +302,7 @@ function ChatPage() {
     }
 
     // Upload images to Firebase if any
-    let imageUrls = []
+    let imageUrls: string[] = []
     if (hasImages) {
       setIsUploadingImages(true)
       try {
@@ -288,7 +316,7 @@ function ChatPage() {
     }
 
     // Process documents if any
-    let documentContents = []
+    let documentContents: ProcessedDocumentAttachment[] = []
     if (hasDocuments) {
       setIsUploadingDocuments(true)
       try {
@@ -313,13 +341,13 @@ function ChatPage() {
       setIsUploadingDocuments(false)
     }
 
-    const userMessage = {
+    const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
       content: textToSend,
       images: imageUrls,
       documents: documentContents,
-      timestamp: new Date()
+      timestamp: new Date(),
     }
 
     const updatedMessages = [...messages, userMessage]
@@ -332,16 +360,18 @@ function ChatPage() {
     setIsGenerating(true)
 
     // Use appropriate model (may have been auto-switched)
-    const modelToUse = appropriateModel || selectedModel
+    const modelToUse = appropriateModel ?? selectedModel
 
     // Add placeholder assistant message for generating state
     const newStreamingMessageId = Date.now()
-    const placeholderMessage = {
+    const placeholderMessage: Message = {
       id: newStreamingMessageId,
       role: 'assistant',
       content: '',
+      images: [],
+      documents: [],
       timestamp: new Date(),
-      isGenerating: true
+      isGenerating: true,
     }
     setMessages([...updatedMessages, placeholderMessage])
     setStreamingMessageId(newStreamingMessageId)
@@ -381,7 +411,7 @@ function ChatPage() {
       })
 
       const fullResponse = response.data.response || response.data.output || 'No response received'
-      const citations = response.data.citations || []
+      const citations = (response.data.citations || []) as ChatCitation[]
       
       // Update message to show search status if applicable
       if (enableWebSearch || enableResearch) {
@@ -416,12 +446,17 @@ function ChatPage() {
             : msg
         ))
 
-        const finalMessages = [...updatedMessages, {
-          role: 'assistant',
-          content: fullResponse,
-          citations: citations,
-          timestamp: new Date()
-        }]
+        const finalMessages: Message[] = [
+          ...updatedMessages,
+          {
+            role: 'assistant',
+            content: fullResponse,
+            citations,
+            images: [],
+            documents: [],
+            timestamp: new Date(),
+          },
+        ]
 
         // Save conversation after getting response
         await saveConversation(finalMessages)
@@ -433,12 +468,14 @@ function ChatPage() {
       // Remove streaming message and add error message
       setMessages(prev => prev.filter(msg => msg.id !== newStreamingMessageId))
       
-      const errorMessage = {
+      const errorMessage: Message = {
         id: `error-${Date.now()}`,
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
+        images: [],
+        documents: [],
         timestamp: new Date(),
-        isError: true
+        isError: true,
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -461,11 +498,13 @@ function ChatPage() {
     setIsLoading(true)
     setIsGenerating(true)
     
-    const userMessage = {
+    const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
       content: prompt,
-      timestamp: new Date()
+      images: [],
+      documents: [],
+      timestamp: new Date(),
     }
 
     const updatedMessages = [...messages, userMessage]
@@ -474,12 +513,14 @@ function ChatPage() {
     setUploadedImages([])
 
     const newStreamingMessageId = Date.now()
-    const placeholderMessage = {
+    const placeholderMessage: Message = {
       id: newStreamingMessageId,
       role: 'assistant',
       content: '',
+      images: [],
+      documents: [],
       timestamp: new Date(),
-      isGenerating: true
+      isGenerating: true,
     }
     setMessages([...updatedMessages, placeholderMessage])
     setStreamingMessageId(newStreamingMessageId)
@@ -491,12 +532,14 @@ function ChatPage() {
 
       const imageUrl = response.data.result
       
-      const assistantMessage = {
+      const assistantMessage: Message = {
         id: newStreamingMessageId,
         role: 'assistant',
         content: `Generated image based on: "${prompt}"`,
         image: imageUrl,
-        timestamp: new Date()
+        images: [],
+        documents: [],
+        timestamp: new Date(),
       }
 
       setMessages(prev => prev.map(msg => 
@@ -513,12 +556,14 @@ function ChatPage() {
       
       setMessages(prev => prev.filter(msg => msg.id !== newStreamingMessageId))
       
-      const errorMessage = {
+      const errorMessage: Message = {
         id: `error-${Date.now()}`,
         role: 'assistant',
         content: 'Sorry, I encountered an error generating the image. Please try again.',
+        images: [],
+        documents: [],
         timestamp: new Date(),
-        isError: true
+        isError: true,
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -534,12 +579,12 @@ function ChatPage() {
     }
   }
 
-  const uploadImagesToFirebase = async (images) => {
+  const uploadImagesToFirebase = async (images: File[]): Promise<string[]> => {
     const uploadPromises = images.map(async (image) => {
       const storageRef = ref(storage, `chat-images/${Date.now()}-${image.name}`)
       const uploadTask = uploadBytesResumable(storageRef, image)
-      
-      return new Promise((resolve, reject) => {
+
+      return new Promise<string>((resolve, reject) => {
         uploadTask.on(
           'state_changed',
           null,
@@ -551,11 +596,13 @@ function ChatPage() {
         )
       })
     })
-    
+
     return Promise.all(uploadPromises)
   }
 
-  const processDocuments = async (documents) => {
+  const processDocuments = async (
+    documents: File[]
+  ): Promise<ProcessedDocumentAttachment[]> => {
     const formData = new FormData()
     documents.forEach((doc) => {
       formData.append('documents', doc)
@@ -573,14 +620,14 @@ function ChatPage() {
         throw new Error('Invalid response from document processing API')
       }
 
-      return response.data.documents
+      return response.data.documents as ProcessedDocumentAttachment[]
     } catch (error) {
       console.error('Document processing error:', error)
       throw error
     }
   }
 
-  const onDropImages = useCallback((acceptedFiles) => {
+  const onDropImages = useCallback((acceptedFiles: File[]) => {
     const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'))
     if (imageFiles.length > 0) {
       setUploadedImages(prev => [...prev, ...imageFiles])
@@ -590,7 +637,7 @@ function ChatPage() {
     }
   }, [])
 
-  const onDropDocuments = useCallback((acceptedFiles) => {
+  const onDropDocuments = useCallback((acceptedFiles: File[]) => {
     const documentFiles = acceptedFiles.filter(file => {
       const validTypes = [
         'application/pdf',
@@ -654,7 +701,11 @@ function ChatPage() {
   // Close upload menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target)) {
+      if (
+        uploadMenuRef.current &&
+        event.target instanceof Node &&
+        !uploadMenuRef.current.contains(event.target)
+      ) {
         setShowUploadMenu(false)
       }
     }
@@ -664,6 +715,8 @@ function ChatPage() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  if (!isLoaded) return null
 
   const streamResponse = async (text, messageId) => {
     // Stream character by character for smoother effect
@@ -709,7 +762,7 @@ function ChatPage() {
     // Update the streaming message to remove streaming/generating flag and get current content
     if (streamingMessageId) {
       let stoppedContent = ''
-      let currentMessages = []
+      let currentMessages: Message[] = []
       
       setMessages(prev => {
         currentMessages = prev.filter(msg => msg.id !== streamingMessageId)
@@ -725,10 +778,12 @@ function ChatPage() {
       
       // Save the partial conversation
       if (stoppedContent) {
-        const stoppedMessage = {
+        const stoppedMessage: Message = {
           role: 'assistant',
           content: stoppedContent,
-          timestamp: new Date()
+          images: [],
+          documents: [],
+          timestamp: new Date(),
         }
         await saveConversation([...currentMessages, stoppedMessage])
       }
@@ -839,8 +894,12 @@ function ChatPage() {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         <ChatSidebar
-          conversations={conversations}
-          currentConversationId={currentConversationId}
+          conversations={conversations.map((c) => ({
+            id: c.id,
+            title: c.title,
+            updatedAt: c.updatedAt ?? '',
+          }))}
+          currentConversationId={currentConversationId ?? ''}
           onSelectConversation={(id) => {
             handleSelectConversation(id)
             setSidebarOpen(false) // Close sidebar on mobile after selection
@@ -881,7 +940,10 @@ function ChatPage() {
               </p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-              <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <Select
+                value={selectedModel}
+                onValueChange={(v) => setSelectedModel(v)}
+              >
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Select model" />
                 </SelectTrigger>
@@ -1188,7 +1250,7 @@ function ChatPage() {
                           onClick={(e) => {
                             e.stopPropagation()
                             const imageInput = document.querySelector('input[type="file"][accept*="image"]')
-                            if (imageInput) imageInput.click()
+                            if (imageInput instanceof HTMLElement) imageInput.click()
                             setShowUploadMenu(false)
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-2 text-sm"
@@ -1201,7 +1263,7 @@ function ChatPage() {
                           onClick={(e) => {
                             e.stopPropagation()
                             const docInput = document.querySelector('input[type="file"][accept*="pdf"], input[type="file"][accept*="doc"], input[type="file"][accept*="txt"]')
-                            if (docInput) docInput.click()
+                            if (docInput instanceof HTMLElement) docInput.click()
                             setShowUploadMenu(false)
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-2 text-sm"
@@ -1258,4 +1320,16 @@ function ChatPage() {
   )
 }
 
-export default ChatPage
+export default function ChatPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] w-full items-center justify-center bg-neutral-50 dark:bg-zinc-950">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+        </div>
+      }
+    >
+      <ChatPageContent />
+    </Suspense>
+  );
+}

@@ -30,39 +30,38 @@ import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 
 export default function UpscaleImage() {
-    const [text, setText] = useState(null);
-    const [file, setFile] = useState(null);
-    const [swap, setSwap] = useState(null);
+    const [text, setText] = useState<string>("");
+    const [file, setFile] = useState<File | null>(null);
+    const [swap, setSwap] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [downloadUrl, setDownloadUrl] = useState(null);
-    const [swapUrl, setSwapUrl] = useState(null);
-    const [modifiedImage, setModifiedImage] = useState(null);
+    const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+    const [swapUrl, setSwapUrl] = useState<string | null>(null);
+    const [modifiedImage, setModifiedImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [uploadedImage, setUploadedImage] = useState();
-    const [swapImage, setSwapImage] = useState();
-    const [formData, setFormData] = useState([]);
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const [swapImage, setSwapImage] = useState<string | null>(null);
+    const [formData, setFormData] = useState<Record<string, unknown>>({});
     const [openedResult, setOpenedResult] = useState(false);
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const { userDetail, setUserDetail } = useUserDetail();
 
-    const naPromenaInput = (ime, vrednost) => {
+    const naPromenaInput = (ime: string, vrednost: unknown) => {
         setFormData(prev => ({
             ...prev,
             [ime]: vrednost
         }));
     }
 
-    const zemiFajlImeFirebase = (url) => {
+    const zemiFajlImeFirebase = (url: string) => {
         const parsedUrl = new URL(url);
         const path = parsedUrl.pathname; 
         const encodedFilePath = path.split("/o/")[1];
         const decodedFilePath = decodeURIComponent(encodedFilePath);
-        const fileName = decodedFilePath.split("/").pop()
-        return fileName;
+        const fileName = decodedFilePath.split("/").pop();
+        return fileName ?? "image.png";
+    };
 
-    }
-
-    const handleDownload = async (imageUrl) => {
+    const handleDownload = async (imageUrl: string) => {
         try {
             const response = await axios.get(imageUrl, { responseType: "blob" });
 
@@ -73,7 +72,9 @@ export default function UpscaleImage() {
             const a = document.createElement("a");
             a.href = url;
 
-            a.download = zemiFajlImeFirebase(modifiedImage);
+            a.download = modifiedImage
+              ? zemiFajlImeFirebase(modifiedImage) ?? "image.png"
+              : "image.png";
             
             document.body.appendChild(a);
             a.click();
@@ -96,10 +97,7 @@ export default function UpscaleImage() {
             setLoading(false);
 
             const slednoPoeni = await deductUserCredits(2);
-            setUserDetail(prev => ({
-                ...prev,
-                "credits": slednoPoeni
-            }));
+            setUserDetail((prev) => (prev ? { ...prev, credits: slednoPoeni } : prev));
 
             if (!!res.data.result) {
                 setModifiedImage(res.data.result);
@@ -111,7 +109,7 @@ export default function UpscaleImage() {
     const handleUpload = async () => {
         if (text.trim() == '') return alert("Please select a file first!");
 
-        if (!proveriPoeni(userDetail.credits, 3)) {
+        if (!userDetail || !proveriPoeni(userDetail.credits ?? 0, 3)) {
             toast("Insufficient credits! Please recharge to generate a video.");
             return;
         }
@@ -122,32 +120,35 @@ export default function UpscaleImage() {
     };
 
 
-    const onDrop = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0];
-        setFile(file);
-        naPromenaInput("image", file);
-        setUploadedImage(URL.createObjectURL(file));
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        const first = acceptedFiles[0];
+        if (!first) return;
+        setFile(first);
+        naPromenaInput("image", first);
+        setUploadedImage(URL.createObjectURL(first));
     }, []);
 
-    const onDropSwap = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0];
-        setSwap(file);
-        naPromenaInput("swap", file);
-        setSwapImage(URL.createObjectURL(file));
+    const onDropSwap = useCallback((acceptedFiles: File[]) => {
+        const first = acceptedFiles[0];
+        if (!first) return;
+        setSwap(first);
+        naPromenaInput("swap", first);
+        setSwapImage(URL.createObjectURL(first));
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: 'image/*',
+        accept: { "image/*": [] },
         multiple: false,
     });
 
     const { getRootProps: getSwapRootProps, getInputProps: getSwapInputProps, isDragActive: isSwapDragActive } = useDropzone({
         onDrop: onDropSwap,
-        accept: 'image/*',
+        accept: { "image/*": [] },
         multiple: false,
     });
 
+    if (!isLoaded) return null;
 
     return (
         <div className="flex dark:bg-zinc-900 bg-white py-12 rounded-xl shadow-sm px-10 mt-4 flex-col max-w-4xl mx-auto space-y-4 p-4">
@@ -172,14 +173,14 @@ export default function UpscaleImage() {
 
             <div className="text-primary gap-2 font-bold flex items-center justify-center">
                 <div className="bg-primary p-1 rounded-full">
-                    <DollarSign className='font-bold text-white' alt='Dollar' size={10} />
+                    <DollarSign className='font-bold text-white' size={10} aria-hidden />
                 </div>
                 <span>
                     1 credit per translation
                 </span>
             </div>
 
-            <Dialog className='flex w-full' open={(!!openedResult)} onOpenChange={setOpenedResult}>
+            <Dialog open={!!openedResult} onOpenChange={setOpenedResult}>
                 <DialogContent className="w-full  z-150 [&>button]:hidden max-w-7xl sm:max-w-xl flex flex-col">
                     <DialogHeader>
                         <DialogTitle className={`font-bold text-3xl text-primary`}>Your result!</DialogTitle>

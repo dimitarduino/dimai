@@ -88,7 +88,7 @@ export default function ImageToVideo() {
     const [currentJobId, setCurrentJobId] = useState<string | null>(null);
     const [jobStatus, setJobStatus] = useState<string | null>(null);
     const [progress, setProgress] = useState<{ step: string, percentage: number }>({ step: '', percentage: 0 });
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const [userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
 
     const { userDetail, setUserDetail } = useUserDetail();
@@ -341,6 +341,8 @@ export default function ImageToVideo() {
         accept: {'image/*': []},
         multiple: false,
     });
+
+    if (!isLoaded) return null;
 
     const handleRecreate = (prompt, negative_prompt, resolution, duration, image) => {
         console.log(prompt, negative_prompt, resolution, duration)

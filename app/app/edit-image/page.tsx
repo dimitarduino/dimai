@@ -100,7 +100,7 @@ export default function EditImage() {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const IMAGES_PER_PAGE = 12;
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const [userLocal, setUserLocal] = useState(user?.primaryEmailAddress?.emailAddress);
     const { userDetail, setUserDetail } = useUserDetail();
     const promptTextareaRef = useRef(null);
@@ -464,6 +464,8 @@ export default function EditImage() {
 
     // Cached version for the current edited image dialog
     const cachedEditedUrl = useImageCache(editedUrl);
+
+    if (!isLoaded) return null;
 
     return (
         <div className="w-full flex flex-col">

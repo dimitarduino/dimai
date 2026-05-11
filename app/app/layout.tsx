@@ -13,19 +13,26 @@ import { MobileNavContext } from "@/app/_context/MobileNavContext";
 import { VideoDataContext } from "@/app/_context/VideoDataContext";
 import { UserDetailContext, type UserDetails } from "@/app/_context/UserDetailContext";
 import { VideoData } from "@/configs/schema";
-import { fetchMyUserDetail } from "@/app/app/_actions/dashboard-data";
+import { ensureClerkUserRegistered, fetchMyUserDetail } from "@/app/app/_actions/dashboard-data";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [videoData, setVideoData] = useState<InferSelectModel<typeof VideoData>[]>([]);
   const [userDetail, setUserDetail] = useState<UserDetails | null>(null);
   const [showBottomNav, setShowBottomNav] = useState(true);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const pathname = usePathname();
 
+  async function getUserDetail() {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return;
+    const row = await fetchMyUserDetail();
+    setUserDetail(row ?? null);
+  }
+
   useEffect(() => {
-    if (user) {
-      void getUserDetail();
-    }
+    if (!user?.primaryEmailAddress?.emailAddress) return;
+    void ensureClerkUserRegistered();
+    void getUserDetail();
   }, [user]);
 
   useEffect(() => {
@@ -36,12 +43,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }, [pathname]);
 
-  const getUserDetail = async () => {
-    const email = user?.primaryEmailAddress?.emailAddress;
-    if (!email) return;
-    const row = await fetchMyUserDetail();
-    setUserDetail(row ?? null);
-  };
+  if (!isLoaded) return null;
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>

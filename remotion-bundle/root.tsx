@@ -2,6 +2,11 @@ import React from "react";
 import { Composition } from "remotion";
 import RemotionVideo from "../app/app/_components/RemotionVideo";
 
+/** Props shape for Composition defaultProps / calculateMetadata (Remotion infers `{}` without this). */
+type ShortVideoData = {
+  captions?: Array<{ end: number }>;
+};
+
 export const RemotionRoot = () => {
   return (
     <>
@@ -1368,7 +1373,8 @@ export const RemotionRoot = () => {
           durationInFrames: 30
         }}
         calculateMetadata={({ props }) => {
-          const captionsMs = props.videoData?.captions?.at(-1)?.end || 0;
+          const videoData = props.videoData as ShortVideoData | undefined;
+          const captionsMs = videoData?.captions?.at(-1)?.end ?? 0;
           const bufferFrames = 10;
           const durationInFrames = Math.round((captionsMs / 1000) * 30) + bufferFrames;
           return {

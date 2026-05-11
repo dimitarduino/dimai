@@ -45,7 +45,7 @@ export default function DubbedVideo() {
     });
     const [openedResult, setOpenedResult] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-    const { user } = useUser();
+    const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
     const { userDetail, setUserDetail } = useUserDetail();
 
     const languages = ["None", "Afrikaans", "Amharic", "Armenian", "Assamese", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian",
@@ -213,6 +213,8 @@ export default function DubbedVideo() {
         accept: { "video/*": [] },
         multiple: false,
     });
+
+    if (!isLoaded) return null;
 
     return (
         <div className="w-full flex">

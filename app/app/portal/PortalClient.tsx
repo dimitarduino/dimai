@@ -21,23 +21,31 @@ import {
 import { toast } from 'sonner';
 import Link from 'next/link';
 
+type SubscriptionPayload = {
+  licenseKey?: string;
+  currentPlan?: {
+    name?: string;
+    status?: string;
+    billing_cycle?: string;
+    price?: string;
+    expires_at?: string | number;
+    license_key?: string;
+    id?: string | number;
+  } | null;
+  user?: { credits?: number; subscription?: unknown; name?: string };
+};
+
 function PortalClient() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const { userDetail, setUserDetail } = useUserDetail();
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<SubscriptionPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [licenseKey, setLicenseKey] = useState('');
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchSubscription();
-    }
-  }, [user]);
-
-  const fetchSubscription = async () => {
+  async function fetchSubscription() {
     if (!user?.primaryEmailAddress?.emailAddress) return;
 
     try {
@@ -66,7 +74,13 @@ function PortalClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (user) {
+      void fetchSubscription();
+    }
+  }, [user]);
 
   const handleCancelSubscription = async () => {
     if (!user?.primaryEmailAddress?.emailAddress) return;
@@ -94,10 +108,7 @@ function PortalClient() {
         toast.success('Subscription canceled successfully');
         await fetchSubscription();
         // Refresh user detail context
-        if (setUserDetail) {
-          const updatedUser = { ...userDetail, pretplata: false };
-          setUserDetail(updatedUser);
-        }
+        setUserDetail((prev) => (prev ? { ...prev, pretplata: false } : prev));
       } else {
         toast.error(data.error || 'Failed to cancel subscription');
       }
@@ -135,11 +146,7 @@ function PortalClient() {
         setLicenseKey('');
         setShowRegisterForm(false);
         await fetchSubscription();
-        // Refresh user detail context
-        if (setUserDetail) {
-          const updatedUser = { ...userDetail, pretplata: true };
-          setUserDetail(updatedUser);
-        }
+        setUserDetail((prev) => (prev ? { ...prev, pretplata: true } : prev));
       } else {
         toast.error(data.error || 'Failed to register subscription');
       }
@@ -150,6 +157,8 @@ function PortalClient() {
       setRegistering(false);
     }
   };
+
+  if (!isLoaded) return null;
 
   if (loading) {
     return (

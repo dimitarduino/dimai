@@ -7,8 +7,9 @@ import { useTheme } from "../_context/ThemeContext";
 import React from "react";
 
 export default function AboutPage() : React.JSX.Element {
-  const { isDark, toggleTheme } = useTheme() ?? { isDark: false, toggleTheme: () => {} };
-
+  // const { isDark, toggleTheme } = useTheme() ?? { isDark: false, toggleTheme: () => {} };
+  const isDark = false;
+  const toggleTheme = () => {};
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}

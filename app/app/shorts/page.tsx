@@ -15,7 +15,7 @@ import { VideoData } from "@/configs/schema";
 import CustomLoading from "../_components/CustomLoading";
 
 function Dashboard() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const [userLocal, setUserLocal] = useState(
     user?.primaryEmailAddress?.emailAddress,
   );
@@ -101,6 +101,8 @@ function Dashboard() {
       clearInterval(intervalId);
     };
   }, [userLocal, loadInitial]);
+
+  if (!isLoaded) return null;
 
   const loadMore = async () => {
     if (nextCursor == null || loadingMore || !userLocal) return;

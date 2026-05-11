@@ -9,11 +9,24 @@ import Script from 'next/script';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
+type FreemiusSandboxParams = Record<string, unknown> & { error?: unknown };
+
+/** Aligns with /api/subscription/get JSON shape (see PortalClient). */
+type SubscriptionPayload = {
+  currentPlan?: {
+    name?: string;
+    status?: string;
+    billing_cycle?: string;
+    id?: string | number;
+  } | null;
+};
+
 function Upgrade() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
   const handlersRef = useRef({});
-  const sandboxParamsRef = useRef(null);
-  const [currentSubscription, setCurrentSubscription] = useState(null);
+  const sandboxParamsRef = useRef<FreemiusSandboxParams | null>(null);
+  const [currentSubscription, setCurrentSubscription] =
+    useState<SubscriptionPayload | null>(null);
   const [loadingSubscription, setLoadingSubscription] = useState(true);
 
   // Check if sandbox mode is enabled
@@ -93,11 +106,12 @@ function Upgrade() {
 
   // Initialize Freemius handlers when script loads
   const initializeHandlers = () => {
-    if (typeof window !== 'undefined' && window.FS && window.FS.Checkout) {
+    const fs = typeof window !== 'undefined' ? window.FS : undefined;
+    if (fs?.Checkout) {
       plans.forEach((plan) => {
         if (!handlersRef.current[plan.id]) {
           try {
-            handlersRef.current[plan.id] = new window.FS.Checkout({
+            handlersRef.current[plan.id] = new fs.Checkout({
               product_id: FREEMIUS_CONFIG.product_id,
               plan_id: FREEMIUS_CONFIG.plans[plan.id],
               public_key: FREEMIUS_CONFIG.public_key,
@@ -177,7 +191,7 @@ function Upgrade() {
       const data = await response.json();
 
       if (response.ok && data.currentPlan) {
-        setCurrentSubscription(data);
+        setCurrentSubscription(data as SubscriptionPayload);
       }
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -215,7 +229,8 @@ function Upgrade() {
 
   const handlePurchase = async (planId) => {
     // Try to initialize handlers if not already done
-    if (typeof window !== 'undefined' && window.FS && window.FS.Checkout) {
+    const fs = typeof window !== 'undefined' ? window.FS : undefined;
+    if (fs?.Checkout) {
       initializeHandlers();
     }
 
@@ -237,7 +252,7 @@ function Upgrade() {
     const userEmail = user?.primaryEmailAddress?.emailAddress;
 
     // Fetch sandbox params if enabled (wait for them to load)
-    let sandboxParams = null;
+    let sandboxParams: FreemiusSandboxParams | null = null;
     if (isSandboxEnabled) {
       // If not already loaded, fetch them now
       if (!sandboxParamsRef.current) {
@@ -263,7 +278,13 @@ function Upgrade() {
     }
 
     // Prepare checkout options
-    const checkoutOptions = {
+    const checkoutOptions: {
+      name: string;
+      licenses: number;
+      purchaseCompleted: (response: any) => Promise<void>;
+      success: (response: any) => Promise<void>;
+      sandbox?: FreemiusSandboxParams;
+    } = {
       name: 'DimnAI',
       licenses: 1,
       purchaseCompleted: async (response) => {
@@ -364,6 +385,8 @@ function Upgrade() {
       alert('An error occurred while opening the checkout. Please try again.');
     }
   };
+
+  if (!isLoaded) return null;
 
   return (
     <>

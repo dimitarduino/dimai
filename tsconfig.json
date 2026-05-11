@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true, // Keep true during migration to allow .js and .ts to coexist
     "checkJs": false,
     "skipLibCheck": true,
@@ -14,24 +18,39 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/ui/*": ["./components/ui/*"],
-      "configs/*": ["./configs/*"],
-      "app/*": ["./app/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/ui/*": [
+        "./components/ui/*"
+      ],
+      "configs/*": [
+        "./configs/*"
+      ],
+      "app/*": [
+        "./app/*"
+      ]
     }
   },
   "include": [
-    "next-env.d.ts", 
-    ".next/types/**/*.ts", 
-    "**/*.ts", 
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
     "**/*.tsx",
     "**/*.js", // Include these so the project still sees your old files
-    "**/*.jsx"
+    "**/*.jsx",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

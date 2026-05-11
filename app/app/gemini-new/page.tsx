@@ -10,7 +10,7 @@ import axios from "axios";
 export default function UpscaleImage() {
     const [prompt, setPrompt] = useState(``);
     const [uploading, setUploading] = useState(false);
-    const [responseText, setResponseText] = useState();
+    const [responseText, setResponseText] = useState<string>("");
 
     const handleGenerate = async () => {
         setUploading(true);
@@ -19,11 +19,11 @@ export default function UpscaleImage() {
         }).then(res => {
             setUploading(false);
 
-            setResponseText(res.data.result);
+            setResponseText(String(res.data.result ?? ""));
         })
     }
 
-    const onChangeInput = (val) => {
+    const onChangeInput = (val: string) => {
         setPrompt(val);
     }
 

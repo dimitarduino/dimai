@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { JSX, useState } from 'react';
 
 interface DashboardGalleryProps {
-  imagesGallery: { src: string; alt: string }[];
+  imagesGallery: { src: string; title?: string; alt?: string }[];
 }
 
-function DashboardGallery({imagesGallery} : DashboardGalleryProps) : JSX.Element {
+function DashboardGallery({ imagesGallery }: DashboardGalleryProps): JSX.Element {
   const [images, setImages] = useState(imagesGallery);
 
   return (
@@ -21,7 +21,7 @@ function DashboardGallery({imagesGallery} : DashboardGalleryProps) : JSX.Element
           <div className="overflow-hidden rounded-sm shadow-sm">
             <Image 
               src={image.src} 
-              alt={image.alt || `Gallery one`} 
+              alt={image.alt ?? image.title ?? "Gallery"} 
               width={400} 
               height={300} 
               layout="responsive"

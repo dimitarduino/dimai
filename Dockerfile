@@ -11,7 +11,23 @@
     # Copy package files and install dependencies
     COPY package*.json ./
     COPY .npmrc ./
-    RUN npm ci --legacy-peer-deps
+    # Lockfile from macOS omits Linux optional native deps; npm ci does not install them (npm/cli#4828).
+    RUN npm ci --legacy-peer-deps && \
+        LCV=$(node -p "require('./node_modules/lightningcss/package.json').version") && \
+        OXV=$(node -p "require('./node_modules/@tailwindcss/oxide/package.json').version") && \
+        case "$(uname -m)" in \
+            aarch64) \
+                npm install \
+                    "lightningcss-linux-arm64-musl@${LCV}" \
+                    "@tailwindcss/oxide-linux-arm64-musl@${OXV}" \
+                    --no-save --legacy-peer-deps ;; \
+            x86_64) \
+                npm install \
+                    "lightningcss-linux-x64-musl@${LCV}" \
+                    "@tailwindcss/oxide-linux-x64-musl@${OXV}" \
+                    --no-save --legacy-peer-deps ;; \
+            *) echo "Unsupported Alpine musl architecture: $(uname -m)" && exit 1 ;; \
+        esac
     
     # Copy the rest of the source code
     COPY . .
@@ -44,8 +60,13 @@
     ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=$NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     ENV NEXT_PUBLIC_DATABASE_URL=$NEXT_PUBLIC_DATABASE_URL
     ENV VERCEL_URL=$VERCEL_URL
-    
+    ENV NEXT_PHASE=phase-production-build
+    ENV NEXT_FORCE_DYNAMIC=1 
+
     # Build the Next.js app
+    ENV NEXT_DISABLE_SOURCEMAPS=1
+    ENV NEXT_TELEMETRY_DISABLED=1
+
     RUN npm run build
     
     # -----------------------------
