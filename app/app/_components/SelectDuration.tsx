@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -8,32 +8,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 type SelectDurationProps = {
   onUserSelect: (key: string, value: string) => void;
+  value: string;
 };
 
-function SelectDuration({ onUserSelect }: SelectDurationProps) {
-  const options = [
-    "Custom Prompt",
-    "Random AI Story",
-    "Scary Story",
-    "Motivational",
-    "Historical Facts",
-    "Bed time story",
-    "Fun Facts",
-  ];
-  const [selectedOption, setSelectedOption] = useState<string | undefined>();
-
+function SelectDuration({ onUserSelect, value }: SelectDurationProps) {
   return (
     <div>
       <h2 className="font-bold text-xl text-primary">Duration</h2>
       <p className="text-gray-500">Select the duration of your video?</p>
       <Select
-        value={`30 seconds`}
+        value={value}
         onValueChange={(val) => {
-          setSelectedOption(val);
           onUserSelect("duration", val);
         }}
       >
@@ -45,14 +33,6 @@ function SelectDuration({ onUserSelect }: SelectDurationProps) {
           <SelectItem value="60 seconds">60 seconds</SelectItem>
         </SelectContent>
       </Select>
-
-      {selectedOption === "Custom Prompt" && (
-        <Textarea
-          onChange={(e) => onUserSelect("topic", e.target.value)}
-          className="my-2"
-          placeholder="Your Topic..."
-        />
-      )}
     </div>
   );
 }

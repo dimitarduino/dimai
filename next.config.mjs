@@ -15,7 +15,14 @@ const nextConfig = {
   // This is the important one:
   output: 'standalone',
   /** Native deps that should not be bundled on the server */
-  serverExternalPackages: ["canvas"],
+  serverExternalPackages: [
+    "canvas",
+    "@google-cloud/text-to-speech",
+    "google-gax",
+    "@grpc/grpc-js",
+    "@grpc/proto-loader",
+    "protobufjs",
+  ],
   images: {
     remotePatterns: [
       {

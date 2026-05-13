@@ -5,7 +5,7 @@ import SelectStyle from '../../_components/SelectStyle';
 import SelectDuration from '../../_components/SelectDuration';
 import { Button } from '@/ui/button';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CustomLoading from '../../_components/CustomLoading';
 import { VideoDataContext } from 'app/_context/VideoDataContext';
 import { useUser } from '@clerk/nextjs';
@@ -13,12 +13,20 @@ import PlayerDialog from '../../_components/PlayerDialog';
 import { useUserDetail } from '@/app/_context/UserDetailContext';
 import { toast } from 'sonner';
 import { deductUserCredits, insertShortVideoData } from '@/app/app/_actions/dashboard-data';
-import { proveriPoeni } from 'lib/utils';
+import { proveriPoeni, cn } from 'lib/utils';
 import SelectComponent from 'app/app/_components/SelectComponent';
 import { Input } from '@/ui/input';
 import Captions from 'app/app/_components/Captions';
 import SelectBackgroundMusic from 'app/app/_components/SelectBackgroundMusic';
+import VoicePicker, { type VoicePickerOption } from 'app/app/_components/VoicePicker';
 import { resolveShortsBackgroundMusic } from 'lib/shorts-background-music';
+import { SHORTS_CURATED_VOICES } from 'lib/shorts-curated-voices';
+
+const SHORTS_VOICE_PICKER_OPTIONS: VoicePickerOption[] = SHORTS_CURATED_VOICES.map((v) => ({
+  name: v.name,
+  ssmlGender: v.ssmlGender,
+  label: v.label,
+}));
 
 type ShortsCreateFormData = {
   topic: string;
@@ -27,11 +35,35 @@ type ShortsCreateFormData = {
   captionTransition: string;
   backgroundMusicId: string;
   duration: string;
+  style: string;
 };
 
-type VoiceOption = { ssmlGender: string; name: string };
+const WIZARD_TOTAL_STEPS = 6;
+
+const WIZARD_STEP_LABELS = [
+  "Topic & instructions",
+  "Style",
+  "Audio",
+  "Duration",
+  "Background music",
+  "Captions & transition",
+] as const;
+
+/** Aligns with Tailwind `sm` (640px): scroll only on narrow viewports. */
+function scrollWizardStepLabelsIntoViewOnMobile() {
+  if (typeof window === "undefined") return;
+  if (!window.matchMedia("(max-width: 639px)").matches) return;
+  const el = document.getElementById("wizard-step-labels");
+  if (!el) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
 
 function CreateNew() {
+  const [wizardStep, setWizardStep] = useState(1);
   const [formData, setFormData] = useState<ShortsCreateFormData>({
     topic: "Random AI Story",
     comment: "video should be go viral, so start the first part of the script with some catchy question.",
@@ -39,11 +71,17 @@ function CreateNew() {
     captionTransition: "Scale (Zoom)",
     backgroundMusicId: "none",
     duration: "30 seconds",
+    style: "",
   });
-  const [voices, setVoices] = useState<VoiceOption[]>([]);
-  const [selectedVoice, setSelectedVoice] = useState("");
-  const [gender, setGender] = useState("");
-  const [currentVoices, setCurrentVoices] = useState<string[]>([]);
+  const voices = SHORTS_VOICE_PICKER_OPTIONS;
+  const [selectedVoice, setSelectedVoice] = useState(
+    () => SHORTS_VOICE_PICKER_OPTIONS.find((v) => v.ssmlGender === "MALE")?.name ?? SHORTS_VOICE_PICKER_OPTIONS[0]?.name ?? ""
+  );
+  const [gender, setGender] = useState(
+    () =>
+      (SHORTS_VOICE_PICKER_OPTIONS.find((v) => v.ssmlGender === "MALE") ?? SHORTS_VOICE_PICKER_OPTIONS[0])
+        ?.ssmlGender ?? "MALE"
+  );
   const [loading, setLoading] = useState(false);
   const [audioFileUrl, setAudioFileUrl] = useState<string | null>("");
   const [videoScript, setVideoScript] = useState<string[]>([]);
@@ -56,7 +94,7 @@ function CreateNew() {
   const [progress, setProgress] = useState({ step: '', percentage: 0 });
   const { userDetail, setUserDetail } = useUserDetail();
 
-  const { user, isLoaded } = useUser() ?? { user: null, isLoaded: false };
+  const { user, isLoaded } = useUser();
   const { videoData, setVideoData } = useContext(VideoDataContext) ?? { videoData: null, setVideoData: (videoData: { captions: unknown; id: number; script: unknown; audio: string; captionStyle: unknown; images: string[] | null; createdBy: string; downloadUrl: string; backgroundMusic: string | null; }[]) => {} };
 
   const captionsData = [{
@@ -121,10 +159,6 @@ function CreateNew() {
       [ime]: vrednost
     }));
   }
-
-  useEffect(() => {
-    getVoices();
-  }, [])
 
   // Check for active jobs when user is available
   useEffect(() => {
@@ -219,31 +253,6 @@ function CreateNew() {
     //     deleteFromLocalStorageJobId(savedJobId[savedJobId.length - 1]);
     //   }
     // }
-  }
-
-  useEffect(() => {
-    const cur : { ssmlGender: string, name: string }[] = voices.filter((v: { ssmlGender: string }) => (v.ssmlGender == gender));
-    const current : string[] = cur.map((c: { name: string }) => c.name);
-
-    try {
-      setCurrentVoices(current);
-      setGender(cur[0]?.ssmlGender ?? '')
-    } catch (e) {
-      // Handle error silently
-    }
-    // setSelectedVoice(cur[0].name);
-  }, [gender])
-
-  const getVoices = async () => {
-    const res = await axios.post("/api/getvoices", {
-    }).then((res) => {
-      const voiceList = (res.data.result ?? []) as VoiceOption[];
-      setVoices(voiceList);
-      const first = voiceList[0];
-      if (!first) return;
-      setSelectedVoice(first.name);
-      setGender(first.ssmlGender);
-    })
   }
 
   const onCreateClickHandler = async () => {
@@ -347,62 +356,211 @@ function CreateNew() {
     }));
   }
 
+  const canGoNextFromStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return Boolean(formData.topic?.trim());
+      case 2:
+        return Boolean(formData.style?.trim());
+      case 3: {
+        const names = voices.filter((v) => v.ssmlGender === gender).map((v) => v.name);
+        return Boolean(gender && selectedVoice && names.includes(selectedVoice));
+      }
+      case 4:
+        return Boolean(formData.duration);
+      case 5:
+        return true;
+      case 6:
+        return Boolean(formData.caption);
+      default:
+        return false;
+    }
+  }
+
+  const goNext = () => {
+    if (!canGoNextFromStep(wizardStep)) {
+      if (wizardStep === 1) toast.error("Please choose a topic.");
+      if (wizardStep === 2) toast.error("Please select a style.");
+      if (wizardStep === 3) toast.error("Pick a voice gender and voice model.");
+      if (wizardStep === 4) toast.error("Select a duration.");
+      if (wizardStep === 6) toast.error("Pick a caption style.");
+      return;
+    }
+    setWizardStep((s) => Math.min(WIZARD_TOTAL_STEPS, s + 1));
+    scrollWizardStepLabelsIntoViewOnMobile();
+  }
+
+  const goBack = () => {
+    setWizardStep((s) => Math.max(1, s - 1));
+  }
+
   if (!isLoaded) return null;
+
+  const wizardProgressPct = (wizardStep / WIZARD_TOTAL_STEPS) * 100;
 
   return (
     <div className='md:px-20 max-w-7xl mx-auto'>
-      <div className='shadow-sm px-10 py-4 flex flex-col gap-7'>
-        {/* Select Topic */}
-        <h1 className="font-bold text-3xl text-primary ">Create Stunning Shorts with AI</h1>
-        <h2>
-          Effortlessly generate eye-catching shorts using the power of AI. Upload your video, and let the technology craft a short, high-quality clip with precise edits and enhancements in just a few seconds.
-        </h2>
-        <SelectTopic onUserSelect={naPromenaInput} />
-
-        <div className="d-flex flex-column">
-          <p className='text-gray-500 dark:text-neutral-200'>Additional instructions?</p>
-          <Input type="text" placeholder="Comment" name="comment" className={`mt-2`} value={formData.comment} onChange={(event) => naPromenaInput("comment", event.target.value)} />
+      <div className='shadow-sm px-4 sm:px-10 py-6 flex flex-col gap-8'>
+        <div>
+          <h1 className="font-bold text-3xl text-primary">Create Stunning Shorts with AI</h1>
+          <p className="text-muted-foreground mt-2 max-w-3xl">
+            Walk through each step below. When you are done, generate your short on the last step.
+          </p>
         </div>
-        {/* Select style */}
-        <SelectStyle onUserSelect={naPromenaInput} />
-        {/* Duration */}
 
+        {/* Step labels + progress */}
+        <div className="space-y-3">
+          <div id="wizard-step-labels" className="flex flex-wrap gap-2 sm:gap-1 sm:justify-between">
+            {WIZARD_STEP_LABELS.map((label, i) => {
+              const n = i + 1;
+              const active = wizardStep === n;
+              const done = wizardStep > n;
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    if (done || active) setWizardStep(n);
+                  }}
+                  className={cn(
+                    "flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-left transition-colors sm:min-w-0 sm:flex-1",
+                    active && "bg-primary/10 ring-2 ring-primary/30",
+                    done && "opacity-90 hover:bg-muted/60",
+                    !done && !active && "opacity-50 cursor-default"
+                  )}
+                  disabled={!done && !active}
+                >
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                      done && "bg-primary text-white",
+                      active && "bg-primary text-white ring-2 ring-offset-2 ring-primary/40",
+                      !done && !active && "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {n}
+                  </span>
+                  <span className={cn("sm:max-w-[7.5rem] text-center text-[11px] font-medium leading-tight text-muted-foreground sm:max-w-none sm:text-xs  hidden sm:flex", !active && "hidden max-w-[4rem] sm:max-w-[7.5rem] sm:flex")}>
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+              style={{ width: `${wizardProgressPct}%` }}
+            />
+          </div>
+          <p className="text-sm font-medium text-foreground">
+            Step {wizardStep} of {WIZARD_TOTAL_STEPS}: {WIZARD_STEP_LABELS[wizardStep - 1]}
+          </p>
+        </div>
 
-        <SelectComponent optionsAvailable={["MALE", "FEMALE"]} className="w-full" onUserSelect={naPromenaInput} placeholder="Voice Gender" name="gender" value={gender} description="Select the voice gender for your video" title="Choose Voice Gender" />
+        {/* Step panels */}
+        <div className="min-h-[220px] rounded-xl border border-border/60 bg-card/30 p-4 sm:p-6">
+          {wizardStep === 1 && (
+            <div className="flex flex-col gap-6">
+              <SelectTopic onUserSelect={naPromenaInput} />
+              <div className="flex flex-col gap-2">
+                <p className="text-sm font-medium text-foreground">Additional instructions</p>
+                <p className="text-xs text-muted-foreground">Optional hints for the script (tone, hook, audience, etc.)</p>
+                <Input
+                  type="text"
+                  placeholder="e.g. Start with a catchy question…"
+                  name="comment"
+                  className="mt-1"
+                  value={formData.comment}
+                  onChange={(event) => naPromenaInput("comment", event.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
-        <SelectComponent
-          defaultValue={selectedVoice}
-          optionsAvailable={currentVoices || []}
-          className="w-full"
-          onUserSelect={naPromenaInput}
-          placeholder="Voice Model"
-          name="voice"
-          description="Select the voice for your video"
-          title="Choose Voice Model"
-        />
+          {wizardStep === 2 && (
+            <div className="flex flex-col gap-2">
+              <SelectStyle value={formData.style} onUserSelect={naPromenaInput} />
+            </div>
+          )}
 
-        <SelectDuration onUserSelect={naPromenaInput} />
+          {wizardStep === 3 && (
+            <VoicePicker
+              voices={voices}
+              gender={gender}
+              selectedVoice={selectedVoice}
+              onGenderChange={(g) => naPromenaInput("gender", g)}
+              onVoiceSelect={(v) => naPromenaInput("voice", v)}
+            />
+          )}
 
-        <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+          {wizardStep === 4 && (
+            <div className="flex flex-col gap-2">
+              <SelectDuration value={formData.duration} onUserSelect={naPromenaInput} />
+            </div>
+          )}
 
-        <SelectBackgroundMusic
-          value={formData.backgroundMusicId}
-          onUserSelect={naPromenaInput}
-        />
+          {wizardStep === 5 && (
+            <div className="flex flex-col gap-2">
+              <SelectBackgroundMusic
+                value={formData.backgroundMusicId}
+                onUserSelect={naPromenaInput}
+              />
+            </div>
+          )}
 
-        <SelectComponent
-          optionsAvailable={["Scale (Zoom)", "Slide Up", "Fade", "None"]}
-          className="w-full"
-          onUserSelect={naPromenaInput}
-          placeholder="Caption Transition"
-          name="captionTransition"
-          value={formData.captionTransition}
-          description="Select how captions appear on screen"
-          title="Caption Transition"
-        />
+          {wizardStep === 6 && (
+            <div className="flex flex-col gap-8">
+              <div>
+                <p className="mb-3 text-sm font-medium text-foreground">Caption look</p>
+                <Captions onCaptionChange={handleCaptionChange} captions={captionsData} />
+              </div>
+              <SelectComponent
+                optionsAvailable={["Scale (Zoom)", "Slide Up", "Fade", "None"]}
+                className="w-full"
+                onUserSelect={naPromenaInput}
+                placeholder="Caption Transition"
+                name="captionTransition"
+                value={formData.captionTransition}
+                description="How captions animate on screen"
+                title="Caption transition"
+              />
+            </div>
+          )}
+        </div>
 
-        {/* Create Button */}
-        <Button onClick={onCreateClickHandler} className="p-6 dark:text-white cursor-pointer">Create short AI Video</Button>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2 px-8 cursor-pointer py-6 text-base"
+            onClick={goBack}
+            disabled={wizardStep <= 1 || loading}
+          >
+            <ChevronLeft className="size-4" />
+            Back
+          </Button>
+          {wizardStep < WIZARD_TOTAL_STEPS ? (
+            <Button
+              type="button"
+              className="gap-2 px-12 cursor-pointer py-6 text-base"
+              onClick={goNext}
+              disabled={loading || !canGoNextFromStep(wizardStep)}
+            >
+              Next
+              <ChevronRight className="size-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              className="gap-2 px-8 cursor-pointer py-6 text-base"
+              onClick={() => void onCreateClickHandler()}
+              disabled={loading || !canGoNextFromStep(6)}
+            >
+              Generate AI short
+            </Button>
+          )}
+        </div>
 
         <CustomLoading loading={loading} />
         {loading && jobStatus && (

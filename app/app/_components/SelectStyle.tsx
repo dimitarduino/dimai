@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 
 type SelectStyleProps = {
   onUserSelect: (key: string, value: string) => void;
+  value?: string;
 };
 
-function SelectStyle({ onUserSelect }: SelectStyleProps) {
+function SelectStyle({ onUserSelect, value = "" }: SelectStyleProps) {
   const styleOptions = [
     { name: "Realistic", image: "/real.jpeg" },
     { name: "Cartoon", image: "/cartoon.png" },
@@ -16,26 +17,24 @@ function SelectStyle({ onUserSelect }: SelectStyleProps) {
     { name: "GTA", image: "/gta.jpeg" },
   ];
 
-  const [odbrano, namestiOdbrano] = useState("");
+  const odbrano = value;
   return (
     <div>
       <h2 className="font-bold text-xl text-primary">Style</h2>
       <p className="text-gray-500">Select your video style</p>
 
-      <div className="grid grid-col-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
         {styleOptions.map((item, index) => (
           <div
             key={index}
             role="button"
             tabIndex={0}
             onClick={() => {
-              namestiOdbrano(item.name);
               onUserSelect("style", item.name);
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                namestiOdbrano(item.name);
                 onUserSelect("style", item.name);
               }
             }}

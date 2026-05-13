@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "configs/Firebase";
+import { buildGoogleTtsVoiceName } from "@/lib/google-tts-voice-name";
+import { resolveSsmlGenderForShortsVoice } from "@/lib/shorts-curated-voices";
 
 let client;
 function getClient() {
@@ -12,22 +14,6 @@ function getClient() {
         });
     }
     return client;
-}
-
-const CHIRP3_HD_VOICES = new Set([
-    "Achernar", "Achird", "Algenib", "Algieba", "Alnilam",
-    "Aoede", "Autonoe", "Callirrhoe", "Charon", "Despina",
-    "Enceladus", "Erinome", "Fenrir", "Gacrux", "Iapetus",
-    "Kore", "Laomedeia", "Leda", "Orus", "Pulcherrima",
-    "Puck", "Rasalgethi", "Sadachbia", "Sadaltager", "Schedar",
-    "Sulafat", "Umbriel", "Vindemiatrix", "Zephyr", "Zubenelgenubi",
-]);
-
-function buildVoiceName(voice, languageCode) {
-    if (CHIRP3_HD_VOICES.has(voice)) {
-        return `${languageCode}-Chirp3-HD-${voice}`;
-    }
-    return voice;
 }
 
 export async function POST(req) {
@@ -43,12 +29,13 @@ export async function POST(req) {
         }
 
         const languageCode = 'en-US';
-        const fullVoiceName = buildVoiceName(voice, languageCode);
+        const fullVoiceName = buildGoogleTtsVoiceName(voice, languageCode);
+        const ssmlGender = resolveSsmlGenderForShortsVoice(voice, gender);
         const storageRef = ref(storage, `aishortvideofiles/${sanitizedId}.mp3`);
 
         const request = {
             input: { text: text },
-            voice: { languageCode, name: fullVoiceName, ssmlGender: gender },
+            voice: { languageCode, name: fullVoiceName, ssmlGender },
             audioConfig: { audioEncoding: 'MP3' },
         };
 
