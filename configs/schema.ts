@@ -4,6 +4,8 @@ import {
   json,
   pgTable,
   serial,
+  text,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -89,6 +91,47 @@ export const VideoGenerationJobs = pgTable('video_generation_jobs', {
    createdAt: varchar("createdAt", { length: 255 }).notNull(),
    updatedAt: varchar("updatedAt", { length: 255 }).notNull()
 });
+
+export const SocialOAuthConnections = pgTable(
+  "social_oauth_connections",
+  {
+    id: serial("id").primaryKey(),
+    clerkUserId: varchar("clerkUserId", { length: 255 }).notNull(),
+    provider: varchar("provider", { length: 32 }).notNull(),
+    accessToken: text("accessToken").notNull(),
+    refreshToken: text("refreshToken"),
+    expiresAt: varchar("expiresAt", { length: 64 }),
+    accountLabel: varchar("accountLabel", { length: 512 }),
+    providerUserId: varchar("providerUserId", { length: 255 }),
+    createdAt: varchar("createdAt", { length: 64 }).notNull(),
+    updatedAt: varchar("updatedAt", { length: 64 }).notNull(),
+  },
+  (t) => [
+    uniqueIndex("social_oauth_clerk_provider_uidx").on(t.clerkUserId, t.provider),
+  ],
+);
+
+export const ScheduledSocialPosts = pgTable(
+  "scheduled_social_posts",
+  {
+    id: serial("id").primaryKey(),
+    clerkUserId: varchar("clerkUserId", { length: 255 }).notNull(),
+    videoId: integer("videoId").notNull(),
+    sourceJobId: varchar("sourceJobId", { length: 255 }).notNull(),
+    postYoutube: boolean("postYoutube").default(false).notNull(),
+    postTiktok: boolean("postTiktok").default(false).notNull(),
+    scheduledAt: varchar("scheduledAt", { length: 64 }).notNull(),
+    title: varchar("title", { length: 500 }).notNull(),
+    description: varchar("description", { length: 2000 }).notNull(),
+    status: varchar("status", { length: 50 }).notNull().default("scheduled"),
+    youtubeVideoId: varchar("youtubeVideoId", { length: 128 }),
+    tiktokPublishId: varchar("tiktokPublishId", { length: 255 }),
+    lastError: varchar("lastError", { length: 2000 }),
+    createdAt: varchar("createdAt", { length: 64 }).notNull(),
+    updatedAt: varchar("updatedAt", { length: 64 }).notNull(),
+  },
+  (t) => [uniqueIndex("scheduled_social_source_job_uidx").on(t.sourceJobId)],
+);
 
 export const SwapFacesImages = pgTable('swap_faces_images', {
    id: serial("id").primaryKey(),

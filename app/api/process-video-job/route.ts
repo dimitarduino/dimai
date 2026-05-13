@@ -3,6 +3,7 @@ import { db } from '@/configs/db';
 import { VideoGenerationJobs, VideoData, Users } from '@/configs/schema';
 import { eq } from 'drizzle-orm';
 import axios from 'axios';
+import { tryEnqueueScheduledSocialPublish } from '@/lib/enqueue-scheduled-social';
 import { resolveShortsBackgroundMusic } from '@/lib/shorts-background-music';
 
 export async function POST(req) {
@@ -192,6 +193,15 @@ export async function POST(req) {
       }).returning({ id: VideoData.id });
 
       const videoId = result[0].id;
+
+      await tryEnqueueScheduledSocialPublish({
+        formData: formData as Record<string, unknown>,
+        videoId,
+        sourceJobId: jobId,
+        clerkUserId: String(
+          (formData as Record<string, unknown>).userId ?? "",
+        ),
+      });
 
       // Update user credits - use email to find user
       const user = await db

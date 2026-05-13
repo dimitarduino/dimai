@@ -22,6 +22,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/generate-audio(.*)",
   "/api/generate-caption(.*)",
   "/api/generate-image(.*)",
+  "/api/oauth/youtube/callback",
+  "/api/oauth/tiktok/callback",
 ]);
 
 export const proxy = clerkMiddleware(async (auth, req: NextRequest) => {

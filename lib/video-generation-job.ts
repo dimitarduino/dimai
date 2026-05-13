@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { db } from '@/configs/db';
 import { VideoGenerationJobs, VideoData, Users } from '@/configs/schema';
 import { eq } from 'drizzle-orm';
+import { tryEnqueueScheduledSocialPublish } from '@/lib/enqueue-scheduled-social';
 import { resolveShortsBackgroundMusic } from '@/lib/shorts-background-music';
 import { VideoScript, VideoScriptItem } from '@/types/videos';
 export const generateVideoJob = inngest.createFunction(
@@ -205,6 +206,15 @@ export const generateVideoJob = inngest.createFunction(
         });
 
         return result[0].id;
+      });
+
+      await step.run("enqueue-scheduled-social", async () => {
+        await tryEnqueueScheduledSocialPublish({
+          formData: { ...formData, userId } as Record<string, unknown>,
+          videoId: videoId as number,
+          sourceJobId: jobId,
+          clerkUserId: userId,
+        });
       });
 
       // Update job status to completed
