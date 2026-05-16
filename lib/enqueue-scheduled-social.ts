@@ -5,6 +5,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/configs/db";
 import { ScheduledSocialPosts } from "@/configs/schema";
 import { inngest } from "@/lib/inngest";
+import {
+  YOUTUBE_DEFAULT_CATEGORY_ID,
+  YOUTUBE_UPLOAD_CATEGORIES,
+} from "@/lib/youtube-upload-categories";
 
 export type SocialScheduleFormPayload = {
   postYouTube?: boolean;
@@ -12,6 +16,9 @@ export type SocialScheduleFormPayload = {
   scheduledAt?: string;
   title?: string;
   description?: string;
+  youtubeCategoryId?: string;
+  /** Comma-separated; stored on the scheduled row for upload. */
+  youtubeTags?: string;
 };
 
 export async function tryEnqueueScheduledSocialPublish(params: {
@@ -50,6 +57,12 @@ export async function tryEnqueueScheduledSocialPublish(params: {
   const title = String(schedule.title || formData.topic || "Short").slice(0, 500);
   const description = String(schedule.description ?? "").slice(0, 2000);
 
+  const catRaw = String(schedule.youtubeCategoryId ?? YOUTUBE_DEFAULT_CATEGORY_ID).trim();
+  const youtubeCategoryId = YOUTUBE_UPLOAD_CATEGORIES.some((c) => c.id === catRaw)
+    ? catRaw
+    : YOUTUBE_DEFAULT_CATEGORY_ID;
+  const youtubeTags = String(schedule.youtubeTags ?? "").slice(0, 2000);
+
   const inserted = await db
     .insert(ScheduledSocialPosts)
     .values({
@@ -61,6 +74,8 @@ export async function tryEnqueueScheduledSocialPublish(params: {
       scheduledAt: when.toISOString(),
       title,
       description,
+      youtubeCategoryId,
+      youtubeTags,
       status: "scheduled",
       createdAt: now,
       updatedAt: now,
@@ -70,12 +85,14 @@ export async function tryEnqueueScheduledSocialPublish(params: {
   const id = inserted[0]?.id;
   if (id == null) return;
 
-  try {
-    await inngest.send({
-      name: "social/scheduled.publish",
-      data: { scheduledPostId: id },
-    });
-  } catch (e) {
-    console.warn("[scheduled-social] Inngest send failed:", e);
+  if (postTk) {
+    try {
+      await inngest.send({
+        name: "social/scheduled.publish",
+        data: { scheduledPostId: id },
+      });
+    } catch (e) {
+      console.warn("[scheduled-social] Inngest send failed:", e);
+    }
   }
 }

@@ -16,6 +16,7 @@ function firstPosterSrc(video: VideoRecord): string | null {
   const first = video.images?.[0];
   return typeof first === "string" && first.trim().length > 0 ? first : null;
 }
+
 function VideosDashboard({ videoList }: VideosDashboardProps) {
   const [openDialog, setOpenDialog] = useState(false);
   const [videoId, setVideoId] = useState<number | undefined>();

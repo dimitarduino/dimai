@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getAppBaseUrl } from "@/lib/app-base-url";
 import { encodeOAuthState } from "@/lib/social-oauth-state";
 
-export async function GET() {
+export async function GET(req: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,8 +18,15 @@ export async function GET() {
     );
   }
 
+  const { searchParams } = new URL(req.url);
+  const returnTo = searchParams.get("returnTo") ?? undefined;
+
   const redirectUri = `${getAppBaseUrl()}/api/oauth/youtube/callback`;
-  const state = encodeOAuthState({ clerkUserId: userId, provider: "youtube" });
+  const state = encodeOAuthState({
+    clerkUserId: userId,
+    provider: "youtube",
+    returnPath: returnTo ?? undefined,
+  });
   const scopes = [
     "openid",
     "https://www.googleapis.com/auth/youtube.upload",

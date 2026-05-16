@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useContext, useEffect, useState, Suspense } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import SelectTopic from '../../_components/SelectTopic'
 import SelectStyle from '../../_components/SelectStyle';
 import SelectDuration from '../../_components/SelectDuration';
@@ -21,9 +21,6 @@ import SelectBackgroundMusic from 'app/app/_components/SelectBackgroundMusic';
 import VoicePicker, { type VoicePickerOption } from 'app/app/_components/VoicePicker';
 import { resolveShortsBackgroundMusic } from 'lib/shorts-background-music';
 import { SHORTS_CURATED_VOICES } from 'lib/shorts-curated-voices';
-import ShortsSocialSchedule, {
-  type ShortsSocialScheduleState,
-} from 'app/app/_components/ShortsSocialSchedule';
 
 const SHORTS_VOICE_PICKER_OPTIONS: VoicePickerOption[] = SHORTS_CURATED_VOICES.map((v) => ({
   name: v.name,
@@ -95,13 +92,6 @@ function CreateNew() {
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
   const [progress, setProgress] = useState({ step: '', percentage: 0 });
-  const [socialSchedule, setSocialSchedule] = useState<ShortsSocialScheduleState>({
-    enabled: false,
-    apiPayload: null,
-  });
-  const onSocialScheduleChange = useCallback((next: ShortsSocialScheduleState) => {
-    setSocialSchedule(next);
-  }, []);
   const { userDetail, setUserDetail } = useUserDetail();
 
   const { user, isLoaded } = useUser();
@@ -278,13 +268,6 @@ function CreateNew() {
       return;
     }
 
-    if (socialSchedule.enabled && !socialSchedule.apiPayload) {
-      toast.error(
-        "Fix scheduling: choose a date and time at least one minute from now, and select at least one connected platform.",
-      );
-      return;
-    }
-
     try {
       setLoading(true);
       setPlayVideo(false);
@@ -295,9 +278,6 @@ function CreateNew() {
           ...formData,
           gender,
           voice: selectedVoice,
-          ...(socialSchedule.enabled && socialSchedule.apiPayload
-            ? { socialSchedule: socialSchedule.apiPayload }
-            : {}),
         },
         userId: user?.id,
         email: user?.primaryEmailAddress?.emailAddress
@@ -545,13 +525,6 @@ function CreateNew() {
                 description="How captions animate on screen"
                 title="Caption transition"
               />
-              <Suspense fallback={null}>
-                <ShortsSocialSchedule
-                  topicDefault={formData.topic}
-                  disabled={loading}
-                  onChange={onSocialScheduleChange}
-                />
-              </Suspense>
             </div>
           )}
         </div>

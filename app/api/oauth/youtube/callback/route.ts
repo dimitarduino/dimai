@@ -13,12 +13,21 @@ export async function GET(req: Request) {
   const state = searchParams.get("state");
   const err = searchParams.get("error");
 
+  let returnPath = "/app/shorts";
+  if (state) {
+    try {
+      returnPath = decodeOAuthState(state).returnPath;
+    } catch {
+      /* use default */
+    }
+  }
+
   const redirectError = (message: string) =>
     NextResponse.redirect(
-      `${base}/app/shorts/create?oauth=youtube&error=${encodeURIComponent(message)}`,
+      `${base}${returnPath}?oauth=youtube&error=${encodeURIComponent(message)}`,
     );
   const redirectOk = () =>
-    NextResponse.redirect(`${base}/app/shorts/create?oauth=youtube&ok=1`);
+    NextResponse.redirect(`${base}${returnPath}?oauth=youtube&ok=1`);
 
   if (err) {
     return redirectError(err);
@@ -30,6 +39,7 @@ export async function GET(req: Request) {
   let clerkUserId: string;
   try {
     const p = decodeOAuthState(state);
+    returnPath = p.returnPath;
     if (p.provider !== "youtube") {
       return redirectError("wrong_provider");
     }

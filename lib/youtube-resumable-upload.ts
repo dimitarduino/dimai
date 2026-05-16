@@ -14,6 +14,12 @@ export async function uploadYoutubeVideoFromUrl(options: {
   videoUrl: string;
   title: string;
   description: string;
+  /** RFC3339 / ISO8601 — when set, video is uploaded as private and YouTube publishes it at this time. */
+  publishAt?: string | null;
+  /** YouTube `snippet.categoryId` (numeric string). */
+  categoryId?: string;
+  /** YouTube `snippet.tags` (already normalized). */
+  tags?: string[];
 }): Promise<ResumableUploadResult> {
   let accessToken = options.accessToken;
 
@@ -32,16 +38,34 @@ export async function uploadYoutubeVideoFromUrl(options: {
       "X-Upload-Content-Type": "video/mp4",
     }) as Record<string, string>;
 
+  const status =
+    options.publishAt != null && options.publishAt !== ""
+      ? {
+          privacyStatus: "private" as const,
+          publishAt: options.publishAt,
+          selfDeclaredMadeForKids: false,
+        }
+      : {
+          privacyStatus: "public" as const,
+          selfDeclaredMadeForKids: false,
+        };
+
+  const catRaw = (options.categoryId ?? "22").trim();
+  const categoryId = /^\d{1,3}$/.test(catRaw) ? catRaw : "22";
+  const tags = (options.tags ?? []).filter((t) => t.length > 0);
+
+  const snippet: Record<string, unknown> = {
+    title: options.title.slice(0, 100),
+    description: options.description.slice(0, 5000),
+    categoryId,
+  };
+  if (tags.length > 0) {
+    snippet.tags = tags;
+  }
+
   const body = JSON.stringify({
-    snippet: {
-      title: options.title.slice(0, 100),
-      description: options.description.slice(0, 5000),
-      categoryId: "22",
-    },
-    status: {
-      privacyStatus: "public",
-      selfDeclaredMadeForKids: false,
-    },
+    snippet,
+    status,
   });
 
   let initRes: Response | null = null;

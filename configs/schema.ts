@@ -123,6 +123,12 @@ export const ScheduledSocialPosts = pgTable(
     scheduledAt: varchar("scheduledAt", { length: 64 }).notNull(),
     title: varchar("title", { length: 500 }).notNull(),
     description: varchar("description", { length: 2000 }).notNull(),
+    /** YouTube Data API `snippet.categoryId` (numeric string, e.g. "24"). */
+    youtubeCategoryId: varchar("youtubeCategoryId", { length: 10 })
+      .notNull()
+      .default("24"),
+    /** Comma-separated tags for YouTube `snippet.tags` (parsed on upload). */
+    youtubeTags: varchar("youtubeTags", { length: 2000 }).notNull().default(""),
     status: varchar("status", { length: 50 }).notNull().default("scheduled"),
     youtubeVideoId: varchar("youtubeVideoId", { length: 128 }),
     tiktokPublishId: varchar("tiktokPublishId", { length: 255 }),

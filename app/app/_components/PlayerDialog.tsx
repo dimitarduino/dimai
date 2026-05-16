@@ -14,6 +14,7 @@ import RemotionVideo from "./RemotionVideo";
 import { Button } from "@/ui/button";
 import { VideoData } from "@/configs/schema";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
 import { proveriPoeni } from "@/lib/utils";
 import {
@@ -21,11 +22,12 @@ import {
   getVideoDataByIdForOwner,
   setVideoDownloadUrlForOwner,
 } from "@/app/app/_actions/dashboard-data";
-import { X } from "lucide-react";
+import { X, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import { useUser } from "@clerk/nextjs";
 import CustomLoading from "./CustomLoading";
+import { publishPagePath } from "@/lib/social-oauth-state";
 import type { InferSelectModel } from "drizzle-orm";
 
 export type VideoDataRecord = InferSelectModel<typeof VideoData>;
@@ -68,12 +70,17 @@ function PlayerDialog({
   }, [downloadUrlProp, videoId]);
 
   useEffect(() => {
+    const url = videoData?.downloadUrl?.trim();
+    if (url) setDownloadUrl(url);
+  }, [videoData?.downloadUrl]);
+
+  useEffect(() => {
     setOpenDialog(!!playVideo);
     if (setOpenDialogPlayer !== false) {
       setOpenDialogPlayer(!!playVideo);
     }
     if (videoId != null) void getVideoData();
-  }, [playVideo, durationFrame]);
+  }, [playVideo, durationFrame, videoId]);
 
   useEffect(() => {
     if (setOpenDialogPlayer !== false) {
@@ -94,16 +101,16 @@ function PlayerDialog({
     }
 
     setLoading(true);
-    console.log(videoData);
 
     try {
       const res = await axios.post<{ result?: string }>("/api/export-video", {
         inputProps: videoData,
       });
       setLoading(false);
-      if (res.data.result) {
+      if (res.data.result && videoId != null) {
         setDownloadUrl(res.data.result);
-        await setVideoDownloadUrlForOwner(videoId ?? 0, res.data.result);
+        await setVideoDownloadUrlForOwner(videoId, res.data.result);
+        toast.success("Video exported. You can upload to social media next.");
       }
 
       const slednoPoeni = await deductUserCredits(2);
@@ -120,11 +127,16 @@ function PlayerDialog({
 
   if (!isLoaded) return null;
 
+  const hasExported =
+    typeof downloadUrl === "string" && downloadUrl.trim().length > 0;
+
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <DialogContent className={`[&>button]:hidden  z-150`}>
-        <DialogHeader className={`flex flex-col items-center justify-center`}>
-          <DialogTitle className={`font-bold text-3xl text-primary`}>Your video is ready!</DialogTitle>
+      <DialogContent className="z-150 max-h-[92vh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto sm:w-full [&>button]:hidden">
+        <DialogHeader className="flex flex-col items-center justify-center gap-2">
+          <DialogTitle className="font-bold text-2xl text-primary sm:text-3xl">
+            Your video is ready!
+          </DialogTitle>
           <Player
             component={RemotionVideo}
             durationInFrames={Math.round(durationFrame)}
@@ -135,47 +147,86 @@ function PlayerDialog({
             controls={true}
             inputProps={{
               videoData: { ...videoData },
-              setDurationInFrame: (frameValue: number) => setDurationFrame(frameValue + 20),
+              setDurationInFrame: (frameValue: number) =>
+                setDurationFrame(frameValue + 20),
             }}
           />
 
-          <div className="grid mt-6 grid-cols-2 gap-12">
-            <Button
-              onClick={() => {
-                router.replace("/app/shorts");
-                setOpenDialog(false);
-              }}
-              className={`py-6 cursor-pointer`}
-              variant={`ghost`}
-            >
-              Cancel
-            </Button>
-            {downloadUrl && typeof downloadUrl === "string" && (
-              <a href={downloadUrl} download="video.mp4" target="_blank" rel="noopener noreferrer">
-                <Button className={`py-6 cursor-pointer dark:text-white text-white`}>Download video</Button>
-              </a>
-            )}
+          {videoId != null && !hasExported ? (
+            <p className="mt-4 w-full rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-left text-xs text-muted-foreground sm:text-sm">
+              To upload to <span className="font-medium text-foreground">YouTube</span> or{" "}
+              <span className="font-medium text-foreground">TikTok</span>, export the video
+              first. After the MP4 is ready, use{" "}
+              <span className="font-medium text-foreground">Upload to social media</span> on
+              the next screen.
+            </p>
+          ) : null}
 
-            {!downloadUrl && (
+          <div className="mt-4 flex w-full max-w-md flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={() => {
+                  router.replace("/app/shorts");
+                  setOpenDialog(false);
+                }}
+                className="py-6 cursor-pointer"
+                variant="ghost"
+              >
+                Cancel
+              </Button>
+              {hasExported ? (
+                <a
+                  href={downloadUrl as string}
+                  download="video.mp4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button className="w-full py-6 cursor-pointer text-white dark:text-white">
+                    Download
+                  </Button>
+                </a>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => void exportVideo()}
+                  className="py-6 cursor-pointer text-white dark:text-white"
+                >
+                  Export (2 credits)
+                </Button>
+              )}
+            </div>
+
+            {videoId != null && hasExported ? (
               <Button
                 type="button"
-                onClick={() => void exportVideo()}
-                className={`py-6 cursor-pointer text-white dark:text-white`}
+                size="lg"
+                className="w-full gap-2 py-6 text-sm font-semibold uppercase tracking-wide"
+                asChild
               >
-                Export (2 credits)
+                <Link
+                  href={publishPagePath(videoId)}
+                  onClick={() => setOpenDialog(false)}
+                >
+                  <Share2 className="size-4" />
+                  Upload to social media
+                </Link>
               </Button>
-            )}
+            ) : null}
           </div>
+
           <DialogDescription asChild>
-            <div className="">
-              <CustomLoading title="Rendering your video..." loading={loading} />
+            <div>
+              <CustomLoading
+                title="Rendering your video..."
+                loading={loading}
+              />
             </div>
           </DialogDescription>
 
           <DialogClose asChild>
             <button
               type="button"
-              className="text-gray-500 absolute right-5 top-5 hover:text-gray-700 transition duration-200 cursor-pointer"
+              className="absolute right-5 top-5 cursor-pointer text-gray-500 transition duration-200 hover:text-gray-700"
             >
               <X size={24} />
             </button>

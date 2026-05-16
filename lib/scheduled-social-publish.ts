@@ -8,13 +8,13 @@ import {
 } from "@/configs/schema";
 import { inngest } from "@/lib/inngest";
 import { refreshTikTokAccessToken, tiktokInitInboxVideoFromUrl } from "@/lib/tiktok-social-server";
-import { uploadYoutubeVideoFromUrl } from "@/lib/youtube-resumable-upload";
 
 function tokenExpiring(expiresAt: string | null | undefined): boolean {
   if (!expiresAt) return true;
   return new Date(expiresAt).getTime() < Date.now() + 120_000;
 }
 
+/** TikTok only — YouTube uses native schedule on export (`finalizeYoutubeScheduledUploadAfterExport`). */
 export const scheduledSocialPublish = inngest.createFunction(
   { id: "scheduled-social-publish", retries: 2 },
   { event: "social/scheduled.publish" },
@@ -33,7 +33,7 @@ export const scheduledSocialPublish = inngest.createFunction(
       return r[0] ?? null;
     });
 
-    if (!row || row.status !== "scheduled") {
+    if (!row || row.status !== "scheduled" || !row.postTiktok) {
       return;
     }
 
@@ -42,13 +42,13 @@ export const scheduledSocialPublish = inngest.createFunction(
       await step.sleepUntil("wait-until-scheduled", when);
     }
 
-    await step.run("publish", async () => {
+    await step.run("publish-tiktok", async () => {
       const [post] = await db
         .select()
         .from(ScheduledSocialPosts)
         .where(eq(ScheduledSocialPosts.id, scheduledPostId))
         .limit(1);
-      if (!post || post.status !== "scheduled") {
+      if (!post || post.status !== "scheduled" || !post.postTiktok) {
         return;
       }
 
@@ -67,7 +67,7 @@ export const scheduledSocialPublish = inngest.createFunction(
           .set({
             status: "failed",
             lastError:
-              "No exported MP4 yet. Open your short, tap Export, and wait for it to finish before the scheduled time (or pick a later time).",
+              "No exported MP4 yet. Export your short before the scheduled time (TikTok pull needs the file URL).",
             updatedAt: now,
           })
           .where(eq(ScheduledSocialPosts.id, scheduledPostId));
@@ -79,123 +79,106 @@ export const scheduledSocialPublish = inngest.createFunction(
         .set({ status: "processing", updatedAt: now })
         .where(eq(ScheduledSocialPosts.id, scheduledPostId));
 
-      let youtubeVideoId: string | null = null;
       let tiktokPublishId: string | null = null;
       const errors: string[] = [];
 
-      if (post.postYoutube) {
-        const [conn] = await db
-          .select()
-          .from(SocialOAuthConnections)
-          .where(
-            and(
-              eq(SocialOAuthConnections.clerkUserId, post.clerkUserId),
-              eq(SocialOAuthConnections.provider, "youtube"),
-            ),
-          )
-          .limit(1);
-        if (!conn) {
-          errors.push("YouTube is not connected.");
-        } else {
-          try {
-            const up = await uploadYoutubeVideoFromUrl({
-              accessToken: conn.accessToken,
-              refreshToken: conn.refreshToken,
-              onAccessTokenRefresh: async (next) => {
-                await db
-                  .update(SocialOAuthConnections)
-                  .set({
-                    accessToken: next.accessToken,
-                    expiresAt: next.expiresAtIso,
-                    updatedAt: new Date().toISOString(),
-                  })
-                  .where(eq(SocialOAuthConnections.id, conn.id));
-              },
-              videoUrl: downloadUrl,
-              title: post.title,
-              description: post.description,
-            });
-            youtubeVideoId = up.youtubeVideoId;
-          } catch (e: unknown) {
-            errors.push(
-              `YouTube: ${e instanceof Error ? e.message : String(e)}`,
-            );
+      const [conn] = await db
+        .select()
+        .from(SocialOAuthConnections)
+        .where(
+          and(
+            eq(SocialOAuthConnections.clerkUserId, post.clerkUserId),
+            eq(SocialOAuthConnections.provider, "tiktok"),
+          ),
+        )
+        .limit(1);
+      if (!conn) {
+        errors.push("TikTok is not connected.");
+      } else {
+        try {
+          let accessToken = conn.accessToken;
+          let refreshToken = conn.refreshToken;
+          let expiresAt = conn.expiresAt;
+
+          if (refreshToken && tokenExpiring(expiresAt)) {
+            const t = await refreshTikTokAccessToken(refreshToken);
+            accessToken = t.accessToken;
+            refreshToken = t.refreshToken;
+            expiresAt = new Date(
+              Date.now() + t.expiresIn * 1000,
+            ).toISOString();
+            await db
+              .update(SocialOAuthConnections)
+              .set({
+                accessToken,
+                refreshToken,
+                expiresAt,
+                providerUserId: t.openId,
+                updatedAt: new Date().toISOString(),
+              })
+              .where(eq(SocialOAuthConnections.id, conn.id));
           }
+
+          const tk = await tiktokInitInboxVideoFromUrl({
+            accessToken,
+            videoUrl: downloadUrl,
+            title: post.title,
+            description: post.description,
+          });
+          tiktokPublishId = tk.publishId;
+        } catch (e: unknown) {
+          errors.push(
+            `TikTok: ${e instanceof Error ? e.message : String(e)}`,
+          );
         }
       }
 
-      if (post.postTiktok) {
-        const [conn] = await db
-          .select()
-          .from(SocialOAuthConnections)
-          .where(
-            and(
-              eq(SocialOAuthConnections.clerkUserId, post.clerkUserId),
-              eq(SocialOAuthConnections.provider, "tiktok"),
-            ),
-          )
-          .limit(1);
-        if (!conn) {
-          errors.push("TikTok is not connected.");
-        } else {
-          try {
-            let accessToken = conn.accessToken;
-            let refreshToken = conn.refreshToken;
-            let expiresAt = conn.expiresAt;
-
-            if (refreshToken && tokenExpiring(expiresAt)) {
-              const t = await refreshTikTokAccessToken(refreshToken);
-              accessToken = t.accessToken;
-              refreshToken = t.refreshToken;
-              expiresAt = new Date(
-                Date.now() + t.expiresIn * 1000,
-              ).toISOString();
-              await db
-                .update(SocialOAuthConnections)
-                .set({
-                  accessToken,
-                  refreshToken,
-                  expiresAt,
-                  providerUserId: t.openId,
-                  updatedAt: new Date().toISOString(),
-                })
-                .where(eq(SocialOAuthConnections.id, conn.id));
-            }
-
-            const tk = await tiktokInitInboxVideoFromUrl({
-              accessToken,
-              videoUrl: downloadUrl,
-              title: post.title,
-              description: post.description,
-            });
-            tiktokPublishId = tk.publishId;
-          } catch (e: unknown) {
-            errors.push(
-              `TikTok: ${e instanceof Error ? e.message : String(e)}`,
-            );
-          }
-        }
-      }
-
-      const wanted =
-        (post.postYoutube ? 1 : 0) + (post.postTiktok ? 1 : 0);
-      const ok =
-        (post.postYoutube && youtubeVideoId ? 1 : 0) +
-        (post.postTiktok && tiktokPublishId ? 1 : 0);
-
-      const done = ok === wanted && wanted > 0;
+      const done = Boolean(tiktokPublishId);
       const doneAt = new Date().toISOString();
 
-      await db
-        .update(ScheduledSocialPosts)
-        .set({
-          status: done ? "completed" : "failed",
-          youtubeVideoId: youtubeVideoId,
-          tiktokPublishId: tiktokPublishId,
-          lastError: done ? null : errors.join("; ").slice(0, 2000),
-          updatedAt: doneAt,
-        })
-        .where(eq(ScheduledSocialPosts.id, scheduledPostId));
+      if (done) {
+        if (!post.postYoutube) {
+          await db
+            .update(ScheduledSocialPosts)
+            .set({
+              status: "completed",
+              tiktokPublishId,
+              lastError: null,
+              updatedAt: doneAt,
+            })
+            .where(eq(ScheduledSocialPosts.id, scheduledPostId));
+        } else if (post.youtubeVideoId) {
+          await db
+            .update(ScheduledSocialPosts)
+            .set({
+              status: "completed",
+              tiktokPublishId,
+              lastError: null,
+              updatedAt: doneAt,
+            })
+            .where(eq(ScheduledSocialPosts.id, scheduledPostId));
+        } else {
+          await db
+            .update(ScheduledSocialPosts)
+            .set({
+              status: "failed",
+              tiktokPublishId,
+              lastError:
+                "TikTok uploaded but YouTube was not scheduled (export the short so the native YouTube schedule can run first).",
+              updatedAt: doneAt,
+            })
+            .where(eq(ScheduledSocialPosts.id, scheduledPostId));
+        }
+      } else {
+        await db
+          .update(ScheduledSocialPosts)
+          .set({
+            status: "failed",
+            lastError: errors.join("; ").slice(0, 2000),
+            updatedAt: doneAt,
+          })
+          .where(eq(ScheduledSocialPosts.id, scheduledPostId));
+      }
     });
   },
 );

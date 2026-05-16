@@ -13,12 +13,21 @@ export async function GET(req: Request) {
   const state = searchParams.get("state");
   const err = searchParams.get("error");
 
+  let returnPath = "/app/shorts";
+  if (state) {
+    try {
+      returnPath = decodeOAuthState(state).returnPath;
+    } catch {
+      /* use default */
+    }
+  }
+
   const redirectError = (message: string) =>
     NextResponse.redirect(
-      `${base}/app/shorts/create?oauth=tiktok&error=${encodeURIComponent(message)}`,
+      `${base}${returnPath}?oauth=tiktok&error=${encodeURIComponent(message)}`,
     );
   const redirectOk = () =>
-    NextResponse.redirect(`${base}/app/shorts/create?oauth=tiktok&ok=1`);
+    NextResponse.redirect(`${base}${returnPath}?oauth=tiktok&ok=1`);
 
   if (err) {
     return redirectError(err);
@@ -28,14 +37,21 @@ export async function GET(req: Request) {
   }
 
   let clerkUserId: string;
+  let codeVerifier: string | undefined;
   try {
     const p = decodeOAuthState(state);
+    returnPath = p.returnPath;
     if (p.provider !== "tiktok") {
       return redirectError("wrong_provider");
     }
     clerkUserId = p.clerkUserId;
+    codeVerifier = p.codeVerifier;
   } catch {
     return redirectError("bad_state");
+  }
+
+  if (!codeVerifier) {
+    return redirectError("missing_pkce_verifier");
   }
 
   const clientKey = process.env.TIKTOK_CLIENT_KEY ?? "";
@@ -54,6 +70,7 @@ export async function GET(req: Request) {
       code,
       grant_type: "authorization_code",
       redirect_uri: redirectUri,
+      code_verifier: codeVerifier,
     }),
   });
 
