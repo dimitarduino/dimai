@@ -172,7 +172,7 @@ function VideosDashboard({ libraryItems, onItemDeleted }: VideosDashboardProps) 
                         No preview
                       </div>
                     )}
-                    <span className="absolute left-2 top-2 flex items-center gap-1 rounded-md bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground shadow">
+                    <span className="absolute left-2 top-2 flex items-center gap-1 rounded-md bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow">
                       <Layers className="size-3" />
                       {item.parts.length < item.partTotal
                         ? `${item.parts.length}/${item.partTotal} parts`
