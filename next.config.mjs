@@ -9,9 +9,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // This is the important one:
   output: 'standalone',
   /** Native deps that should not be bundled on the server */

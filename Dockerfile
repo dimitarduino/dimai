@@ -83,9 +83,11 @@
     # Create non-root user
     RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
     
-    # Copy built app from builder stage
-    COPY --from=builder /app ./
-    
+    # Standalone output: minimal runtime (see next.config.mjs output: 'standalone')
+    COPY --from=builder /app/public ./public
+    COPY --from=builder /app/.next/standalone ./
+    COPY --from=builder /app/.next/static ./.next/static
+
     # Set permissions for non-root user
     RUN chown -R nextjs:nodejs /app
     
@@ -96,5 +98,4 @@
     EXPOSE 3000
     
     # Use tmpfs for Next.js cache and /tmp for runtime temp files (set when running container)
-    # Start the Next.js app
-    CMD ["npm", "start"]
+    CMD ["node", "server.js"]
