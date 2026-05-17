@@ -34,7 +34,13 @@ export const VideoData = pgTable("videos", {
    createdBy: varchar("createdBy").notNull(),
    downloadUrl: varchar("downloadUrl").default('').notNull(),
    /** Optional background music URL (voiceover remains primary; mixed in Remotion export). */
-   backgroundMusic: varchar("backgroundMusic", { length: 2048 })
+   backgroundMusic: varchar("backgroundMusic", { length: 2048 }),
+   /** Shared id for multi-part series; null for standalone shorts. */
+   seriesGroupId: varchar("seriesGroupId", { length: 64 }),
+   /** 0-based part index within the series. */
+   seriesPartIndex: integer("seriesPartIndex"),
+   /** Total parts in the series (e.g. 5). */
+   seriesPartTotal: integer("seriesPartTotal"),
 });
 
 

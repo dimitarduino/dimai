@@ -44,7 +44,7 @@ export async function POST(req) {
             const formData = jobData.formData as Record<string, unknown>;
 
             // Step 1: Generate video script
-            const prompt = `Write a script to generate 60 seconds video on topic: "${String(formData.topic ?? "")}" along with AI image prompt in ${String(formData.style ?? "")} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${String(formData.comment ?? "")}. Give me JSON only and make it safe for NSFW check. Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
+            const prompt = `Write a script to generate 60 seconds video on topic: "${String(formData.topic ?? "")}" along with AI image prompt in ${String(formData.style ?? "")} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${String(formData.comment ?? "")}. Give me JSON only. Each imagePrompt must be family-friendly and SFW (no violence, gore, nudity, or horror). Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
 
             await db
                 .update(VideoGenerationJobs)

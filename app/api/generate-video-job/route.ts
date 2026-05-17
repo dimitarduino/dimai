@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { inngest } from '@/lib/inngest';
 import { db } from '@/configs/db';
 import { VideoGenerationJobs } from '@/configs/schema';
+import { useInngestForVideoJobs } from '@/lib/video-job-runner';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to process job directly when Inngest is not available
@@ -54,27 +55,23 @@ export async function POST(req) {
       updatedAt: new Date().toISOString(),
     }).returning({ jobId: VideoGenerationJobs.jobId });
 
-    // Try to trigger Inngest function, but also start processing directly as fallback
-    // Process job directly in background (works whether Inngest is available or not)
-    processJobDirectly(jobId).catch(err => {
-      console.error('Error processing job directly:', err);
-    });
-
-    // Also try Inngest if available (non-blocking)
-    try {
-      await inngest.send({
-        name: 'video/generate',
-        data: {
-          jobId,
-          formData,
-          userId,
-          email,
-        },
-      }).catch(err => {
-        console.warn('Inngest send failed (using direct processing):', err);
+    // Local dev: direct API processing. Production: Inngest (one step per series part).
+    if (useInngestForVideoJobs()) {
+      try {
+        await inngest.send({
+          name: "video/generate",
+          data: { jobId, formData, userId, email },
+        });
+      } catch (inngestError) {
+        console.warn("Inngest send failed, falling back to direct processing:", inngestError);
+        processJobDirectly(jobId).catch((err) => {
+          console.error("Error processing job directly:", err);
+        });
+      }
+    } else {
+      processJobDirectly(jobId).catch((err) => {
+        console.error("Error processing job directly:", err);
       });
-    } catch (inngestError) {
-      console.warn('Inngest not available (using direct processing):', inngestError);
     }
 
     return NextResponse.json({ jobId });

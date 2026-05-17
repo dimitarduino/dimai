@@ -26,7 +26,12 @@ import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { cn } from "@/lib/utils";
 import ScheduleDateTimePicker from "@/app/app/_components/ScheduleDateTimePicker";
-import type { SocialScheduleSavePayload } from "@/lib/social-schedule-types";
+import SocialScheduleBadges from "@/app/app/_components/SocialScheduleBadges";
+import type {
+  SocialScheduleSavePayload,
+  VideoSocialUploadStatus,
+} from "@/lib/social-schedule-types";
+import { hasSocialSchedule } from "@/lib/social-upload-status-label";
 import {
   YOUTUBE_DEFAULT_CATEGORY_ID,
   YOUTUBE_UPLOAD_CATEGORIES,
@@ -129,6 +134,9 @@ export default function SocialUploadForm({
   const [uploading, setUploading] = useState(false);
   const [youtubeUploaded, setYoutubeUploaded] = useState(false);
   const [tiktokUploaded, setTiktokUploaded] = useState(false);
+  const [socialStatus, setSocialStatus] = useState<VideoSocialUploadStatus | null>(
+    null,
+  );
   const [metadataLoading, setMetadataLoading] = useState(true);
 
   const loadConnections = useCallback(async () => {
@@ -153,20 +161,35 @@ export default function SocialUploadForm({
   }, [loadConnections]);
 
   useEffect(() => {
-    void (async () => {
-      const status = await getVideoSocialUploadStatus(videoId);
-      setYoutubeUploaded(status.youtubeUploaded);
-      setTiktokUploaded(status.tiktokUploaded);
-      if (status.youtubeUploaded) setPostYoutube(false);
-      if (status.tiktokUploaded) setPostTiktok(false);
-    })();
-  }, [videoId]);
-
-  useEffect(() => {
     let cancelled = false;
     void (async () => {
       setMetadataLoading(true);
       try {
+        const status = await getVideoSocialUploadStatus(videoId);
+        if (cancelled) return;
+        setSocialStatus(status);
+        setYoutubeUploaded(status.youtubeUploaded);
+        setTiktokUploaded(status.tiktokUploaded);
+        if (status.postYoutube) setPostYoutube(true);
+        if (status.postTiktok) setPostTiktok(true);
+        if (status.scheduledAt) {
+          const d = new Date(status.scheduledAt);
+          if (!Number.isNaN(d.getTime())) setScheduledAt(d);
+        }
+
+        const hasSavedCopy =
+          Boolean(status.title?.trim()) || Boolean(status.description?.trim());
+
+        if (hasSavedCopy) {
+          if (status.title) setTitle(status.title);
+          if (status.description) setDescription(status.description);
+          if (status.youtubeTags) setYoutubeTagsInput(status.youtubeTags);
+          if (status.youtubeCategoryId) {
+            setYoutubeCategoryId(status.youtubeCategoryId);
+          }
+          return;
+        }
+
         const res = await generateSocialPublishMetadataForVideo(videoId);
         if (cancelled) return;
         if (res.ok) {
@@ -349,20 +372,14 @@ export default function SocialUploadForm({
           Schedule & platforms
         </div>
 
-        {(youtubeUploaded || tiktokUploaded) && (
-          <div className="space-y-2">
-            {youtubeUploaded ? (
-              <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-sm text-foreground">
-                Video is already uploaded to YouTube.
-              </p>
-            ) : null}
-            {tiktokUploaded ? (
-              <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-sm text-foreground">
-                Video is already uploaded to TikTok.
-              </p>
-            ) : null}
+        {socialStatus && hasSocialSchedule(socialStatus) ? (
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+            <p className="text-sm font-medium text-foreground mb-2">
+              Already scheduled
+            </p>
+            <SocialScheduleBadges status={socialStatus} />
           </div>
-        )}
+        ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-8">
           <label className="flex items-center gap-2.5 text-sm cursor-pointer">
@@ -371,7 +388,10 @@ export default function SocialUploadForm({
               className="size-4 rounded border-input accent-primary"
               checked={postYoutube}
               onChange={(e) => setPostYoutube(e.target.checked)}
-              disabled={!youtube || youtubeUploaded}
+              disabled={
+                !youtube ||
+                (socialStatus?.postYoutube && socialStatus.status !== "failed")
+              }
             />
             <Youtube className="size-4 text-red-600" />
             YouTube (native schedule)
@@ -382,7 +402,10 @@ export default function SocialUploadForm({
               className="size-4 rounded border-input accent-primary"
               checked={postTiktok}
               onChange={(e) => setPostTiktok(e.target.checked)}
-              disabled={!tiktok || tiktokUploaded}
+              disabled={
+                !tiktok ||
+                (socialStatus?.postTiktok && socialStatus.status !== "failed")
+              }
             />
             TikTok inbox
           </label>

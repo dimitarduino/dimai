@@ -1,12 +1,14 @@
 "use client"
 import React, { useContext, useEffect, useState } from 'react'
+import SelectShortsFormat from '../../_components/SelectShortsFormat'
 import SelectTopic from '../../_components/SelectTopic'
 import SelectStyle from '../../_components/SelectStyle';
 import SelectDuration from '../../_components/SelectDuration';
 import { Button } from '@/ui/button';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import CustomLoading from '../../_components/CustomLoading';
+import GenerationProgressOverlay from '../../_components/GenerationProgressOverlay';
+import { labelForJobProgress } from '@/lib/video-job-progress-label';
 import { VideoDataContext } from 'app/_context/VideoDataContext';
 import { useUser } from '@clerk/nextjs';
 import PlayerDialog from '../../_components/PlayerDialog';
@@ -21,6 +23,19 @@ import SelectBackgroundMusic from 'app/app/_components/SelectBackgroundMusic';
 import VoicePicker, { type VoicePickerOption } from 'app/app/_components/VoicePicker';
 import { resolveShortsBackgroundMusic } from 'lib/shorts-background-music';
 import { SHORTS_CURATED_VOICES } from 'lib/shorts-curated-voices';
+import {
+  computeSeriesPublishTimes,
+  defaultSeriesSchedule,
+  shortsCreditsRequired,
+  SHORTS_SERIES_PART_COUNT,
+  type SeriesScheduleConfig,
+  type ShortsFormatMode,
+} from '@/lib/shorts-series';
+import { publishPagePath } from '@/lib/social-oauth-state';
+import { seriesSchedulePagePath } from '@/lib/series-schedule-path';
+import { shouldRedirectToSeriesSchedule } from '@/lib/series-social-redirect';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const SHORTS_VOICE_PICKER_OPTIONS: VoicePickerOption[] = SHORTS_CURATED_VOICES.map((v) => ({
   name: v.name,
@@ -38,9 +53,10 @@ type ShortsCreateFormData = {
   style: string;
 };
 
-const WIZARD_TOTAL_STEPS = 6;
+const WIZARD_TOTAL_STEPS = 7;
 
 const WIZARD_STEP_LABELS = [
+  "Format",
   "Topic & instructions",
   "Style",
   "Audio",
@@ -63,6 +79,7 @@ function scrollWizardStepLabelsIntoViewOnMobile() {
 }
 
 function CreateNew() {
+  const router = useRouter();
   const [wizardStep, setWizardStep] = useState(1);
   const [formData, setFormData] = useState<ShortsCreateFormData>({
     topic: "Random AI Story",
@@ -89,9 +106,21 @@ function CreateNew() {
   const [imageList, setImageList] = useState<string[]>([]);
   const [playVideo, setPlayVideo] = useState(false);
   const [videoId, setVideoId] = useState<number | null>(null);
+  const [seriesVideoIds, setSeriesVideoIds] = useState<number[]>([]);
+  const [lastSeriesGroupId, setLastSeriesGroupId] = useState<string | null>(null);
+  const [formatMode, setFormatMode] = useState<ShortsFormatMode>("single");
+  const [seriesSchedule, setSeriesSchedule] = useState<SeriesScheduleConfig>(
+    defaultSeriesSchedule,
+  );
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
-  const [progress, setProgress] = useState({ step: '', percentage: 0 });
+  const [progress, setProgress] = useState<{
+    step?: string;
+    percentage?: number;
+    part?: number;
+    totalParts?: number;
+    detail?: string;
+  }>({ step: '', percentage: 0 });
   const { userDetail, setUserDetail } = useUserDetail();
 
   const { user, isLoaded } = useUser();
@@ -193,19 +222,63 @@ function CreateNew() {
 
         if (job.status === 'completed') {
           setLoading(false);
-          setVideoId(job.result?.videoId);
-          setPlayVideo(true);
-          // Refresh user details to get updated credits
-          // if (user?.primaryEmailAddress?.emailAddress) {
-          //   const userRes = await db.select().from(Users).where(eq(Users.email, user.primaryEmailAddress.emailAddress));
-          //   if (userRes[0]) {
-          //     setUserDetail(userRes[0]);
-          //   }
-          // }
-          clearInterval(intervalId);
-          setCurrentJobId(null);
-          if (typeof window !== 'undefined') {
-            deleteFromLocalStorageJobId(currentJobId);
+          let redirected = false;
+          const result = job.result as {
+            videoIds?: number[];
+            videoId?: number;
+            seriesGroupId?: string;
+            formatMode?: string;
+          } | null;
+          const ids = result?.videoIds;
+          const seriesGroupId = result?.seriesGroupId;
+
+          if (Array.isArray(ids) && ids.length > 0 && seriesGroupId) {
+            const wantsSocial =
+              seriesSchedule.postYouTube || seriesSchedule.postTiktok;
+            if (wantsSocial) {
+              try {
+                const connRes = await axios.get<{
+                  youtube: boolean;
+                  tiktok: boolean;
+                }>("/api/oauth/social-connections");
+                if (
+                  shouldRedirectToSeriesSchedule(seriesSchedule, connRes.data)
+                ) {
+                  toast.success(
+                    `${ids.length}-part series created! Opening publish schedule…`,
+                  );
+                  clearInterval(intervalId);
+                  setCurrentJobId(null);
+                  if (typeof window !== "undefined") {
+                    deleteFromLocalStorageJobId(currentJobId);
+                  }
+                  router.push(seriesSchedulePagePath(seriesGroupId));
+                  redirected = true;
+                }
+              } catch {
+                /* fall through to inline summary */
+              }
+            }
+            if (!redirected) {
+              setSeriesVideoIds(ids);
+              setLastSeriesGroupId(seriesGroupId);
+              setVideoId(ids[0] ?? null);
+              setPlayVideo(false);
+              toast.success(
+                `${ids.length}-part series created and exported! Ready to publish.`,
+              );
+            }
+          } else {
+            setSeriesVideoIds([]);
+            setVideoId(result?.videoId ?? null);
+            setPlayVideo(true);
+          }
+          if (!redirected) {
+            clearInterval(intervalId);
+            setCurrentJobId(null);
+            if (typeof window !== 'undefined') {
+              deleteFromLocalStorageJobId(currentJobId);
+            }
           }
         } else if (job.status === 'failed') {
           setLoading(false);
@@ -220,8 +293,7 @@ function CreateNew() {
         console.error('Error checking job status:', error);
       }
 
-      console.log('intervalam');
-    }, 2000); // Poll every 2 seconds
+    }, 2000);
 
     return () => clearInterval(intervalId);
   }, [currentJobId]);  // Check for active jobs on page load
@@ -256,10 +328,11 @@ function CreateNew() {
   }
 
   const onCreateClickHandler = async () => {
-    const daliImaPoeni = proveriPoeni(userDetail?.credits ?? 0, 10);
+    const creditsNeeded = shortsCreditsRequired(formatMode);
+    const daliImaPoeni = proveriPoeni(userDetail?.credits ?? 0, creditsNeeded);
 
     if (!daliImaPoeni) {
-      toast("Insufficient credits! Please recharge to generate a video.");
+      toast(`Insufficient credits! You need ${creditsNeeded} credits for this ${formatMode === "series" ? "series" : "video"}.`);
       return;
     }
 
@@ -278,6 +351,8 @@ function CreateNew() {
           ...formData,
           gender,
           voice: selectedVoice,
+          formatMode,
+          seriesSchedule: formatMode === "series" ? seriesSchedule : undefined,
         },
         userId: user?.id,
         email: user?.primaryEmailAddress?.emailAddress
@@ -359,18 +434,24 @@ function CreateNew() {
   const canGoNextFromStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return Boolean(formData.topic?.trim());
+        if (formatMode === "series") {
+          const t = new Date(seriesSchedule.startAt);
+          return !Number.isNaN(t.getTime()) && t.getTime() > Date.now() + 60_000;
+        }
+        return true;
       case 2:
+        return Boolean(formData.topic?.trim());
+      case 3:
         return Boolean(formData.style?.trim());
-      case 3: {
+      case 4: {
         const names = voices.filter((v) => v.ssmlGender === gender).map((v) => v.name);
         return Boolean(gender && selectedVoice && names.includes(selectedVoice));
       }
-      case 4:
-        return Boolean(formData.duration);
       case 5:
-        return true;
+        return Boolean(formData.duration);
       case 6:
+        return true;
+      case 7:
         return Boolean(formData.caption);
       default:
         return false;
@@ -379,11 +460,14 @@ function CreateNew() {
 
   const goNext = () => {
     if (!canGoNextFromStep(wizardStep)) {
-      if (wizardStep === 1) toast.error("Please choose a topic.");
-      if (wizardStep === 2) toast.error("Please select a style.");
-      if (wizardStep === 3) toast.error("Pick a voice gender and voice model.");
-      if (wizardStep === 4) toast.error("Select a duration.");
-      if (wizardStep === 6) toast.error("Pick a caption style.");
+      if (wizardStep === 1 && formatMode === "series") {
+        toast.error("Pick a first publish time at least one minute from now.");
+      }
+      if (wizardStep === 2) toast.error("Please choose a topic.");
+      if (wizardStep === 3) toast.error("Please select a style.");
+      if (wizardStep === 4) toast.error("Pick a voice gender and voice model.");
+      if (wizardStep === 5) toast.error("Select a duration.");
+      if (wizardStep === 7) toast.error("Pick a caption style.");
       return;
     }
     setWizardStep((s) => Math.min(WIZARD_TOTAL_STEPS, s + 1));
@@ -397,6 +481,14 @@ function CreateNew() {
   if (!isLoaded) return null;
 
   const wizardProgressPct = (wizardStep / WIZARD_TOTAL_STEPS) * 100;
+
+  const progressLabels = labelForJobProgress(progress, formatMode);
+  const statusLabel =
+    jobStatus === "pending"
+      ? "Queued"
+      : jobStatus === "processing"
+        ? "In progress"
+        : jobStatus ?? undefined;
 
   return (
     <div className='md:px-20 max-w-7xl mx-auto'>
@@ -461,6 +553,17 @@ function CreateNew() {
         {/* Step panels */}
         <div className="min-h-[220px] rounded-xl border border-border/60 bg-card/30 p-4 sm:p-6">
           {wizardStep === 1 && (
+            <SelectShortsFormat
+              formatMode={formatMode}
+              onFormatModeChange={setFormatMode}
+              seriesSchedule={seriesSchedule}
+              onSeriesScheduleChange={(patch) =>
+                setSeriesSchedule((prev) => ({ ...prev, ...patch }))
+              }
+            />
+          )}
+
+          {wizardStep === 2 && (
             <div className="flex flex-col gap-6">
               <SelectTopic onUserSelect={naPromenaInput} />
               <div className="flex flex-col gap-2">
@@ -478,13 +581,13 @@ function CreateNew() {
             </div>
           )}
 
-          {wizardStep === 2 && (
+          {wizardStep === 3 && (
             <div className="flex flex-col gap-2">
               <SelectStyle value={formData.style} onUserSelect={naPromenaInput} />
             </div>
           )}
 
-          {wizardStep === 3 && (
+          {wizardStep === 4 && (
             <VoicePicker
               voices={voices}
               gender={gender}
@@ -494,13 +597,13 @@ function CreateNew() {
             />
           )}
 
-          {wizardStep === 4 && (
+          {wizardStep === 5 && (
             <div className="flex flex-col gap-2">
               <SelectDuration value={formData.duration} onUserSelect={naPromenaInput} />
             </div>
           )}
 
-          {wizardStep === 5 && (
+          {wizardStep === 6 && (
             <div className="flex flex-col gap-2">
               <SelectBackgroundMusic
                 value={formData.backgroundMusicId}
@@ -509,7 +612,7 @@ function CreateNew() {
             </div>
           )}
 
-          {wizardStep === 6 && (
+          {wizardStep === 7 && (
             <div className="flex flex-col gap-8">
               <div>
                 <p className="mb-3 text-sm font-medium text-foreground">Caption look</p>
@@ -555,41 +658,69 @@ function CreateNew() {
               type="button"
               className="gap-2 px-8 cursor-pointer py-6 text-base"
               onClick={() => void onCreateClickHandler()}
-              disabled={loading || !canGoNextFromStep(6)}
+              disabled={loading || !canGoNextFromStep(7)}
             >
-              Generate AI short
+              {formatMode === "series"
+                ? `Generate ${SHORTS_SERIES_PART_COUNT}-part series`
+                : "Generate AI short"}
             </Button>
           )}
         </div>
 
-        <CustomLoading loading={loading} />
-        {loading && jobStatus && (
-          <div className="mt-4 p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
-            <p className="text-sm font-medium mb-2">
-              Status: {jobStatus === 'pending' ? 'Initializing...' :
-                jobStatus === 'processing' ? 'Generating video...' : jobStatus}
+        <GenerationProgressOverlay
+          open={loading}
+          title={progressLabels.title}
+          detail={progressLabels.detail}
+          percentage={progress.percentage ?? 0}
+          statusLabel={statusLabel}
+        />
+        {seriesVideoIds.length > 0 ? (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 space-y-4">
+            <p className="font-semibold text-foreground">
+              {seriesVideoIds.length}-part series ready
             </p>
-            {progress.step && (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {progress.step === 'generating_script' && 'Writing script...'}
-                  {progress.step === 'generating_audio' && 'Generating audio...'}
-                  {progress.step === 'generating_captions' && 'Creating captions...'}
-                  {progress.step === 'generating_images' && 'Generating images...'}
-                  {progress.step === 'saving' && 'Saving video data...'}
-                  {progress.step === 'completed' && 'Complete!'}
-                </p>
-                <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress.percentage || 0}%` }}
-                  />
-                </div>
-                <p className="text-xs text-gray-500">{progress.percentage || 0}%</p>
-              </div>
-            )}
+            <p className="text-sm text-muted-foreground">
+              All parts are exported automatically. Connect YouTube or TikTok on step 1
+              before generating to open the full schedule page when done. Times:
+            </p>
+            {lastSeriesGroupId &&
+            (seriesSchedule.postYouTube || seriesSchedule.postTiktok) ? (
+              <Button type="button" variant="secondary" size="sm" asChild>
+                <Link href={seriesSchedulePagePath(lastSeriesGroupId)}>
+                  View series schedule
+                </Link>
+              </Button>
+            ) : null}
+            <ul className="space-y-2">
+              {seriesVideoIds.map((id, i) => {
+                const times = computeSeriesPublishTimes(seriesSchedule);
+                const when = times[i] ? new Date(times[i]) : null;
+                return (
+                  <li
+                    key={id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/60 bg-card px-3 py-2 text-sm"
+                  >
+                    <span className="font-medium">Part {i + 1}</span>
+                    {when ? (
+                      <span className="text-xs text-muted-foreground">
+                        {when.toLocaleString(undefined, {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    ) : null}
+                    <Button type="button" size="sm" variant="outline" asChild>
+                      <Link href={publishPagePath(id)}>Publish part {i + 1}</Link>
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-        )}
+        ) : null}
         <PlayerDialog playVideo={playVideo} videoId={videoId} />
       </div>
     </div>

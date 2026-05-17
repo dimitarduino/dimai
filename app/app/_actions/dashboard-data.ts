@@ -2,7 +2,7 @@
 
 import { isClerkAPIResponseError } from "@clerk/shared/error";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { and, desc, eq, inArray, isNull, lt } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lt } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 
 import { db } from "@/configs/db";
@@ -25,10 +25,18 @@ import {
   generateSocialPublishMetadataFromScript,
   type SocialPublishMetadata,
 } from "@/lib/generate-social-publish-metadata";
-import { uploadYoutubeVideoFromUrl } from "@/lib/youtube-resumable-upload";
-import { parseYoutubeTagsFromUserInput } from "@/lib/youtube-tags";
+import { finalizeYoutubeScheduledUploadInternal } from "@/lib/finalize-youtube-scheduled-upload";
+import {
+  groupVideosForLibrary,
+  hydrateSeriesLibraryParts,
+  libraryCursorFromItems,
+  type ShortsLibraryItem,
+} from "@/lib/shorts-library";
 import { inngest } from "@/lib/inngest";
-import type { SocialScheduleSavePayload } from "@/lib/social-schedule-types";
+import type {
+  SocialScheduleSavePayload,
+  VideoSocialUploadStatus,
+} from "@/lib/social-schedule-types";
 import {
   YOUTUBE_DEFAULT_CATEGORY_ID,
   YOUTUBE_UPLOAD_CATEGORIES,
@@ -136,6 +144,233 @@ export async function listMyVideoData(options?: {
   const nextCursor = hasMore ? items[items.length - 1]!.id : undefined;
 
   return { items, nextCursor };
+}
+
+/** Shorts grid: one card per video or per multi-part series. */
+export async function listMyShortsLibrary(options?: {
+  limit?: number;
+  cursor?: number;
+}): Promise<{ items: ShortsLibraryItem[]; nextCursor?: number }> {
+  const email = await ownerEmailOrThrow();
+  const limit = Math.min(Math.max(options?.limit ?? DEFAULT_PAGE, 1), MAX_PAGE);
+  const overfetch = limit * 8 + 5;
+
+  const conditions = [eq(VideoData.createdBy, email)];
+  if (options?.cursor != null) {
+    conditions.push(lt(VideoData.id, options.cursor));
+  }
+
+  const rows = await db
+    .select()
+    .from(VideoData)
+    .where(and(...conditions))
+    .orderBy(desc(VideoData.id))
+    .limit(overfetch + 1);
+
+  let grouped = groupVideosForLibrary(rows);
+  grouped = await hydrateSeriesLibraryParts(grouped, async (seriesGroupIds) => {
+    if (seriesGroupIds.length === 0) return [];
+    return db
+      .select()
+      .from(VideoData)
+      .where(
+        and(
+          eq(VideoData.createdBy, email),
+          inArray(VideoData.seriesGroupId, seriesGroupIds),
+        ),
+      )
+      .orderBy(asc(VideoData.seriesPartIndex));
+  });
+  const items = grouped.slice(0, limit);
+  const hasMoreGrouped = grouped.length > limit;
+  const hasMoreRows = rows.length > overfetch;
+  const nextCursor =
+    hasMoreGrouped || hasMoreRows ? libraryCursorFromItems(items) : undefined;
+
+  return { items, nextCursor };
+}
+
+export async function getVideoSeriesParts(seriesGroupId: string) {
+  const email = await ownerEmailOrThrow();
+
+  const rows = await db
+    .select()
+    .from(VideoData)
+    .where(
+      and(
+        eq(VideoData.createdBy, email),
+        eq(VideoData.seriesGroupId, seriesGroupId),
+      ),
+    )
+    .orderBy(asc(VideoData.seriesPartIndex));
+
+  return rows;
+}
+
+export async function deleteMyShortVideo(
+  videoId: number,
+): Promise<{ ok: boolean; error?: string }> {
+  const email = await ownerEmailOrThrow();
+  const { userId } = await auth();
+
+  const owned = await db
+    .select({ id: VideoData.id })
+    .from(VideoData)
+    .where(and(eq(VideoData.id, videoId), eq(VideoData.createdBy, email)))
+    .limit(1);
+
+  if (!owned[0]) {
+    return { ok: false, error: "Video not found." };
+  }
+
+  if (userId) {
+    await db
+      .delete(ScheduledSocialPosts)
+      .where(
+        and(
+          eq(ScheduledSocialPosts.videoId, videoId),
+          eq(ScheduledSocialPosts.clerkUserId, userId),
+        ),
+      );
+  }
+
+  await db
+    .delete(VideoData)
+    .where(and(eq(VideoData.id, videoId), eq(VideoData.createdBy, email)));
+
+  return { ok: true };
+}
+
+export async function deleteMyShortSeries(
+  seriesGroupId: string,
+): Promise<{ ok: boolean; error?: string; deletedCount?: number }> {
+  const email = await ownerEmailOrThrow();
+  const { userId } = await auth();
+
+  const parts = await db
+    .select({ id: VideoData.id })
+    .from(VideoData)
+    .where(
+      and(
+        eq(VideoData.createdBy, email),
+        eq(VideoData.seriesGroupId, seriesGroupId),
+      ),
+    );
+
+  if (parts.length === 0) {
+    return { ok: false, error: "Series not found." };
+  }
+
+  const videoIds = parts.map((p) => p.id);
+
+  if (userId && videoIds.length > 0) {
+    await db
+      .delete(ScheduledSocialPosts)
+      .where(
+        and(
+          eq(ScheduledSocialPosts.clerkUserId, userId),
+          inArray(ScheduledSocialPosts.videoId, videoIds),
+        ),
+      );
+  }
+
+  await db
+    .delete(VideoData)
+    .where(
+      and(
+        eq(VideoData.createdBy, email),
+        eq(VideoData.seriesGroupId, seriesGroupId),
+      ),
+    );
+
+  return { ok: true, deletedCount: videoIds.length };
+}
+
+export type SeriesPartScheduleRow = {
+  videoId: number;
+  partIndex: number;
+  partTotal: number;
+  title: string;
+  description: string | null;
+  scheduledAt: string | null;
+  postYoutube: boolean;
+  postTiktok: boolean;
+  status: string;
+  youtubeVideoId: string | null;
+  tiktokPublishId: string | null;
+  lastError: string | null;
+};
+
+export async function getSeriesSocialScheduleOverview(
+  seriesGroupId: string,
+): Promise<SeriesPartScheduleRow[]> {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const email = await ownerEmailOrThrow();
+  const videos = await db
+    .select()
+    .from(VideoData)
+    .where(
+      and(
+        eq(VideoData.createdBy, email),
+        eq(VideoData.seriesGroupId, seriesGroupId),
+      ),
+    )
+    .orderBy(asc(VideoData.seriesPartIndex));
+
+  if (videos.length === 0) return [];
+
+  const videoIds = videos.map((v) => v.id);
+  const posts =
+    videoIds.length > 0
+      ? await db
+          .select()
+          .from(ScheduledSocialPosts)
+          .where(
+            and(
+              eq(ScheduledSocialPosts.clerkUserId, userId),
+              inArray(ScheduledSocialPosts.videoId, videoIds),
+            ),
+          )
+      : [];
+
+  const postByVideoId = new Map(posts.map((p) => [p.videoId, p]));
+
+  return videos.map((v) => {
+    const post = postByVideoId.get(v.id);
+    const partIndex = v.seriesPartIndex ?? 0;
+    const partTotal = v.seriesPartTotal ?? videos.length;
+    let title = post?.title?.trim() || `Part ${partIndex + 1}`;
+    if (!post?.title) {
+      try {
+        const s = v.script as unknown;
+        if (Array.isArray(s) && s.length > 0) {
+          const first = s[0] as { contentText?: string };
+          if (typeof first?.contentText === "string" && first.contentText.trim()) {
+            title = first.contentText.trim().slice(0, 80);
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    return {
+      videoId: v.id,
+      partIndex,
+      partTotal,
+      title,
+      description: post?.description?.trim() || null,
+      scheduledAt: post?.scheduledAt ?? null,
+      postYoutube: Boolean(post?.postYoutube),
+      postTiktok: Boolean(post?.postTiktok),
+      status: post?.status ?? "none",
+      youtubeVideoId: post?.youtubeVideoId ?? null,
+      tiktokPublishId: post?.tiktokPublishId ?? null,
+      lastError: post?.lastError ?? null,
+    };
+  });
 }
 
 export async function insertShortVideoData(values: {
@@ -353,140 +588,11 @@ export async function finalizeYoutubeScheduledUploadAfterExport(videoId: number)
   }
 
   const video = await getVideoDataByIdForOwner(videoId);
-  const downloadUrl = video?.downloadUrl?.trim();
-  if (!downloadUrl) {
+  if (!video?.downloadUrl?.trim()) {
     return { ok: true, skipped: true };
   }
 
-  const pending = await db
-    .select()
-    .from(ScheduledSocialPosts)
-    .where(
-      and(
-        eq(ScheduledSocialPosts.videoId, videoId),
-        eq(ScheduledSocialPosts.clerkUserId, userId),
-        eq(ScheduledSocialPosts.postYoutube, true),
-        eq(ScheduledSocialPosts.status, "scheduled"),
-        isNull(ScheduledSocialPosts.youtubeVideoId),
-      ),
-    )
-    .limit(1);
-
-  const row = pending[0];
-  if (!row) {
-    return { ok: true, skipped: true };
-  }
-
-  const publishAt = new Date(row.scheduledAt);
-  if (Number.isNaN(publishAt.getTime())) {
-    const now = new Date().toISOString();
-    await db
-      .update(ScheduledSocialPosts)
-      .set({
-        status: "failed",
-        lastError: "Invalid scheduled time.",
-        updatedAt: now,
-      })
-      .where(eq(ScheduledSocialPosts.id, row.id));
-    return { ok: false, error: "Invalid scheduled time." };
-  }
-
-  const minLeadMs = 15 * 60 * 1000;
-  if (publishAt.getTime() < Date.now() + minLeadMs) {
-    const msg =
-      "YouTube needs the go-live time to be at least about 15 minutes after upload. Pick a later time when you generate.";
-    const now = new Date().toISOString();
-    await db
-      .update(ScheduledSocialPosts)
-      .set({
-        status: "failed",
-        lastError: msg,
-        updatedAt: now,
-      })
-      .where(eq(ScheduledSocialPosts.id, row.id));
-    return { ok: false, error: msg };
-  }
-
-  const [conn] = await db
-    .select()
-    .from(SocialOAuthConnections)
-    .where(
-      and(
-        eq(SocialOAuthConnections.clerkUserId, userId),
-        eq(SocialOAuthConnections.provider, "youtube"),
-      ),
-    )
-    .limit(1);
-
-  if (!conn) {
-    const now = new Date().toISOString();
-    await db
-      .update(ScheduledSocialPosts)
-      .set({
-        status: "failed",
-        lastError: "YouTube is not connected.",
-        updatedAt: now,
-      })
-      .where(eq(ScheduledSocialPosts.id, row.id));
-    return { ok: false, error: "YouTube is not connected." };
-  }
-
-  try {
-    const up = await uploadYoutubeVideoFromUrl({
-      accessToken: conn.accessToken,
-      refreshToken: conn.refreshToken,
-      publishAt: publishAt.toISOString(),
-      categoryId: row.youtubeCategoryId ?? "22",
-      tags: parseYoutubeTagsFromUserInput(row.youtubeTags ?? ""),
-      onAccessTokenRefresh: async (next) => {
-        await db
-          .update(SocialOAuthConnections)
-          .set({
-            accessToken: next.accessToken,
-            expiresAt: next.expiresAtIso,
-            updatedAt: new Date().toISOString(),
-          })
-          .where(eq(SocialOAuthConnections.id, conn.id));
-      },
-      videoUrl: downloadUrl,
-      title: row.title,
-      description: row.description,
-    });
-
-    const now = new Date().toISOString();
-    if (!row.postTiktok) {
-      await db
-        .update(ScheduledSocialPosts)
-        .set({
-          youtubeVideoId: up.youtubeVideoId,
-          status: "completed",
-          lastError: null,
-          updatedAt: now,
-        })
-        .where(eq(ScheduledSocialPosts.id, row.id));
-    } else {
-      await db
-        .update(ScheduledSocialPosts)
-        .set({
-          youtubeVideoId: up.youtubeVideoId,
-          updatedAt: now,
-        })
-        .where(eq(ScheduledSocialPosts.id, row.id));
-    }
-    return { ok: true };
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    const now = new Date().toISOString();
-    await db
-      .update(ScheduledSocialPosts)
-      .set({
-        status: "failed",
-        lastError: `YouTube: ${message}`.slice(0, 2000),
-        updatedAt: now,
-      })
-      .where(eq(ScheduledSocialPosts.id, row.id));
-    return { ok: false, error: message };
-  }
+  return finalizeYoutubeScheduledUploadInternal(videoId, userId);
 }
 
 const PLAYER_DIALOG_SOURCE_PREFIX = "player-dialog-";
@@ -495,39 +601,125 @@ function playerDialogSourceJobId(videoId: number) {
   return `${PLAYER_DIALOG_SOURCE_PREFIX}${videoId}`;
 }
 
-export type VideoSocialUploadStatus = {
-  youtubeUploaded: boolean;
-  tiktokUploaded: boolean;
+const EMPTY_SOCIAL_STATUS: VideoSocialUploadStatus = {
+  youtubeUploaded: false,
+  tiktokUploaded: false,
+  postYoutube: false,
+  postTiktok: false,
+  scheduledAt: null,
+  status: null,
+  title: null,
+  description: null,
+  youtubeTags: null,
+  youtubeCategoryId: null,
+  lastError: null,
 };
+
+function mapSocialUploadRow(
+  row: {
+    youtubeVideoId: string | null;
+    tiktokPublishId: string | null;
+    postYoutube: boolean;
+    postTiktok: boolean;
+    scheduledAt: string;
+    status: string;
+    title: string;
+    description: string;
+    youtubeTags: string | null;
+    youtubeCategoryId: string | null;
+    lastError: string | null;
+  } | undefined,
+): VideoSocialUploadStatus {
+  if (!row) return { ...EMPTY_SOCIAL_STATUS };
+  return {
+    youtubeUploaded: Boolean(row.youtubeVideoId),
+    tiktokUploaded: Boolean(row.tiktokPublishId),
+    postYoutube: row.postYoutube,
+    postTiktok: row.postTiktok,
+    scheduledAt: row.scheduledAt,
+    status: row.status,
+    title: row.title || null,
+    description: row.description || null,
+    youtubeTags: row.youtubeTags ?? null,
+    youtubeCategoryId: row.youtubeCategoryId ?? null,
+    lastError: row.lastError ?? null,
+  };
+}
 
 export async function getVideoSocialUploadStatus(
   videoId: number,
 ): Promise<VideoSocialUploadStatus> {
   const { userId } = await auth();
-  if (!userId) {
-    return { youtubeUploaded: false, tiktokUploaded: false };
-  }
+  if (!userId) return { ...EMPTY_SOCIAL_STATUS };
 
   const rows = await db
     .select({
       youtubeVideoId: ScheduledSocialPosts.youtubeVideoId,
       tiktokPublishId: ScheduledSocialPosts.tiktokPublishId,
+      postYoutube: ScheduledSocialPosts.postYoutube,
+      postTiktok: ScheduledSocialPosts.postTiktok,
+      scheduledAt: ScheduledSocialPosts.scheduledAt,
+      status: ScheduledSocialPosts.status,
+      title: ScheduledSocialPosts.title,
+      description: ScheduledSocialPosts.description,
+      youtubeTags: ScheduledSocialPosts.youtubeTags,
+      youtubeCategoryId: ScheduledSocialPosts.youtubeCategoryId,
+      lastError: ScheduledSocialPosts.lastError,
     })
     .from(ScheduledSocialPosts)
     .where(
       and(
         eq(ScheduledSocialPosts.clerkUserId, userId),
-        eq(ScheduledSocialPosts.sourceJobId, playerDialogSourceJobId(videoId)),
+        eq(ScheduledSocialPosts.videoId, videoId),
       ),
     )
     .orderBy(desc(ScheduledSocialPosts.updatedAt))
     .limit(1);
 
-  const row = rows[0];
-  return {
-    youtubeUploaded: Boolean(row?.youtubeVideoId),
-    tiktokUploaded: Boolean(row?.tiktokPublishId),
-  };
+  return mapSocialUploadRow(rows[0]);
+}
+
+export async function getVideoSocialUploadStatuses(
+  videoIds: number[],
+): Promise<Record<number, VideoSocialUploadStatus>> {
+  const { userId } = await auth();
+  const out: Record<number, VideoSocialUploadStatus> = {};
+  if (!userId || videoIds.length === 0) return out;
+
+  const rows = await db
+    .select({
+      videoId: ScheduledSocialPosts.videoId,
+      youtubeVideoId: ScheduledSocialPosts.youtubeVideoId,
+      tiktokPublishId: ScheduledSocialPosts.tiktokPublishId,
+      postYoutube: ScheduledSocialPosts.postYoutube,
+      postTiktok: ScheduledSocialPosts.postTiktok,
+      scheduledAt: ScheduledSocialPosts.scheduledAt,
+      status: ScheduledSocialPosts.status,
+      title: ScheduledSocialPosts.title,
+      description: ScheduledSocialPosts.description,
+      youtubeTags: ScheduledSocialPosts.youtubeTags,
+      youtubeCategoryId: ScheduledSocialPosts.youtubeCategoryId,
+      lastError: ScheduledSocialPosts.lastError,
+    })
+    .from(ScheduledSocialPosts)
+    .where(
+      and(
+        eq(ScheduledSocialPosts.clerkUserId, userId),
+        inArray(ScheduledSocialPosts.videoId, videoIds),
+      ),
+    )
+    .orderBy(desc(ScheduledSocialPosts.updatedAt));
+
+  for (const id of videoIds) {
+    out[id] = { ...EMPTY_SOCIAL_STATUS };
+  }
+  const filled = new Set<number>();
+  for (const row of rows) {
+    if (filled.has(row.videoId)) continue;
+    out[row.videoId] = mapSocialUploadRow(row);
+    filled.add(row.videoId);
+  }
+  return out;
 }
 
 export async function saveScheduledSocialUploadForVideo(
@@ -564,19 +756,19 @@ export async function saveScheduledSocialUploadForVideo(
     : YOUTUBE_DEFAULT_CATEGORY_ID;
   const youtubeTags = String(payload.youtubeTags ?? "").slice(0, 2000);
 
-  const sourceJobId = playerDialogSourceJobId(videoId);
-
   const existingRows = await db
     .select()
     .from(ScheduledSocialPosts)
     .where(
       and(
         eq(ScheduledSocialPosts.clerkUserId, userId),
-        eq(ScheduledSocialPosts.sourceJobId, sourceJobId),
+        eq(ScheduledSocialPosts.videoId, videoId),
       ),
     )
+    .orderBy(desc(ScheduledSocialPosts.updatedAt))
     .limit(1);
   const existing = existingRows[0];
+  const sourceJobId = existing?.sourceJobId ?? playerDialogSourceJobId(videoId);
 
   if (postYt && existing?.youtubeVideoId) {
     return { ok: false, error: "Video is already uploaded to YouTube." };

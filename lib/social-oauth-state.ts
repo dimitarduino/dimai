@@ -14,11 +14,14 @@ function oauthStateSecret(): string {
 const ALLOWED_OAUTH_RETURN_PATHS = new Set(["/app/shorts", "/app/shorts/create"]);
 
 const PUBLISH_PATH_RE = /^\/app\/shorts\/publish\/\d+$/;
+const SERIES_SCHEDULE_PATH_RE =
+  /^\/app\/shorts\/series\/[0-9a-f-]{36}\/schedule$/i;
 
 function sanitizeReturnPath(input: string | undefined): string {
   if (!input) return "/app/shorts";
   if (ALLOWED_OAUTH_RETURN_PATHS.has(input)) return input;
   if (PUBLISH_PATH_RE.test(input)) return input;
+  if (SERIES_SCHEDULE_PATH_RE.test(input)) return input;
   return "/app/shorts";
 }
 

@@ -1,261 +1,56 @@
-import { NextResponse } from 'next/server';
-import { db } from '@/configs/db';
-import { VideoGenerationJobs, VideoData, Users } from '@/configs/schema';
-import { eq } from 'drizzle-orm';
-import axios from 'axios';
-import { tryEnqueueScheduledSocialPublish } from '@/lib/enqueue-scheduled-social';
-import { resolveShortsBackgroundMusic } from '@/lib/shorts-background-music';
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
-export async function POST(req) {
+import { db } from "@/configs/db";
+import { VideoGenerationJobs } from "@/configs/schema";
+import { runVideoGenerationJob } from "@/lib/run-video-generation-job";
+
+/** Allow full 5-part series in one request when not using Inngest. */
+export const maxDuration = 300;
+
+export async function POST(req: Request) {
+  let jobId: string | undefined;
   try {
-    const { jobId } = await req.json();
+    const body = await req.json();
+    jobId = body.jobId;
 
     if (!jobId) {
-      return NextResponse.json({ error: 'jobId is required' }, { status: 400 });
+      return NextResponse.json({ error: "jobId is required" }, { status: 400 });
     }
 
-    // Process the job directly (fallback when Inngest isn't available)
     const job = await db
       .select()
       .from(VideoGenerationJobs)
       .where(eq(VideoGenerationJobs.jobId, jobId))
       .limit(1);
 
-    if (!job || job.length === 0) {
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    if (!job[0]) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
     const jobData = job[0];
 
-    if (jobData.status !== 'pending' && jobData.status !== 'processing') {
-      return NextResponse.json({ error: 'Job already processed' }, { status: 400 });
+    if (jobData.status !== "pending" && jobData.status !== "processing") {
+      return NextResponse.json({ error: "Job already processed" }, { status: 400 });
     }
 
-    // Start processing
-    await db
-      .update(VideoGenerationJobs)
-      .set({
-        status: 'processing',
-        progress: { step: 'generating_script', percentage: 10 },
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(VideoGenerationJobs.jobId, jobId));
+    const result = await runVideoGenerationJob(jobId);
+    return NextResponse.json({ success: true, ...result });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error processing job:", error);
 
-    try {
-      const formData = jobData.formData as Record<string, unknown>;
-      
-      // Step 1: Generate video script
-      const prompt = `Write a script to generate 60 seconds video on topic: "${String(formData.topic ?? "")}" along with AI image prompt in ${String(formData.style ?? "")} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, ${String(formData.comment ?? "")}. Give me JSON only and make it safe for NSFW check. Result should be in this style: [{imagePrompt: '', contentText: ''}]`;
-
+    if (jobId) {
       await db
         .update(VideoGenerationJobs)
         .set({
-          progress: { step: 'generating_script', percentage: 20 },
+          status: "failed",
+          error: message,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      const scriptRes = await axios.post(`${getBaseUrl()}/api/get-video-script`, { prompt });
-      
-      const videoScript = (scriptRes.data as Record<string, any>).result as Array<{
-        contentText: string;
-        imagePrompt: string;
-      }>;
-
-      // Step 2: Generate audio
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          progress: { step: 'generating_audio', percentage: 40 },
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      let script = ``;
-      const id = `audio-${jobId}`;
-      videoScript.forEach(item => {
-        script += item.contentText + " ";
-      });
-
-      const audioRes = await axios.post(`${getBaseUrl()}/api/generate-audio`, {
-        id,
-        text: script,
-        gender: formData.gender,
-        voice: formData.voice,
-      });
-      const audioFileUrl = (audioRes.data as Record<string, any>).result as string;
-
-      // Step 3: Generate captions
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          progress: { step: 'generating_captions', percentage: 60 },
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      const captionRes = await axios.post(`${getBaseUrl()}/api/generate-caption`, {
-        audioUrl: audioFileUrl,
-      });
-      const captions = (captionRes.data as Record<string, any>).result;
-
-      // Step 4: Generate images
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          progress: { step: 'generating_images', percentage: 80 },
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      const images: string[] = [];
-      for (const item of videoScript) {
-        const imageRes = await axios.post(`${getBaseUrl()}/api/generate-image`, {
-          prompt: item.imagePrompt + " - Make it safe for NSFW",
-        });
-        images.push((imageRes.data as Record<string, any>).result as string);
-      }
-
-      // Step 5: Save video data
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          progress: { step: 'saving', percentage: 90 },
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      // Get caption style
-      const captionsData = [{
-        name: "YOUTUBER",
-        classesCaption: {
-          color: '#eab308',
-          cursor: 'pointer',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-        }
-      }, {
-        name: "Superme",
-        classesCaption: {
-          color: '#ffffff',
-          cursor: 'pointer',
-          fontWeight: 700,
-          fontStyle: 'italic',
-          filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-        }
-      }, {
-        name: "NEON",
-        classesCaption: {
-          color: '#22c55e',
-          cursor: 'pointer',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-        }
-      }, {
-        name: "GLITCH",
-        classesCaption: {
-          color: '#ec4899', 
-          cursor: 'pointer',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-        }
-      }, {
-        name: "FIRE",
-        classesCaption: {
-          color: '#ef4444',
-          cursor: 'pointer',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-        }
-      }];
-
-      const captionStyle = captionsData.find(c => c.name == formData.caption)?.classesCaption || captionsData[0].classesCaption;
-
-      // Get the user email from formData (we store it there)
-      const userEmail =
-        String((jobData.formData as Record<string, unknown>)?.email ?? "") ||
-        String(jobData.userId ?? "");
-
-      const bgMusic = resolveShortsBackgroundMusic(String(formData.backgroundMusicId ?? "none"));
-      
-      const result = await db.insert(VideoData).values({
-        script: videoScript,
-        audio: audioFileUrl,
-        captionStyle: captionStyle,
-        captions: captions,
-        images: images,
-        createdBy: userEmail,
-        backgroundMusic: bgMusic.url || null,
-      }).returning({ id: VideoData.id });
-
-      const videoId = result[0].id;
-
-      await tryEnqueueScheduledSocialPublish({
-        formData: formData as Record<string, unknown>,
-        videoId,
-        sourceJobId: jobId,
-        clerkUserId: String(
-          (formData as Record<string, unknown>).userId ?? "",
-        ),
-      });
-
-      // Update user credits - use email to find user
-      const user = await db
-        .select()
-        .from(Users)
-        .where(eq(Users.email, userEmail))
-        .limit(1);
-
-        console.log(user);
-
-      const u = user[0];
-      if (u) {
-        await db
-          .update(Users)
-          .set({
-            credits: (u.credits ?? 0) - 10,
-          })
-          .where(eq(Users.email, userEmail));
-      }
-
-      // Update job status to completed
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          status: 'completed',
-          progress: { step: 'completed', percentage: 100 },
-          result: { videoId },
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      return NextResponse.json({ success: true, videoId });
-    } catch (error) {
-      console.error('Error processing job:', error);
-      
-      // Update job status to failed
-      await db
-        .update(VideoGenerationJobs)
-        .set({
-          status: 'failed',
-          error: error.message || 'Unknown error occurred',
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(VideoGenerationJobs.jobId, jobId));
-
-      return NextResponse.json({ error: error.message }, { status: 500 });
     }
-  } catch (error) {
-    console.error('Error in process-video-job:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
-function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-}
-

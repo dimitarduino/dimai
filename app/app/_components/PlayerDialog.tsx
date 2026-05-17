@@ -16,9 +16,7 @@ import { VideoData } from "@/configs/schema";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { proveriPoeni } from "@/lib/utils";
 import {
-  deductUserCredits,
   getVideoDataByIdForOwner,
   setVideoDownloadUrlForOwner,
 } from "@/app/app/_actions/dashboard-data";
@@ -89,13 +87,7 @@ function PlayerDialog({
   }, [openDialog]);
 
   const exportVideo = async () => {
-    if (!proveriPoeni(userDetail?.credits ?? 0, 2)) {
-      toast("Insufficient credits! Please recharge to generate a video.");
-      return;
-    }
-
-    const email = user?.primaryEmailAddress?.emailAddress;
-    if (!email || !userDetail || !setUserDetail) {
+    if (!user?.primaryEmailAddress?.emailAddress) {
       toast("Sign in to export.");
       return;
     }
@@ -112,9 +104,6 @@ function PlayerDialog({
         await setVideoDownloadUrlForOwner(videoId, res.data.result);
         toast.success("Video exported. You can upload to social media next.");
       }
-
-      const slednoPoeni = await deductUserCredits(2);
-      setUserDetail((prev) => (prev ? { ...prev, credits: slednoPoeni } : prev));
     } catch (err: unknown) {
       setLoading(false);
       const message =
@@ -191,7 +180,7 @@ function PlayerDialog({
                   onClick={() => void exportVideo()}
                   className="py-6 cursor-pointer text-white dark:text-white"
                 >
-                  Export (2 credits)
+                  Export MP4 (free)
                 </Button>
               )}
             </div>

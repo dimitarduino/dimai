@@ -7,11 +7,10 @@ import VideosDashboard from "@/app/app/_components/VideosDashboard";
 import EmptyState from "@/app/app/_components/EmptyState";
 import { toast } from "sonner";
 import {
-  listMyVideoData,
+  listMyShortsLibrary,
   getBatchVideoJobStatuses,
 } from "@/app/app/_actions/dashboard-data";
-import { InferSelectModel } from "drizzle-orm";
-import { VideoData } from "@/configs/schema";
+import type { ShortsLibraryItem } from "@/lib/shorts-library";
 import CustomLoading from "../_components/CustomLoading";
 
 function Dashboard() {
@@ -20,7 +19,7 @@ function Dashboard() {
     user?.primaryEmailAddress?.emailAddress,
   );
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [videos, setVideos] = useState<InferSelectModel<typeof VideoData>[]>([]);
+  const [libraryItems, setLibraryItems] = useState<ShortsLibraryItem[]>([]);
   const [nextCursor, setNextCursor] = useState<number | undefined>(undefined);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [progressVideos, setProgressVideos] = useState(() => {
@@ -38,10 +37,10 @@ function Dashboard() {
   const loadInitial = useCallback(async () => {
     if (!userLocal) return;
     try {
-      const { items, nextCursor: next } = await listMyVideoData({
+      const { items, nextCursor: next } = await listMyShortsLibrary({
         limit: 40,
       });
-      setVideos(items);
+      setLibraryItems(items);
       setLoaded(true);
       setNextCursor(next);
     } catch (error) {
@@ -108,11 +107,11 @@ function Dashboard() {
     if (nextCursor == null || loadingMore || !userLocal) return;
     setLoadingMore(true);
     try {
-      const { items, nextCursor: next } = await listMyVideoData({
+      const { items, nextCursor: next } = await listMyShortsLibrary({
         limit: 40,
         cursor: nextCursor,
       });
-      setVideos((prev) => prev ? [...prev, ...items] : prev);
+      setLibraryItems((prev) => (prev ? [...prev, ...items] : prev));
       setNextCursor(next);
     } catch (e) {
       console.error(e);
@@ -137,8 +136,13 @@ function Dashboard() {
         </Link>
       </div>
 
-      {videos.length == 0 ? loaded ? <EmptyState /> : <CustomLoading title="Loading your videos..." loading={true} /> : null}
-      {videos.length > 0 && <VideosDashboard videoList={videos} />}
+      {libraryItems.length == 0 ? loaded ? <EmptyState /> : <CustomLoading title="Loading your videos..." loading={true} /> : null}
+      {libraryItems.length > 0 && (
+        <VideosDashboard
+          libraryItems={libraryItems}
+          onItemDeleted={() => void loadInitial()}
+        />
+      )}
       {nextCursor != null && (
         <div className="mt-8 flex justify-center">
           <Button
