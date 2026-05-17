@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { getAppBaseUrl } from "@/lib/app-base-url";
+import { getTikTokOAuthRedirectUri } from "@/lib/app-base-url";
 import { encodeOAuthState } from "@/lib/social-oauth-state";
 import {
   generateTikTokCodeVerifier,
@@ -23,9 +23,12 @@ export async function GET(req: Request) {
   }
 
   const { searchParams } = new URL(req.url);
-  const returnTo = searchParams.get("returnTo") ?? undefined;
+  const returnTo =
+    searchParams.get("returnTo") ??
+    searchParams.get("returnPath") ??
+    undefined;
 
-  const redirectUri = `${getAppBaseUrl()}/api/oauth/tiktok/callback`;
+  const redirectUri = getTikTokOAuthRedirectUri(req);
   const codeVerifier = generateTikTokCodeVerifier();
   const codeChallenge = tiktokCodeChallengeFromVerifier(codeVerifier);
   const state = encodeOAuthState({

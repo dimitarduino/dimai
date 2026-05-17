@@ -60,8 +60,8 @@ export default function SocialPlatformConnect({
   }, [searchParams, loadConnections]);
 
   const connect = (provider: "youtube" | "tiktok") => {
-    const path = encodeURIComponent(oauthReturnPath);
-    window.location.href = `/api/oauth/${provider}/authorize?returnPath=${path}`;
+    const q = new URLSearchParams({ returnTo: oauthReturnPath });
+    window.location.href = `/api/oauth/${provider}/authorize?${q.toString()}`;
   };
 
   const disconnect = async (provider: "youtube" | "tiktok") => {

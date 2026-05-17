@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/configs/db";
 import { SocialOAuthConnections } from "@/configs/schema";
-import { getAppBaseUrl } from "@/lib/app-base-url";
+import { getAppBaseUrl, getYoutubeOAuthRedirectUri } from "@/lib/app-base-url";
 import { decodeOAuthState } from "@/lib/social-oauth-state";
 
 export async function GET(req: Request) {
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     return redirectError("server_missing_google_oauth");
   }
 
-  const redirectUri = `${base}/api/oauth/youtube/callback`;
+  const redirectUri = getYoutubeOAuthRedirectUri(req);
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

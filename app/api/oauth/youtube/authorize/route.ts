@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { getAppBaseUrl } from "@/lib/app-base-url";
+import { getYoutubeOAuthRedirectUri } from "@/lib/app-base-url";
 import { encodeOAuthState } from "@/lib/social-oauth-state";
 
 export async function GET(req: Request) {
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const returnTo = searchParams.get("returnTo") ?? undefined;
 
-  const redirectUri = `${getAppBaseUrl()}/api/oauth/youtube/callback`;
+  const redirectUri = getYoutubeOAuthRedirectUri(req);
   const state = encodeOAuthState({
     clerkUserId: userId,
     provider: "youtube",

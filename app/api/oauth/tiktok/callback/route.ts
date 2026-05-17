@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/configs/db";
 import { SocialOAuthConnections } from "@/configs/schema";
-import { getAppBaseUrl } from "@/lib/app-base-url";
+import { getAppBaseUrl, getTikTokOAuthRedirectUri } from "@/lib/app-base-url";
 import { decodeOAuthState } from "@/lib/social-oauth-state";
 
 export async function GET(req: Request) {
@@ -60,7 +60,7 @@ export async function GET(req: Request) {
     return redirectError("server_missing_tiktok_oauth");
   }
 
-  const redirectUri = `${base}/api/oauth/tiktok/callback`;
+  const redirectUri = getTikTokOAuthRedirectUri(req);
   const tokenRes = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
