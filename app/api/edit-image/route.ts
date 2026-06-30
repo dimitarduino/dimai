@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
                     images: [imageUrl],
                     prompt,
                     aspect_ratio: "match_input_image",
-                    disable_safety_checker: false,
+                    disable_safety_checker: true,
                 }
             }
         );
