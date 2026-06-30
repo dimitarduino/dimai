@@ -22,11 +22,13 @@ export async function POST(req: NextRequest) {
         }
 
         const output = await replicate.run(
-            "reve/edit-fast",
+            "prunaai/p-image-edit",
             {
                 input: {
-                    image: imageUrl,
-                    prompt: prompt
+                    images: [imageUrl],
+                    prompt,
+                    aspect_ratio: "match_input_image",
+                    disable_safety_checker: false,
                 }
             }
         );
@@ -37,8 +39,8 @@ export async function POST(req: NextRequest) {
           responseType: "arraybuffer",
         });
 
-        const base64 = `data:image/png;base64,${Buffer.from(resp.data).toString('base64')}`;
-        const storageRef = ref(storage, `edited_images/${Date.now()}.png`);
+        const base64 = `data:image/jpeg;base64,${Buffer.from(resp.data).toString('base64')}`;
+        const storageRef = ref(storage, `edited_images/${Date.now()}.jpeg`);
 
         await uploadString(storageRef, base64, 'data_url');
 
