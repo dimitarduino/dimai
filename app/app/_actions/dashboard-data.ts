@@ -2,7 +2,7 @@
 
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { and, asc, desc, eq, inArray, isNull, lt } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 
 import { db } from "@/configs/db";
@@ -518,11 +518,11 @@ export async function deductUserCredits(kolkuMinus: number): Promise<number> {
   // Prevents race conditions where two concurrent requests both pass a balance check.
   const result = await db
     .update(Users)
-    .set({ credits: db.$sql`"credits" - ${kolkuMinus}` as unknown as number })
+    .set({ credits: sql`"credits" - ${kolkuMinus}` as unknown as number })
     .where(
       and(
         eq(Users.email, email),
-        db.$sql`"credits" >= ${kolkuMinus}` as unknown as ReturnType<typeof eq>,
+        sql`"credits" >= ${kolkuMinus}` as unknown as ReturnType<typeof eq>,
       ),
     )
     .returning({ credits: Users.credits });
