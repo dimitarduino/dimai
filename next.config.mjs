@@ -6,9 +6,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   // This is the important one:
   output: 'standalone',
   /** Native deps that should not be bundled on the server */
@@ -21,6 +18,8 @@ const nextConfig = {
     "protobufjs",
   ],
   images: {
+    unoptimized: true,
+    qualities: [40, 55, 65, 75, 82],
     remotePatterns: [
       {
         protocol: "https",
@@ -38,7 +37,39 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.dimnai.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://replicate.delivery https://img.clerk.com; font-src 'self' data:; connect-src 'self' https://api.replicate.com https://api.openai.com https://clerk.dimnai.com https://*.clerk.accounts.dev; frame-src 'self' https://challenges.cloudflare.com; media-src 'self' https://cdn.pixabay.com https://incompetech.com https://firebasestorage.googleapis.com blob:;",
+          },
+        ],
+      },
+    ];
   },
   turbopack: {
     /** Avoid wrong workspace root when multiple lockfiles exist on the machine */

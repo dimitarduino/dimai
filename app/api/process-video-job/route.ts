@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/configs/db";
 import { VideoGenerationJobs } from "@/configs/schema";
@@ -11,6 +12,11 @@ export const maxDuration = 300;
 export async function POST(req: Request) {
   let jobId: string | undefined;
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     jobId = body.jobId;
 

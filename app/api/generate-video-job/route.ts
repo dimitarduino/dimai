@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from "@clerk/nextjs/server";
 import { inngest } from '@/lib/inngest';
 import { db } from '@/configs/db';
 import { VideoGenerationJobs } from '@/configs/schema';
@@ -31,9 +32,14 @@ async function processJobDirectly(jobId) {
 
 export async function POST(req) {
   try {
-    const { formData, userId, email } = await req.json();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    if (!formData || !userId || !email) {
+    const { formData, userId: clientUserId, email } = await req.json();
+
+    if (!formData || !clientUserId || !email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 

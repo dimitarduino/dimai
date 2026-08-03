@@ -1,6 +1,7 @@
 import textToSpeech from "@google-cloud/text-to-speech";
 import { NextResponse } from "next/server";
 import path from "path";
+import { auth } from "@clerk/nextjs/server";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "configs/Firebase";
 import { buildGoogleTtsVoiceName } from "@/lib/google-tts-voice-name";
@@ -9,15 +10,25 @@ import { resolveSsmlGenderForShortsVoice } from "@/lib/shorts-curated-voices";
 let client;
 function getClient() {
     if (!client) {
-        client = new textToSpeech.TextToSpeechClient({
-            keyFilename: path.join(process.cwd(), "secrets/google-tts.json"),
-        });
+        if (process.env.GOOGLE_CREDENTIALS_JSON) {
+            const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+            client = new textToSpeech.TextToSpeechClient({ credentials });
+        } else {
+            client = new textToSpeech.TextToSpeechClient({
+                keyFilename: path.join(process.cwd(), "secrets/google-tts.json"),
+            });
+        }
     }
     return client;
 }
 
 export async function POST(req) {
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { text, id, gender, voice } = await req.json();
 
         if (!id || typeof id !== 'string') {

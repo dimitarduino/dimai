@@ -1,6 +1,6 @@
 "use server";
 
-import { isClerkAPIResponseError } from "@clerk/shared/error";
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { and, asc, desc, eq, inArray, isNull, lt } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
@@ -476,7 +476,8 @@ export async function listMyEditedImageSourcePairs() {
     })
     .from(editedImages)
     .where(eq(editedImages.createdBy, email))
-    .orderBy(desc(editedImages.id));
+    .orderBy(desc(editedImages.id))
+    .limit(200);
 }
 
 export async function deleteMyEditedImage(id: number): Promise<void> {
@@ -513,21 +514,24 @@ export async function deductUserCredits(kolkuMinus: number): Promise<number> {
     throw new Error("Invalid credit amount");
   }
 
-  const existing = await db
-    .select({ credits: Users.credits })
-    .from(Users)
-    .where(eq(Users.email, email))
-    .limit(1);
+  // Atomic deduction: single UPDATE that checks balance in the WHERE clause.
+  // Prevents race conditions where two concurrent requests both pass a balance check.
+  const result = await db
+    .update(Users)
+    .set({ credits: db.$sql`"credits" - ${kolkuMinus}` as unknown as number })
+    .where(
+      and(
+        eq(Users.email, email),
+        db.$sql`"credits" >= ${kolkuMinus}` as unknown as ReturnType<typeof eq>,
+      ),
+    )
+    .returning({ credits: Users.credits });
 
-  const current = Number(existing[0]?.credits ?? 0);
-  if (current < kolkuMinus) {
+  if (!result[0]) {
     throw new Error("Insufficient credits");
   }
 
-  const next = current - kolkuMinus;
-  await db.update(Users).set({ credits: next }).where(eq(Users.email, email));
-
-  return next;
+  return Number(result[0].credits);
 }
 
 export async function setVideoDownloadUrlForOwner(

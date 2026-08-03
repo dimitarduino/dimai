@@ -22,7 +22,7 @@ export default function ClerkWithThemeProvider({
   return (
     <ClerkProvider
       appearance={{
-        baseTheme,
+        theme: baseTheme,
         variables: { colorPrimary: "#059485" },
       }}
       signInUrl="/sign-in"

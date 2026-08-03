@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "configs/db";
 import { ChatConversations } from "configs/schema";
 import { eq } from "drizzle-orm";
@@ -6,6 +7,10 @@ import { eq } from "drizzle-orm";
 // GET - Fetch a specific conversation by ID
 export async function GET(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const conversationId = searchParams.get("id");
     const email = searchParams.get("email");
@@ -48,7 +53,7 @@ export async function GET(req) {
   } catch (error) {
     console.error("Error fetching conversation:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch conversation" },
+      { error: "Failed to fetch conversation" },
       { status: 500 }
     );
   }

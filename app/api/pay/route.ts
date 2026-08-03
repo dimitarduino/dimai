@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
-import Replicate from "replicate";
-import axios from "axios";
+import { auth } from "@clerk/nextjs/server";
 import { freemius } from "lib/reemius";
-import { storage } from "configs/Firebase";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 export async function POST(req) {
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const product = await freemius.api.product.retrieve();
-        console.log(product);
 
         return NextResponse.json({ result: product });
     } catch (error) {
-        console.log(error)
-        return NextResponse.json({ error: error }, { status: 500 });
+        console.error("Error retrieving product:", error);
+        return NextResponse.json({ error: "Failed to retrieve product info" }, { status: 500 });
     }
 }

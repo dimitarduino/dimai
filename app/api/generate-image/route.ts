@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import Replicate from "replicate";
+import { auth } from "@clerk/nextjs/server";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 import { storage } from "configs/Firebase";
@@ -9,6 +10,11 @@ import { isReplicateNsfwError } from "@/lib/replicate-image-prompt";
 
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const replicate = new Replicate({
       auth: process.env.REPLICATE_APIKEY,
     });

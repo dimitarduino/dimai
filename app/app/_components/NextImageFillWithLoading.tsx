@@ -16,7 +16,7 @@ export type NextImageFillWithLoadingProps = Omit<ImageProps, "fill"> & {
 export function NextImageFillWithLoading({
   className,
   imageClassName,
-  onLoadingComplete,
+  onLoad,
   onError,
   loading = "lazy",
   decoding = "async",
@@ -54,9 +54,9 @@ export function NextImageFillWithLoading({
           "transition-opacity duration-300",
           loaded ? "opacity-100" : "opacity-0",
         )}
-        onLoadingComplete={(img) => {
+        onLoad={(e) => {
           setLoaded(true);
-          onLoadingComplete?.(img);
+          onLoad?.(e);
         }}
         onError={(e) => {
           setLoaded(true);
@@ -66,3 +66,4 @@ export function NextImageFillWithLoading({
     </div>
   );
 }
+

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { freemius } from "lib/reemius";
 import { db } from "configs/db";
 import { Users } from "configs/schema";
@@ -6,6 +7,11 @@ import { eq } from "drizzle-orm";
 
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { email, licenseKey } = await req.json();
 
     if (!email) {
@@ -38,10 +44,10 @@ export async function POST(req) {
 
     // Verify license key with Freemius
     try {
-      // Verify the license key
+      // TODO: Implement actual Freemius license verification when SDK supports it.
+      // For now, require auth at minimum so anonymous users cannot activate subscriptions.
       // const license = await freemius.api.licenses.retrieve({ licenseKey });
-      // For now, we'll just update the database
-      console.log("Registering license key:", licenseKey);
+      console.log("Registering license key for authenticated user:", userId);
     } catch (error) {
       console.error("Error verifying license key:", error);
       return NextResponse.json(
@@ -70,7 +76,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error registering subscription:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to register subscription" },
+      { error: "Failed to register subscription" },
       { status: 500 }
     );
   }

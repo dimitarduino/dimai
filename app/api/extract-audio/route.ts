@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import { execFile } from "child_process";
@@ -10,6 +11,11 @@ import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 export async function POST(req) {
     let tempVideoPath, tempAudioPath;
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { videoUrl } = await req.json();
         if (!videoUrl) {
             return NextResponse.json({ error: "No video file provided" }, { status: 400 });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { storage } from "@/configs/Firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import axios from "axios";
@@ -11,6 +12,11 @@ const TEMP_DIR = "/tmp";
 export async function POST(req) {
     let videoPath, audioPath, outputPath;
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { videoUrl, dubbedAudioUrl } = await req.json();
 
         if (!videoUrl || !dubbedAudioUrl) {

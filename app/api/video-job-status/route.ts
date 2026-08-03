@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
+import { auth } from "@clerk/nextjs/server";
 import { db } from '@/configs/db';
 import { VideoGenerationJobs } from '@/configs/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const jobId = searchParams.get('jobId');
 
@@ -25,6 +31,7 @@ export async function GET(req) {
     return NextResponse.json(job[0]);
   } catch (error) {
     console.error('Error fetching job status:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch job status' }, { status: 500 });
   }
 }
+

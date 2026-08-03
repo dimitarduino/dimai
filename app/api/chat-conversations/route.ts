@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "configs/db";
 import { ChatConversations } from "configs/schema";
 import { eq, desc } from "drizzle-orm";
@@ -6,6 +7,10 @@ import { eq, desc } from "drizzle-orm";
 // GET - Fetch all conversations for a user
 export async function GET(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
 
@@ -26,7 +31,7 @@ export async function GET(req) {
   } catch (error) {
     console.error("Error fetching conversations:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch conversations" },
+      { error: "Failed to fetch conversations" },
       { status: 500 }
     );
   }
@@ -35,6 +40,11 @@ export async function GET(req) {
 // POST - Create a new conversation or update existing one
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { conversationId, title, model, messages, email } = await req.json();
 
     if (!email) {
@@ -97,7 +107,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error saving conversation:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to save conversation" },
+      { error: "Failed to save conversation" },
       { status: 500 }
     );
   }
@@ -106,6 +116,10 @@ export async function POST(req) {
 // DELETE - Delete a conversation
 export async function DELETE(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const conversationId = searchParams.get("id");
     const email = searchParams.get("email");
@@ -152,7 +166,7 @@ export async function DELETE(req) {
   } catch (error) {
     console.error("Error deleting conversation:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to delete conversation" },
+      { error: "Failed to delete conversation" },
       { status: 500 }
     );
   }

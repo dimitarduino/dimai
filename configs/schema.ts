@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   integer,
   json,
   pgTable,
@@ -18,30 +19,37 @@ export const Users = pgTable('users', {
    credits: integer("credits").default(30)
 });
 
-export const VideoData = pgTable("videos", {
-   id: serial("id").primaryKey(),
-   script: json("script").notNull(),
-   audio: varchar("audio").notNull(),
-   captions: json("captions").notNull(),
-   captionStyle: json("captionStyle").notNull().default({
-      color: '#eab308',
-      cursor: 'pointer',
-      fontWeight: 800,
-      textTransform: 'uppercase',
-      filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
-    }),
-   images: varchar("images").array(),
-   createdBy: varchar("createdBy").notNull(),
-   downloadUrl: varchar("downloadUrl").default('').notNull(),
-   /** Optional background music URL (voiceover remains primary; mixed in Remotion export). */
-   backgroundMusic: varchar("backgroundMusic", { length: 2048 }),
-   /** Shared id for multi-part series; null for standalone shorts. */
-   seriesGroupId: varchar("seriesGroupId", { length: 64 }),
-   /** 0-based part index within the series. */
-   seriesPartIndex: integer("seriesPartIndex"),
-   /** Total parts in the series (e.g. 5). */
-   seriesPartTotal: integer("seriesPartTotal"),
-});
+export const VideoData = pgTable(
+   "videos",
+   {
+      id: serial("id").primaryKey(),
+      script: json("script").notNull(),
+      audio: varchar("audio").notNull(),
+      captions: json("captions").notNull(),
+      captionStyle: json("captionStyle").notNull().default({
+         color: '#eab308',
+         cursor: 'pointer',
+         fontWeight: 800,
+         textTransform: 'uppercase',
+         filter: 'drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1))',
+       }),
+      images: varchar("images").array(),
+      createdBy: varchar("createdBy").notNull(),
+      downloadUrl: varchar("downloadUrl").default('').notNull(),
+      /** Optional background music URL (voiceover remains primary; mixed in Remotion export). */
+      backgroundMusic: varchar("backgroundMusic", { length: 2048 }),
+      /** Shared id for multi-part series; null for standalone shorts. */
+      seriesGroupId: varchar("seriesGroupId", { length: 64 }),
+      /** 0-based part index within the series. */
+      seriesPartIndex: integer("seriesPartIndex"),
+      /** Total parts in the series (e.g. 5). */
+      seriesPartTotal: integer("seriesPartTotal"),
+   },
+   (t) => [
+      index("videos_created_by_idx").on(t.createdBy),
+      index("videos_series_group_idx").on(t.seriesGroupId),
+   ]
+);
 
 
 export const ImageVideo = pgTable("image_video", {
@@ -53,7 +61,7 @@ export const ImageVideo = pgTable("image_video", {
    mode: varchar("mode").default("standard").notNull(),
    video: varchar("video").notNull(),
    createdBy: varchar("createdBy").notNull()
-});
+}, (t) => [index("image_video_created_by_idx").on(t.createdBy)]);
 
 export const Subscribers = pgTable('subscribers', {
    id: serial("id").primaryKey(),
@@ -66,7 +74,7 @@ export const upscaledImages = pgTable('upscaled_images', {
    finalImage: varchar("finalImage").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("upscaled_images_created_by_idx").on(t.createdBy)]);
 
 export const removedbgImages = pgTable('removedbg_images', {
    id: serial("id").primaryKey(),
@@ -74,7 +82,7 @@ export const removedbgImages = pgTable('removedbg_images', {
    finalImage: varchar("finalImage").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("removedbg_images_created_by_idx").on(t.createdBy)]);
 
 export const expandedImages = pgTable('expanded_images', {
    id: serial("id").primaryKey(),
@@ -83,20 +91,27 @@ export const expandedImages = pgTable('expanded_images', {
    aspectRatio: varchar("aspectRatios").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("expanded_images_created_by_idx").on(t.createdBy)]);
 
-export const VideoGenerationJobs = pgTable('video_generation_jobs', {
-   id: serial("id").primaryKey(),
-   jobId: varchar("jobId", { length: 255 }).notNull().unique(),
-   userId: varchar("userId", { length: 255 }).notNull(),
-   status: varchar("status", { length: 50 }).notNull().default('pending'), // pending, processing, completed, failed
-   progress: json("progress").default({}),
-   formData: json("formData").notNull(),
-   result: json("result"), // stores videoId when completed
-   error: varchar("error", { length: 500 }),
-   createdAt: varchar("createdAt", { length: 255 }).notNull(),
-   updatedAt: varchar("updatedAt", { length: 255 }).notNull()
-});
+export const VideoGenerationJobs = pgTable(
+   'video_generation_jobs',
+   {
+      id: serial("id").primaryKey(),
+      jobId: varchar("jobId", { length: 255 }).notNull().unique(),
+      userId: varchar("userId", { length: 255 }).notNull(),
+      status: varchar("status", { length: 50 }).notNull().default('pending'), // pending, processing, completed, failed
+      progress: json("progress").default({}),
+      formData: json("formData").notNull(),
+      result: json("result"), // stores videoId when completed
+      error: varchar("error", { length: 500 }),
+      createdAt: varchar("createdAt", { length: 255 }).notNull(),
+      updatedAt: varchar("updatedAt", { length: 255 }).notNull()
+   },
+   (t) => [
+      index("video_jobs_user_id_idx").on(t.userId),
+      index("video_jobs_status_idx").on(t.status),
+   ]
+);
 
 export const SocialOAuthConnections = pgTable(
   "social_oauth_connections",
@@ -152,7 +167,7 @@ export const SwapFacesImages = pgTable('swap_faces_images', {
    finalImage: varchar("finalImage").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("swap_faces_images_created_by_idx").on(t.createdBy)]);
 
 export const EmojiGenerationImages = pgTable('emoji_generation_images', {
    id: serial("id").primaryKey(),
@@ -162,7 +177,7 @@ export const EmojiGenerationImages = pgTable('emoji_generation_images', {
    finalImage: varchar("finalImage").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("emoji_images_created_by_idx").on(t.createdBy)]);
 
 export const DubbingVideos = pgTable('dubbing_videos', {
    id: serial("id").primaryKey(),
@@ -171,7 +186,7 @@ export const DubbingVideos = pgTable('dubbing_videos', {
    language: varchar("language").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("dubbing_videos_created_by_idx").on(t.createdBy)]);
 
 export const ChatConversations = pgTable('chat_conversations', {
    id: serial("id").primaryKey(),
@@ -181,7 +196,7 @@ export const ChatConversations = pgTable('chat_conversations', {
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull(),
    updatedAt: varchar("updatedAt", {length: 255}).notNull()
-});
+}, (t) => [index("chat_conversations_created_by_idx").on(t.createdBy)]);
 
 export const editedImages = pgTable('edited_images', {
    id: serial("id").primaryKey(),
@@ -190,4 +205,4 @@ export const editedImages = pgTable('edited_images', {
    finalImage: varchar("finalImage").notNull(),
    createdBy: varchar("createdBy").notNull(),
    createdAt: varchar("createdAt", {length: 255}).notNull()
-});
+}, (t) => [index("edited_images_created_by_idx").on(t.createdBy)]);

@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "configs/db";
 import { Users } from "configs/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { email, credits } = await req.json();
 
     if (!email) {
@@ -55,7 +61,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error adding credits:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to add credits" },
+      { error: "Failed to add credits" },
       { status: 500 }
     );
   }

@@ -1,11 +1,6 @@
-import textToSpeech from "@google-cloud/text-to-speech";
-import { chatSession } from "configs/AiModel";
-import { NextResponse } from "next/server";
-import util from 'util'
-import fs from 'fs'
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "configs/Firebase";
+import { auth } from "@clerk/nextjs/server";
 import { AssemblyAI } from "assemblyai";
+import { NextResponse } from "next/server";
 
 const client = new AssemblyAI({
   apiKey: process.env.ASSEBLY_APIKEY ?? "",
@@ -13,6 +8,11 @@ const client = new AssemblyAI({
 
 
 export async function POST(req) {
+    const { userId } = await auth();
+    if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { audioUrl } = await req.json();
     const config = {
         audio_url: audioUrl
