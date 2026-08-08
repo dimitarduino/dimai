@@ -124,6 +124,8 @@ export default function ImageToImage() {
         setUploading(true);
         const storageRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
+        
+        console.log(uploadTask);
 
         uploadTask.on(
             "state_changed",
@@ -136,6 +138,7 @@ export default function ImageToImage() {
             },
             async () => {
                 const url = await getDownloadURL(uploadTask.snapshot.ref);
+                console.log(url);
                 setDownloadUrl(url);
                 setUploading(false);
 

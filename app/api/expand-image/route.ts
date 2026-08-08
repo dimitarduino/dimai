@@ -5,11 +5,11 @@ import axios from "axios";
 import { storage } from "configs/Firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
-export async function POST(req) {
+export async function POST(req: Request) {
     try {
         const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-
         const { imageUrl, aspectRatio } = await req.json();
+        console.log(imageUrl);
         const input = { image: imageUrl, aspect_ratio: aspectRatio };
 
         // bria/remove-background
@@ -24,7 +24,7 @@ export async function POST(req) {
 
         const downloadUrl = await getDownloadURL(storageRef);
         return NextResponse.json({ result: downloadUrl });
-    } catch (error) {
+    } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

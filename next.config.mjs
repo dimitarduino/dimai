@@ -65,7 +65,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.dimnai.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://replicate.delivery https://img.clerk.com; font-src 'self' data:; connect-src 'self' https://api.replicate.com https://api.openai.com https://clerk.dimnai.com https://*.clerk.accounts.dev; frame-src 'self' https://challenges.cloudflare.com; media-src 'self' https://cdn.pixabay.com https://incompetech.com https://firebasestorage.googleapis.com blob:;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.dimnai.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://replicate.delivery https://img.clerk.com; font-src 'self' data:; connect-src 'self' https://api.replicate.com https://api.openai.com https://clerk.dimnai.com https://*.clerk.accounts.dev https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com; frame-src 'self' https://challenges.cloudflare.com; media-src 'self' https://cdn.pixabay.com https://incompetech.com https://firebasestorage.googleapis.com blob:;",
           },
         ],
       },
