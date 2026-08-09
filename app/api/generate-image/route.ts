@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import Replicate from "replicate";
-import { auth } from "@clerk/nextjs/server";
+import { verifyInternalOrClerkAuth } from "@/lib/internal-auth";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 import { storage } from "configs/Firebase";
@@ -10,7 +10,7 @@ import { isReplicateNsfwError } from "@/lib/replicate-image-prompt";
 
 export async function POST(req) {
   try {
-    const { userId } = await auth();
+    const userId = await verifyInternalOrClerkAuth(req);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

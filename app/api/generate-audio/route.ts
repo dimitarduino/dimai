@@ -1,7 +1,7 @@
 import textToSpeech from "@google-cloud/text-to-speech";
 import { NextResponse } from "next/server";
 import path from "path";
-import { auth } from "@clerk/nextjs/server";
+import { verifyInternalOrClerkAuth } from "@/lib/internal-auth";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "configs/Firebase";
 import { buildGoogleTtsVoiceName } from "@/lib/google-tts-voice-name";
@@ -24,7 +24,7 @@ function getClient() {
 
 export async function POST(req) {
     try {
-        const { userId } = await auth();
+        const userId = await verifyInternalOrClerkAuth(req);
         if (!userId) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }

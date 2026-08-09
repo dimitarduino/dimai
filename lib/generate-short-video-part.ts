@@ -4,6 +4,7 @@ import { db } from "@/configs/db";
 import { VideoData } from "@/configs/schema";
 import { tryEnqueueScheduledSocialPublish } from "@/lib/enqueue-scheduled-social";
 import { generateSocialPublishMetadataFromScript } from "@/lib/generate-social-publish-metadata";
+import { INTERNAL_AUTH_HEADER } from "@/lib/internal-auth";
 import { resolveShortsBackgroundMusic } from "@/lib/shorts-background-music";
 import { resolveCaptionStyle } from "@/lib/shorts-caption-styles";
 import {
@@ -13,6 +14,14 @@ import {
   type SeriesScheduleConfig,
 } from "@/lib/shorts-series";
 import type { VideoScript, VideoScriptItem } from "@/types/videos";
+
+const INTERNAL_SECRET =
+  process.env.INTERNAL_API_SECRET ?? "dev-internal-secret-do-not-use-in-prod";
+
+/** Headers sent with every internal server-to-server API call. */
+const internalHeaders = {
+  [INTERNAL_AUTH_HEADER]: INTERNAL_SECRET,
+};
 
 function getBaseUrl(): string {
   return (
@@ -75,7 +84,10 @@ export async function generateShortVideoPart(
   const scriptRes: AxiosResponse<{ result: VideoScript }> = await axios.post(
     `${baseUrl}/api/get-video-script`,
     { prompt },
+    { headers: internalHeaders },
   );
+
+  console.log(scriptRes.data);
   const videoScript = scriptRes.data.result as VideoScript;
 
   await report("generating_audio", 25);
@@ -93,6 +105,7 @@ export async function generateShortVideoPart(
       gender: formData.gender,
       voice: formData.voice,
     },
+    { headers: internalHeaders },
   );
   const audioFileUrl = audioRes.data.result as string;
 
@@ -100,7 +113,7 @@ export async function generateShortVideoPart(
 
   const captionRes = await axios.post(`${baseUrl}/api/generate-caption`, {
     audioUrl: audioFileUrl,
-  });
+  }, { headers: internalHeaders });
   const captions = captionRes.data.result as string[];
 
   await report("generating_images", 60);
@@ -110,6 +123,7 @@ export async function generateShortVideoPart(
     const imageRes: AxiosResponse<{ result: string }> = await axios.post(
       `${baseUrl}/api/generate-image`,
       { prompt: item.imagePrompt },
+      { headers: internalHeaders },
     );
     images.push(imageRes.data.result as string);
   }

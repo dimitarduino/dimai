@@ -4,28 +4,25 @@ import { inngest } from '@/lib/inngest';
 import { db } from '@/configs/db';
 import { VideoGenerationJobs } from '@/configs/schema';
 import { useInngestForVideoJobs } from '@/lib/video-job-runner';
+import { runVideoGenerationJob } from '@/lib/run-video-generation-job';
+import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to process job directly when Inngest is not available
-async function processJobDirectly(jobId) {
+async function processJobDirectly(jobId: string) {
   try {
-    // Use absolute URL for internal API calls
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    
-    const response = await fetch(`${baseUrl}/api/process-video-job`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobId }),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log(response);
-      throw new Error(`Failed to process job: ${response.statusText} - ${errorText}`);
-    }
+    await runVideoGenerationJob(jobId);
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error in processJobDirectly:', error);
+    await db
+      .update(VideoGenerationJobs)
+      .set({
+        status: 'failed',
+        error: message,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(VideoGenerationJobs.jobId, jobId));
     throw error;
   }
 }

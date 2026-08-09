@@ -34,10 +34,25 @@ export async function renderShortVideoToMp4Url(
     throw new Error("AWS_SERVE_URL is not configured");
   }
 
-  const functions = await getFunctions({
+  if (!process.env.AWS_ACCESS_KEY_ID && process.env.REMOTION_AWS_ACCESS_KEY_ID) {
+    process.env.AWS_ACCESS_KEY_ID = process.env.REMOTION_AWS_ACCESS_KEY_ID;
+  }
+  if (!process.env.AWS_SECRET_ACCESS_KEY && process.env.REMOTION_AWS_SECRET_ACCESS_KEY) {
+    process.env.AWS_SECRET_ACCESS_KEY = process.env.REMOTION_AWS_SECRET_ACCESS_KEY;
+  }
+
+  let functions = await getFunctions({
     region: "us-east-1",
     compatibleOnly: true,
   });
+
+  if (!functions.length) {
+    functions = await getFunctions({
+      region: "us-east-1",
+      compatibleOnly: false,
+    });
+  }
+
   const functionName = functions[0]?.functionName;
   if (!functionName) {
     throw new Error("No Remotion Lambda function available");
