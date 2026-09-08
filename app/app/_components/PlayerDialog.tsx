@@ -57,8 +57,18 @@ function PlayerDialog({
   async function getVideoData() {
     if (videoId == null) return;
     const id = videoId;
-    const result = await getVideoDataByIdForOwner(id);
-    setVideoData(result ?? undefined);
+    try {
+      const result = await getVideoDataByIdForOwner(id);
+      setVideoData(result ?? undefined);
+      if (!result) {
+        toast.error("Could not load video data for preview/export.");
+      }
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Could not load video data.";
+      console.error("getVideoDataByIdForOwner failed:", e);
+      toast.error(message);
+    }
   }
 
   useEffect(() => {
@@ -87,8 +97,13 @@ function PlayerDialog({
   }, [openDialog]);
 
   const exportVideo = async () => {
-    if (!user?.primaryEmailAddress?.emailAddress) {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) {
       toast("Sign in to export.");
+      return;
+    }
+    if (videoId == null) {
+      toast.error("Missing video id — cannot export.");
       return;
     }
 
@@ -96,21 +111,38 @@ function PlayerDialog({
 
     try {
       const res = await axios.post<{ result?: string }>("/api/export-video", {
-        inputProps: videoData,
+        videoId,
+        email,
       });
       setLoading(false);
-      if (res.data.result && videoId != null) {
+      if (res.data.result) {
         setDownloadUrl(res.data.result);
-        await setVideoDownloadUrlForOwner(videoId, res.data.result);
+        // Server already persists downloadUrl via exportShortVideoById;
+        // best-effort sync if Clerk server profile works.
+        try {
+          await setVideoDownloadUrlForOwner(videoId, res.data.result);
+        } catch (e) {
+          console.warn("setVideoDownloadUrlForOwner skipped:", e);
+        }
         toast.success("Video exported. You can upload to social media next.");
       }
     } catch (err: unknown) {
       setLoading(false);
-      const message =
-        axios.isAxiosError(err) ? err.response?.data?.error : undefined;
-      toast.error(
-        typeof message === "string" ? message : "Error enountered",
-      );
+      const raw = axios.isAxiosError(err) ? err.response?.data?.error : undefined;
+      let message = "Export failed";
+      if (typeof raw === "string" && raw.trim()) {
+        message = raw;
+      } else if (raw && typeof raw === "object") {
+        try {
+          message = JSON.stringify(raw);
+        } catch {
+          message = "Export failed";
+        }
+      } else if (err instanceof Error && err.message) {
+        message = err.message;
+      }
+      console.error("Export MP4 error:", err);
+      toast.error(message);
     }
   };
 

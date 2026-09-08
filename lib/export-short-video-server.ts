@@ -26,6 +26,42 @@ function durationInFramesFromCaptions(captions: unknown): number {
   return Math.round((captionsMs / 1000) * 30) + bufferFrames;
 }
 
+/** Remotion Lambda errors are plain objects; String(err) becomes "[object Object]". */
+function formatRemotionRenderError(error: unknown): string {
+  if (error == null) return "Unknown Remotion error";
+  if (typeof error === "string") return error;
+  if (error instanceof Error) {
+    return error.message || error.name || "Unknown error";
+  }
+  if (typeof error === "object") {
+    const e = error as {
+      message?: unknown;
+      name?: unknown;
+      explanation?: unknown;
+      type?: unknown;
+      stack?: unknown;
+      frame?: unknown;
+      chunk?: unknown;
+    };
+    const parts: string[] = [];
+    if (typeof e.name === "string" && e.name) parts.push(e.name);
+    if (typeof e.type === "string" && e.type) parts.push(`(${e.type})`);
+    if (typeof e.message === "string" && e.message) parts.push(e.message);
+    if (typeof e.explanation === "string" && e.explanation) {
+      parts.push(e.explanation);
+    }
+    if (e.frame != null) parts.push(`frame=${String(e.frame)}`);
+    if (e.chunk != null) parts.push(`chunk=${String(e.chunk)}`);
+    if (parts.length > 0) return parts.join(": ");
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "Unserializable Remotion error";
+    }
+  }
+  return String(error);
+}
+
 export async function renderShortVideoToMp4Url(
   inputProps: ShortVideoExportInput,
 ): Promise<string> {
@@ -89,8 +125,9 @@ export async function renderShortVideoToMp4Url(
     }
     if (progress.fatalErrorEncountered) {
       const errMsg =
-        progress.errors?.map((e) => String(e)).join("; ") ||
+        progress.errors?.map(formatRemotionRenderError).filter(Boolean).join("; ") ||
         "Remotion render failed";
+      console.error("Remotion render fatal error:", progress.errors);
       throw new Error(errMsg);
     }
   }
